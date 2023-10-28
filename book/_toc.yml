@@ -1,0 +1,45 @@
+format: jb-book
+root: welcome
+
+parts:
+  - chapters:
+      - file: overview
+      - file: quick-start
+      - file: preprocessing/into
+        sections:
+          - title: Preprocessing
+            file: preprocessing/preprocessing
+          - title: Examples
+            file: preprocessing/examples
+      - file: datasets/into
+        sections:
+          - title: Datasets
+            file: datasets/datasets
+          - title: Mahnob
+            file: datasets/mahnob
+          - title: DEAP
+            file: datasets/deap
+          - title: SEED
+            file: datasets/seed
+          - title: SEED-IV
+            file: datasets/seed-iv
+          - title: DREAMER
+            file: datasets/dreamer
+      - file: models/into
+        sections:
+          - title: Models
+            file: models/models
+          - title: TSception
+            file: models/tsception
+          - title: EEGNet
+            file: models/eegnet
+          - title: DeepConvNet
+            file: models/deepconvnet
+          - title: Shallow ConvNet
+            file: models/shallow_convnet
+      - file: evaluation/into
+        sections:
+          - title: Tensorboard
+            file: evaluation/tensorboard
+          - title: Wandb
+            file: evaluation/wandb
