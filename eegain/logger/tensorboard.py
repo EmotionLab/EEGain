@@ -13,17 +13,17 @@ logger = logging.getLogger("Tensorboard")
 # SubjectLogger class for logging metrics for each subject
 class SubjectLogger:
     def __init__(
-        self, subject_id: int, writer_train: SummaryWriter, writer_test: SummaryWriter
+        self, subject_id: int, writer_train: SummaryWriter, writer_test: SummaryWriter, class_names: list[str]
     ):
         self.subject_id = subject_id
         self.writer_train = writer_train
         self.writer_test = writer_test
         self.metrics = {}
+        self.class_names = class_names
 
     def _log_confusion_matrix(self, value: float | list, step: int, data_part: str):
-        classes = ["low", "high"]
         df_cm = pd.DataFrame(
-            value, index=[i for i in classes], columns=[i for i in classes]
+            value, index=[i for i in self.class_names], columns=[i for i in self.class_names]
         )
         plt.figure(figsize=(12, 7))
         image = sn.heatmap(df_cm, annot=True).get_figure()
@@ -64,11 +64,13 @@ class SubjectLogger:
 
 # EmotionLogger class for handling the overall logging functionality
 class EmotionLogger:
-    def __init__(self, log_dir: str):
+    def __init__(self, log_dir: str, class_names: int):
         self.subject_loggers = {}
         self.writer = SummaryWriter(log_dir)
         self.writer_train = SummaryWriter(f"{log_dir}/train")
         self.writer_test = SummaryWriter(f"{log_dir}/test")
+        self.class_names = class_names
+        self.num_class = len(class_names)
 
         logger.info(f"Using Tensorboard logger")
         logger.info(
@@ -79,7 +81,7 @@ class EmotionLogger:
     def add_subject_logger(self, subject_id: int):
         if subject_id not in self.subject_loggers:
             self.subject_loggers[subject_id] = SubjectLogger(
-                subject_id, self.writer_train, self.writer_test
+                subject_id, self.writer_train, self.writer_test, self.class_names
             )
 
     def log_metric(
@@ -112,41 +114,41 @@ class EmotionLogger:
         i: int,
         data_part: str,
     ):
+
         self.log_metric(
-            subject_id, "accuracy", accuracy_score(test_actual, test_pred), i, data_part
+            subject_id, "accuracy",
+            accuracy_score(test_actual, test_pred), i, data_part
         )
         self.log_metric(
-            subject_id, "f1", f1_score(test_actual, test_pred), i, data_part
+            subject_id, "f1",
+            f1_score(test_actual, test_pred, average='binary' if self.num_class <= 2 else 'weighted'), i, data_part
         )
         self.log_metric(
-            subject_id, "recall", recall_score(test_actual, test_pred), i, data_part
+            subject_id, "recall",
+            recall_score(test_actual, test_pred, average='binary' if self.num_class <= 2 else 'weighted'), i, data_part
         )
         self.log_metric(
             subject_id,
             "precision",
-            precision_score(test_actual, test_pred),
-            i,
-            data_part,
+            precision_score(test_actual, test_pred, average='binary' if self.num_class <= 2 else 'weighted'), i, data_part
         )
         self.log_metric(
-            subject_id, "kappa", cohen_kappa_score(test_actual, test_pred), i, data_part
+            subject_id, "kappa",
+            cohen_kappa_score(test_actual, test_pred), i, data_part
         )
-        self.log_metric(
-            subject_id, "roc_auc", roc_auc_score(test_actual, test_pred), i, data_part
-        )
+        # self.log_metric(
+        #     subject_id, "roc_auc",
+        #     roc_auc_score(test_actual, test_pred, average='binary' if self.num_class <= 2 else 'weighted', multi_class='ovr'), i, data_part
+        # )
         self.log_metric(
             subject_id,
             "matthews_corrcoef",
-            matthews_corrcoef(test_actual, test_pred),
-            i,
-            data_part,
+            matthews_corrcoef(test_actual, test_pred), i, data_part
         )
         self.log_metric(
             subject_id,
             "confusion_matrix",
-            confusion_matrix(test_actual, test_pred),
-            i,
-            data_part,
+            confusion_matrix(test_actual, test_pred), i, data_part
         )
 
     def log_each_user_metrics(self, metric_names: list[str]):
@@ -187,7 +189,7 @@ class EmotionLogger:
                 "recall",
                 "precision",
                 "kappa",
-                "roc_auc",
+                # "roc_auc",
                 "matthews_corrcoef",
             ]
         )
@@ -198,7 +200,7 @@ class EmotionLogger:
                 "recall",
                 "precision",
                 "kappa",
-                "roc_auc",
+                # "roc_auc",
                 "matthews_corrcoef",
             ]
         )
