@@ -139,7 +139,7 @@ class SeedIV(EEGDataset):
                     ch_names=channels, sfreq=sampling_rate, ch_types="eeg"
                 )
                 raw_data = mne.io.RawArray(
-                    eeg_data, info
+                    eeg_data, info, verbose=False
                 )  # convert numpy ndarray to mne object
 
                 if self.transform:  # apply transformations

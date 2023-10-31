@@ -8,4 +8,6 @@
 5. to check the results: <br>
    - run <code>tensorboard --logdir ./logs </code>
    - logs will be saved in **log.log** file as well<br> 
+
+**[Struture of the framework](https://miro.com/app/board/uXjVMEB2nB0=/?share_link_id=710707650624)** <br>
    

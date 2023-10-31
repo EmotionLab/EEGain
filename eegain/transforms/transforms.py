@@ -77,7 +77,8 @@ class Filter:
         self.h_freq = h_freq
 
     def __call__(self, data) -> None:
-        data.filter(l_freq=self.l_freq, h_freq=self.h_freq, verbose=False)
+        iir_params = dict(order=8, ftype="butter")
+        data.filter(l_freq=self.l_freq, h_freq=self.h_freq, picks=None, method='iir', iir_params=iir_params, verbose=False)
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}(l_freq={self.l_freq}, h_freq={self.h_freq})"
