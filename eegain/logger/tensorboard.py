@@ -113,6 +113,7 @@ class EmotionLogger:
         test_actual: torch.Tensor,
         i: int,
         data_part: str,
+        loss=None,
     ):
 
         self.log_metric(
@@ -150,6 +151,12 @@ class EmotionLogger:
             "confusion_matrix",
             confusion_matrix(test_actual, test_pred), i, data_part
         )
+        if loss:
+            self.log_metric(
+                subject_id,
+                "loss",
+                loss, i, data_part
+            )
 
     def log_each_user_metrics(self, metric_names: list[str]):
         metrics_for_each_subject = {}

@@ -87,8 +87,8 @@ def run(
             model, test_dataloader, loss_fn
         )
 
-        logger.log(test_subject_ids[0], train_pred, train_actual, i, "train")
-        logger.log(test_subject_ids[0], test_pred, test_actual, i, "val")
+        logger.log(test_subject_ids[0], train_pred, train_actual, i, "train", train_loss)
+        logger.log(test_subject_ids[0], test_pred, test_actual, i, "val", test_loss)
 
     logger.log_summary()
 
@@ -140,7 +140,7 @@ transform = eegain.transforms.Construct(
 
 # -------------- Dataset --------------
 seed_dataset = SeedIV(
-    "path/to/seed/folder",
+    "/Users/raphaelkalandadze/Downloads/seed-iv",
     label_type="V",
     transform=transform,
 )
@@ -162,14 +162,14 @@ model = TSception(
 )
 model = model.to(device)
 
-optimizer = torch.optim.Adam(model.parameters(), lr=1e-3, weight_decay=0)
-loss_fn = nn.CrossEntropyLoss()
+optimizer = torch.optim.Adam(model.parameters(), lr=1e-5, weight_decay=0.1)
+loss_fn = nn.CrossEntropyLoss(label_smoothing=0.1)
 logger = EmotionLogger(log_dir="logs/", class_names=[0, 1, 2, 3])
 
 
 # -------------- Training --------------
 for loader in eegloader:
-    main.run(
+    run(
         model=model,
         train_dataloader=loader["train"],
         test_dataloader=loader["test"],

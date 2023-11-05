@@ -114,7 +114,6 @@ class SeedIV(EEGDataset):
             label_array(Dict[str, int]): labels for each recording
         """
 
-        subject_index = 3
         labels_file_path = self.root / Path("ReadMe.txt")
         path_to_channels_excel = self.root / Path("Channel Order.xlsx")
         channels_file = pd.read_excel(path_to_channels_excel, header=None)
@@ -128,9 +127,7 @@ class SeedIV(EEGDataset):
         for session in sessions:
             path_to_mat = self.root / Path("eeg_raw_data") / Path(str(session))
             mat_data = scipy.io.loadmat(path_to_mat)  # Get Matlab File
-            mat_data_values = list(mat_data.values())[
-                3:
-            ]  # Matlab file contains some not necessary info so let's remove it
+            mat_data_values = list(mat_data.values())[3:]  # Matlab file contains some not necessary info so let's remove it
             for trial in range(1, num_trials + 1):
                 eeg_data = mat_data_values[
                     trial - 1
