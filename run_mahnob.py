@@ -155,6 +155,16 @@ logger = EmotionLogger(log_dir="logs/", class_names=["low", "high"])
 
 # -------------- Training --------------
 for loader in eegloader:
+    model = TSception(
+        num_classes=2,
+        input_size=(1, 32, 512),
+        sampling_r=128,
+        num_t=15,
+        num_s=15,
+        hidden=32,
+        dropout_rate=0.5,
+    )
+    model = model.to(device)
     run(
         model=model,
         train_dataloader=loader["train"],
