@@ -150,25 +150,10 @@ seed_dataset = SeedIV(
 eegloader = EEGDataloader(seed_dataset, batch_size=32).loso()
 
 
-# -------------- Model --------------
-model = TSception(
-    num_classes=4,
-    input_size=(1, 32, 512),
-    sampling_r=128,
-    num_t=15,
-    num_s=15,
-    hidden=32,
-    dropout_rate=0.5,
-)
-model = model.to(device)
-
-optimizer = torch.optim.Adam(model.parameters(), lr=1e-5, weight_decay=0.1)
-loss_fn = nn.CrossEntropyLoss(label_smoothing=0.1)
-logger = EmotionLogger(log_dir="logs/", class_names=[0, 1, 2, 3])
-
-
 # -------------- Training --------------
+
 for loader in eegloader:
+    # -------------- Model --------------
     model = TSception(
         num_classes=2,
         input_size=(1, 32, 512),
@@ -179,6 +164,9 @@ for loader in eegloader:
         dropout_rate=0.5,
     )
     model = model.to(device)
+    optimizer = torch.optim.Adam(model.parameters(), lr=1e-5, weight_decay=0.1)
+    loss_fn = nn.CrossEntropyLoss(label_smoothing=0.1)
+    logger = EmotionLogger(log_dir="logs/", class_names=[0, 1, 2, 3])
     run(
         model=model,
         train_dataloader=loader["train"],
