@@ -87,8 +87,8 @@ def run(
             model, test_dataloader, loss_fn
         )
 
-        logger.log(test_subject_ids[0], train_pred, train_actual, i, "train")
-        logger.log(test_subject_ids[0], test_pred, test_actual, i, "val")
+        logger.log(test_subject_ids[0], train_pred, train_actual, i, "train", train_loss)
+        logger.log(test_subject_ids[0], test_pred, test_actual, i, "val", test_loss)
 
     logger.log_summary()
 
@@ -124,7 +124,7 @@ eegloader = EEGDataloader(deap_dataset, batch_size=32).loso()
 
 
 # -------------- Training --------------
-
+logger = EmotionLogger(log_dir="logs/", class_names=["low", "high"])
 for loader in eegloader:
     # # -------------- Model --------------
     model = TSception(
@@ -139,8 +139,7 @@ for loader in eegloader:
     model = model.to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-3, weight_decay=0)
     loss_fn = nn.CrossEntropyLoss()
-    logger = EmotionLogger(log_dir="logs/", class_names=["low", "high"])
-    main.run(
+    run(
         model=model,
         train_dataloader=loader["train"],
         test_dataloader=loader["test"],
