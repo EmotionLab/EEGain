@@ -229,7 +229,7 @@ class MAHNOB(EEGDataset):
         idx = 0 if self.label_type == "A" else 1
         for session_id, data in label_array.items():
             target_label = data[idx]
-            target_label = 0 if target_label <= 5 else 1
+            target_label = 0 if target_label <= 4.5 else 1
             label_array[session_id] = target_label
 
         # expand dims
@@ -350,7 +350,7 @@ class DEAP(EEGDataset):
         idx = 0 if self.label_type == "A" else 1
         for session_id, data in label_array.items():
             target_label = data[idx]
-            target_label = 0 if target_label <= 5 else 1
+            target_label = 0 if target_label <= 4.5 else 1
             label_array[session_id] = target_label
 
         # expand dims
