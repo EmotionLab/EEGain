@@ -126,14 +126,14 @@ transform = eegain.transforms.Construct(
 
 # -------------- Dataset --------------
 mahnob_dataset = MAHNOB(
-    "path/to/mahnob/",
+    "/Users/rango/Desktop/Sessions",
     label_type="V",
     transform=transform,
 )
 
 
 # -------------- Dataloader --------------
-eegloader = EEGDataloader(mahnob_dataset, batch_size=32).loso()
+eegloader = EEGDataloader(mahnob_dataset, batch_size=32).loso()  # .loto()
 
 
 # -------------- Training --------------
@@ -156,7 +156,7 @@ for loader in eegloader:
         model=model,
         train_dataloader=loader["train"],
         test_dataloader=loader["test"],
-        test_subject_ids=loader["test_subject_indexes"],
+        test_subject_ids=loader["test_subject_indexes"],  # loader["test_video_indexes"] - for loto
         optimizer=optimizer,
         loss_fn=loss_fn,
         epoch=5,

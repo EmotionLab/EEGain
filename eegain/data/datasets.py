@@ -1,5 +1,6 @@
 import logging
 import os
+import re
 import pickle
 import xml.etree.ElementTree as ET
 from abc import ABC, abstractmethod
@@ -241,6 +242,77 @@ class MAHNOB(EEGDataset):
             f"subj index: {subject_index} data {data_array.keys()}, label {label_array.keys()}"
         )
         return data_array, label_array
+
+    def __get_subject_videos__(
+            self, subject_index: int, video_out_idx: int
+        ) -> Tuple[Dict[int, np.ndarray], Dict[int, int]]:
+        sessions = self.mapping_list[subject_index]
+
+        train_data_array, train_label_array, test_data_array, test_label_array = {}, {}, {}, {}
+
+        for session in sessions:
+            xml_path = next((Path(self.root) / session).glob("*.xml"), None)
+            bdf_path = next((Path(self.root) / session).glob("*.bdf"), None)
+            if (xml_path is None) or (bdf_path is None):
+                continue
+
+            data = mne.io.read_raw_bdf(str(bdf_path), preload=True, verbose=False)
+
+            if self.transform:
+                data_bdf = self.transform(data)
+
+            with open(xml_path, "r") as f:
+                data = f.read()
+                root = ET.fromstring(data)
+
+            felt_arousal = int(root.attrib["feltArsl"])
+            felt_valence = int(root.attrib["feltVlnc"])
+
+            skip_video = self.__check_video__(root, video_out_idx)
+            if skip_video:
+                test_label_array[session] = np.array([felt_arousal, felt_valence])
+                test_data_array[session] = data_bdf.get_data()
+            else:
+                train_data_array[session] = data_bdf.get_data()
+                train_label_array[session] = np.array([felt_arousal, felt_valence])
+
+        # choose label and split into binary
+        idx = 0 if self.label_type == "A" else 1
+        for session_id, data in train_label_array.items():
+            target_label = data[idx]
+            target_label = 0 if target_label <= 5 else 1
+            train_label_array[session_id] = target_label
+
+        for session_id, data in test_label_array.items():
+            target_label = data[idx]
+            target_label = 0 if target_label <= 5 else 1
+            test_label_array[session_id] = target_label
+
+        # expand dims
+        train_data_array = {
+            key: np.expand_dims(value, axis=-3) for key, value in train_data_array.items()
+        }
+
+        test_data_array = {
+            key: np.expand_dims(value, axis=-3) for key, value in test_data_array.items()
+        }
+
+        logger.debug(
+            f"subj index: {subject_index} data {train_data_array.keys()}, label {train_label_array.keys()}"
+        )
+
+        return (train_data_array, train_label_array), (test_data_array, test_label_array)
+
+    # @staticmethod
+    def __check_video__(self, root, video_out_idx):
+        bdf_filename = None
+        for track in root.findall('.//track[@type="Physiological"]'):
+            if track.attrib['filename'].endswith('.bdf'):
+                bdf_filename = track.attrib['filename']
+                break
+
+        num_trial = re.search(r'Trial(\d+)_', bdf_filename).group(1)
+        return int(num_trial) == video_out_idx[0]
 
 
 class DEAP(EEGDataset):
