@@ -151,8 +151,6 @@ class EmotionLogger:
             "matthews_corrcoef",
             matthews_corrcoef(test_actual, test_pred), i, data_part
         )
-        if test_actual == test_pred:
-            print('a')
         self.log_metric(
             subject_id,
             "confusion_matrix",
