@@ -22,9 +22,14 @@ class SubjectLogger:
         self.class_names = class_names
 
     def _log_confusion_matrix(self, value: float | list, step: int, data_part: str):
-        df_cm = pd.DataFrame(
-            value, index=[i for i in self.class_names], columns=[i for i in self.class_names]
-        )
+        if value.shape == (1, 1):
+            df_cm = pd.DataFrame(
+                value, index=[0], columns=[0]
+            )
+        else:
+            df_cm = pd.DataFrame(
+                value, index=[i for i in self.class_names], columns=[i for i in self.class_names]
+            )
         plt.figure(figsize=(12, 7))
         image = sn.heatmap(df_cm, annot=True).get_figure()
         plt.title("Valence")
@@ -146,6 +151,8 @@ class EmotionLogger:
             "matthews_corrcoef",
             matthews_corrcoef(test_actual, test_pred), i, data_part
         )
+        if test_actual == test_pred:
+            print('a')
         self.log_metric(
             subject_id,
             "confusion_matrix",
