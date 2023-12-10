@@ -88,8 +88,8 @@ class EEGDataloader:
             test_data[:, :, channel, :] = (test_data[:, :, channel, :] - mean) / std
         return train_data, test_data
     
-    def get_subject(self, idx, num_test_rec):
-        subject_data = self.dataset.__get_subject__(idx)
+    def get_subject(self, id, num_test_rec):
+        subject_data = self.dataset.__get_subject__(id)
 
         session_idxs = list(subject_data[1].keys())
         training_idxs = session_idxs[ : -num_test_rec]
@@ -119,8 +119,8 @@ class EEGDataloader:
         return {
             "train": train_dataloader,
             "test": test_dataloader,
-            "test_subject_indexes": [idx],
-            "train_subject_indexes": [idx],
+            "test_subject_indexes": [id],
+            "train_subject_indexes": [id],
         }
 
     def loso(self, subject_out_num: int = 1) -> Dict[str, Any]:
