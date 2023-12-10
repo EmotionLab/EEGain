@@ -16,32 +16,8 @@ class EEGDataloader:
         self.dataset = dataset
         self.batch_size = batch_size
 
-    def loto(self, video_out_num=1):
-        logger.info(f"Splitting type: leave-one-trial-out")
-        subject_ids = self.dataset.__get_subject_ids__()
-        num_trials = 20  # TODO this is correct only for mahnob
-        video_idxs = set(i for i in range(1, num_trials + 1))
-        test_video_trials_combination = list(combinations(video_idxs, video_out_num))
-
-        for subject_id in subject_ids:
-            for test_video_trial in test_video_trials_combination:
-                # TODO get_subjects and get_subject_videos are similar to each other
-                data = self.dataset.__get_subject_videos__(subject_id, video_out_idx=test_video_trial)
-                train_data = [data[0]]
-                test_data = [data[1]]
-                train_data, train_label = EEGDataloader._concat_data(train_data)
-                test_data, test_label = EEGDataloader._concat_data(test_data)
-
-                train_data, test_data = EEGDataloader.normalize(train_data, test_data)
-
-                train_dataloader = self._get_dataloader(train_data, train_label)
-                test_dataloader = self._get_dataloader(test_data, test_label)
-                yield {
-                    "train": train_dataloader,
-                    "test": test_dataloader,
-                    "test_video_indexes": test_video_trial,
-                    "train_video_indexes": video_idxs - set(test_video_trial),
-                }
+    def loto(self):
+        pass
 
     @staticmethod
     def _concat_data(
@@ -111,6 +87,41 @@ class EEGDataloader:
             train_data[:, :, channel, :] = (train_data[:, :, channel, :] - mean) / std
             test_data[:, :, channel, :] = (test_data[:, :, channel, :] - mean) / std
         return train_data, test_data
+    
+    def get_subject(self, idx, num_test_rec):
+        subject_data = self.dataset.__get_subject__(idx)
+
+        session_idxs = list(subject_data[1].keys())
+        training_idxs = session_idxs[ : -num_test_rec]
+        testing_idxs  = session_idxs[- num_test_rec :]
+
+        training_sessions = {}
+        training_labels = {}
+
+        testing_sessions = {}
+        testing_labels = {}
+
+        for idx in training_idxs:
+            training_sessions[idx] = subject_data[0][idx]
+            training_labels[idx] = subject_data[1][idx]
+
+        for idx in testing_idxs:
+            testing_sessions[idx] = subject_data[0][idx]
+            testing_labels[idx] = subject_data[1][idx]
+
+        train_data, train_label = EEGDataloader._concat_data([(training_sessions, training_labels)])
+        test_data, test_label = EEGDataloader._concat_data([(testing_sessions, testing_labels)])
+
+        train_data, test_data = EEGDataloader.normalize(train_data, test_data)
+
+        train_dataloader = self._get_dataloader(train_data, train_label)
+        test_dataloader = self._get_dataloader(test_data, test_label)
+        return {
+            "train": train_dataloader,
+            "test": test_dataloader,
+            "test_subject_indexes": [idx],
+            "train_subject_indexes": [idx],
+        }
 
     def loso(self, subject_out_num: int = 1) -> Dict[str, Any]:
         logger.info(f"Splitting type: leave-one-subject-out")
