@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sn
 import torch
+import numpy as np
 from sklearn.metrics import *
 from torch.utils.tensorboard import SummaryWriter
 
@@ -206,10 +207,12 @@ class EmotionLogger:
             metric_average = []
             for _, metrics in metrics_for_each_subject.items():
                 metric_average.append(metrics[metric_name][-1])
-
+            
+            metric_average_std = np.std(metric_average)
             metric_average = sum(metric_average) / len(metric_average)
 
             self.writer.add_scalar(f"Overall/{metric_name}", metric_average)
+            self.writer.add_scalar(f"Overall/{metric_name}_std", metric_average_std)
 
     def log_each_user_metrics_loto(self, metric_names: list[str], subject_id: int = None):
         metrics_for_each_video = {}
