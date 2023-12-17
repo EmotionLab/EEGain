@@ -39,6 +39,7 @@ class EEGDataloader:
                 yield {
                     "train": train_dataloader,
                     "test": test_dataloader,
+                    "test_subject_id": subject_id,
                     "test_video_indexes": test_video_trial,
                     "train_video_indexes": video_idxs - set(test_video_trial),
                 }

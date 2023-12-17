@@ -72,10 +72,11 @@ def run(
     model,
     train_dataloader,
     test_dataloader,
-    test_subject_ids,
+    test_ids,
     optimizer,
     loss_fn,
     epoch,
+    split_type,
 ):
     for i in range(epoch):
         print(f"\nEpoch {i}/{epoch}")
@@ -87,10 +88,12 @@ def run(
             model, test_dataloader, loss_fn
         )
 
-        logger.log(test_subject_ids[0], train_pred, train_actual, i, "train", train_loss)
-        logger.log(test_subject_ids[0], test_pred, test_actual, i, "val", test_loss)
+        # in the end of epoch it logs metrics for this specific epoch
+        logger.log(test_ids[0], train_pred, train_actual, i, "train", split_type, train_loss)
+        logger.log(test_ids[0], test_pred, test_actual, i, "val", split_type, test_loss)
 
-    logger.log_summary()
+    # for loso
+    # logger.log_summary()
 
 
 # -------------- Preprocessing --------------
@@ -126,19 +129,28 @@ transform = eegain.transforms.Construct(
 
 # -------------- Dataset --------------
 mahnob_dataset = MAHNOB(
-    "path/to/mahnob/",
+    "/Users/rango/Desktop/Sessions",
     label_type="V",
     transform=transform,
 )
 
 
 # -------------- Dataloader --------------
-eegloader = EEGDataloader(mahnob_dataset, batch_size=32).loso()  # .loto()
+eegloader = EEGDataloader(mahnob_dataset, batch_size=32).loto()  # .loto()
 
 
 # -------------- Training --------------
 logger = EmotionLogger(log_dir="logs/", class_names=["low", "high"])
-for loader in eegloader:
+
+# for loto
+mapping_list = mahnob_dataset.mapping_list
+mapping_list = dict({key: len(value) for key, value in mapping_list.items()})
+
+# -------------- Training --------------
+for i, loader in enumerate(eegloader):
+    # for loto
+    subject_id = list(mapping_list.keys())[i]
+    num_videos = mapping_list[subject_id]
     # -------------- Model --------------
     model = TSception(
         num_classes=2,
@@ -156,8 +168,24 @@ for loader in eegloader:
         model=model,
         train_dataloader=loader["train"],
         test_dataloader=loader["test"],
-        test_subject_ids=loader["test_subject_indexes"],  # loader["test_video_indexes"] - for loto
+        test_ids=loader["test_video_indexes"],  # loader["test_video_indexes"] - for loto
         optimizer=optimizer,
         loss_fn=loss_fn,
-        epoch=5,
+        epoch=1,
+        split_type="LOTO"  # for loto
     )
+    # for loto
+    num_videos -= 1
+    if num_videos == 0:
+        logger.log_summary("LOTO", subject_id=subject_id)
+
+# for loto
+logger.log_overall_loto([
+                    "accuracy",
+                    "f1",
+                    "recall",
+                    "precision",
+                    "kappa",
+                    # "roc_auc",
+                    "matthews_corrcoef",
+                ])
