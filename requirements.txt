@@ -7,3 +7,4 @@ scikit-learn
 tensorboard
 torch
 tqdm
+click

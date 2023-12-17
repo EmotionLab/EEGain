@@ -11,3 +11,4 @@ seaborn
 tensorboard
 torch
 tqdm
+click
