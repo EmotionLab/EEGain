@@ -78,7 +78,8 @@ def run(
     optimizer,
     loss_fn,
     epoch,
-    logger
+    logger,
+    **kwargs
 ):
     for i in range(epoch):
         print(f"\nEpoch {i}/{epoch}")
@@ -92,8 +93,6 @@ def run(
 
         logger.log(test_subject_ids[0], train_pred, train_actual, i, "train", train_loss)
         logger.log(test_subject_ids[0], test_pred, test_actual, i, "val", test_loss)
-
-    logger.log_summary()
 
 
 @click.group()
@@ -175,8 +174,10 @@ def main(**kwargs):
             loss_fn=loss_fn,
             epoch=kwargs["num_epochs"],
             logger=logger,
+            **kwargs,
         )
 
+    logger.log_summary(**kwargs)
 
 if __name__ == "__main__":
     main()

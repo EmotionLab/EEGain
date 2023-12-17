@@ -1,6 +1,7 @@
 import logging
 
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 import seaborn as sn
 import torch
@@ -13,7 +14,7 @@ logger = logging.getLogger("Tensorboard")
 # SubjectLogger class for logging metrics for each subject
 class SubjectLogger:
     def __init__(
-        self, subject_id: int, writer_train: SummaryWriter, writer_test: SummaryWriter, class_names: list[str]
+            self, subject_id: int, writer_train: SummaryWriter, writer_test: SummaryWriter, class_names: list[str]
     ):
         self.subject_id = subject_id
         self.writer_train = writer_train
@@ -46,7 +47,7 @@ class SubjectLogger:
             )
 
     def log_metric(
-        self, step: int, metric_name: str, value: float | list, data_part: str
+            self, step: int, metric_name: str, value: float | list, data_part: str
     ):
         if metric_name not in self.metrics:
             self.metrics[metric_name] = []
@@ -90,12 +91,12 @@ class EmotionLogger:
             )
 
     def log_metric(
-        self,
-        subject_id: int,
-        metric_name: str,
-        value: float | list,
-        step: int,
-        data_part: str,
+            self,
+            subject_id: int,
+            metric_name: str,
+            value: float | list,
+            step: int,
+            data_part: str,
     ):
         if subject_id not in self.subject_loggers:
             self.add_subject_logger(subject_id)
@@ -112,13 +113,13 @@ class EmotionLogger:
             )
 
     def log(
-        self,
-        subject_id: int,
-        test_pred: torch.Tensor,
-        test_actual: torch.Tensor,
-        i: int,
-        data_part: str,
-        loss=None,
+            self,
+            subject_id: int,
+            test_pred: torch.Tensor,
+            test_actual: torch.Tensor,
+            i: int,
+            data_part: str,
+            loss=None,
     ):
 
         self.log_metric(
@@ -127,7 +128,11 @@ class EmotionLogger:
         )
         self.log_metric(
             subject_id, "f1",
-            f1_score(test_actual, test_pred, average='binary' if self.num_class <= 2 else 'weighted'), i, data_part
+            f1_score(test_actual, test_pred, average='binary'), i, data_part
+        )
+        self.log_metric(
+            subject_id, "f1_weighted",
+            f1_score(test_actual, test_pred, average='weighted'), i, data_part
         )
         self.log_metric(
             subject_id, "recall",
@@ -136,7 +141,8 @@ class EmotionLogger:
         self.log_metric(
             subject_id,
             "precision",
-            precision_score(test_actual, test_pred, average='binary' if self.num_class <= 2 else 'weighted'), i, data_part
+            precision_score(test_actual, test_pred, average='binary' if self.num_class <= 2 else 'weighted'), i,
+            data_part
         )
         self.log_metric(
             subject_id, "kappa",
@@ -179,25 +185,34 @@ class EmotionLogger:
             self.writer.add_figure(f"For each subject/{metric_name}", plt.gcf())
             plt.close()
 
-    def log_overall_metrics(self, metric_names: list[str]):
+    def log_overall_metrics(self, metric_names: list[str], **kwargs):
         metrics_for_each_subject = {}
         for subject_id, subject_logger in self.subject_loggers.items():
             metrics_for_each_subject[subject_id] = subject_logger.metrics
 
-        for metric_name in metric_names:
-            metric_average = []
-            for _, metrics in metrics_for_each_subject.items():
-                metric_average.append(metrics[metric_name][-1])
+        with open("logs.txt", 'a') as file:
+            file.write("=" * 100 + "\n")
+            file.write(f"log_dir={kwargs['log_dir']}\n")
+            file.write(" ".join([f"{k}={v}" for k, v in kwargs.items()]) + "\n")
 
-            metric_average = sum(metric_average) / len(metric_average)
+            for metric_name in metric_names:
+                metric_average = []
+                for _, metrics in metrics_for_each_subject.items():
+                    metric_average.append(metrics[metric_name][-1])
 
-            self.writer.add_scalar(f"Overall/{metric_name}", metric_average)
+                metric_std = np.std(metric_average)
+                metric_average = sum(metric_average) / len(metric_average)
 
-    def log_summary(self):
+                self.writer.add_scalar(f"Overall/{metric_name}", metric_average)
+                file.write(f"{metric_name}={metric_average}\n")
+                file.write(f"{metric_name}_std={metric_std}\n")
+
+    def log_summary(self, **kwargs):
         self.log_each_user_metrics(
             [
                 "accuracy",
                 "f1",
+                "f1_weighted",
                 "recall",
                 "precision",
                 "kappa",
@@ -209,11 +224,13 @@ class EmotionLogger:
             [
                 "accuracy",
                 "f1",
+                "f1_weighted",
                 "recall",
                 "precision",
                 "kappa",
                 # "roc_auc",
                 "matthews_corrcoef",
-            ]
+            ],
+            **kwargs
         )
         self.writer.close()
