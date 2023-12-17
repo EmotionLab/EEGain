@@ -37,7 +37,6 @@ class EEGNetConfig:
 @dataclass
 class TScepctionConfig:
     num_classes: int = 2
-    input_size: list[int] = field(default_factory=lambda: [1, 3, 512])
     sampling_r: int = 128
     num_t: int = 15
     num_s: int = 15

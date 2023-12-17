@@ -69,7 +69,7 @@ class SubjectLogger:
 
 # EmotionLogger class for handling the overall logging functionality
 class EmotionLogger:
-    def __init__(self, log_dir: str, class_names: int):
+    def __init__(self, log_dir: str, class_names: list):
         self.subject_loggers = {}
         self.writer = SummaryWriter(log_dir)
         self.writer_train = SummaryWriter(f"{log_dir}/train")

@@ -159,10 +159,10 @@ def main(**kwargs):
     eegloader = EEGDataloader(mahnob_dataset, batch_size=kwargs["batch_size"]).loso()  # .loto()
 
     # -------------- Training --------------
-    logger = EmotionLogger(log_dir=kwargs["log_dir"], class_names=kwargs["class_names"])
+    logger = EmotionLogger(log_dir=kwargs["log_dir"], class_names=["low", "high"])
     for loader in eegloader:
         # -------------- Model --------------
-        model = globals()[kwargs['model_name']](**kwargs)
+        model = globals()[kwargs['model_name']](input_size=[1, 32, kwargs["window"]*kwargs["s_rate"]], **kwargs)
         model = model.to(device)
         optimizer = torch.optim.Adam(model.parameters(), lr=kwargs["lr"], weight_decay=kwargs["weight_decay"])
         loss_fn = nn.CrossEntropyLoss()
