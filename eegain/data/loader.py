@@ -16,33 +16,57 @@ class EEGDataloader:
         self.dataset = dataset
         self.batch_size = batch_size
 
-    def loto(self, video_out_num=1):
-        logger.info(f"Splitting type: leave-one-trial-out")
-        subject_ids = self.dataset.__get_subject_ids__()
-        num_trials = 20  # TODO this is correct only for mahnob
-        video_idxs = set(i for i in range(1, num_trials + 1))
-        test_video_trials_combination = list(combinations(video_idxs, video_out_num))
+    def loto(self, subject_id, session_ids):
+        for test_session in session_ids:
+            logger.debug(f"subject_id is: {subject_id}, test session is: {test_session}")
+            train_sessions = session_ids.copy()
+            train_sessions.remove(test_session)
+            test_session = [test_session]
+            test_data = self.dataset.__get_videos__(test_session)
+            train_data = self.dataset.__get_videos__(train_sessions)
 
-        for subject_id in subject_ids:
-            for test_video_trial in test_video_trials_combination:
-                # TODO get_subjects and get_subject_videos are similar to each other
-                data = self.dataset.__get_subject_videos__(subject_id, video_out_idx=test_video_trial)
-                train_data = [data[0]]
-                test_data = [data[1]]
-                train_data, train_label = EEGDataloader._concat_data(train_data)
-                test_data, test_label = EEGDataloader._concat_data(test_data)
+            train_data, train_label = EEGDataloader._concat_data(train_data)
+            test_data, test_label = EEGDataloader._concat_data(test_data)
 
-                train_data, test_data = EEGDataloader.normalize(train_data, test_data)
 
-                train_dataloader = self._get_dataloader(train_data, train_label)
-                test_dataloader = self._get_dataloader(test_data, test_label)
-                yield {
-                    "train": train_dataloader,
-                    "test": test_dataloader,
-                    "test_subject_id": subject_id,
-                    "test_video_indexes": test_video_trial,
-                    "train_video_indexes": video_idxs - set(test_video_trial),
-                }
+            train_data, test_data = EEGDataloader.normalize(train_data, test_data)
+
+            train_dataloader = self._get_dataloader(train_data, train_label)
+            test_dataloader = self._get_dataloader(test_data, test_label)
+            yield {
+                "train": train_dataloader,
+                "test": test_dataloader,
+                "test_session_indexes": test_session,
+                "train_session_indexes": train_sessions,
+            }
+
+    # def loto(self, video_out_num=1):
+    #     logger.info(f"Splitting type: leave-one-trial-out")
+    #     subject_ids = self.dataset.__get_subject_ids__()
+    #     num_trials = 20  # TODO this is correct only for mahnob
+    #     video_idxs = set(i for i in range(1, num_trials + 1))
+    #     test_video_trials_combination = list(combinations(video_idxs, video_out_num))
+    #
+    #     for subject_id in subject_ids:
+    #         for test_video_trial in test_video_trials_combination:
+    #             # TODO get_subjects and get_subject_videos are similar to each other
+    #             data = self.dataset.__get_subject_videos__(subject_id, video_out_idx=test_video_trial)
+    #             train_data = [data[0]]
+    #             test_data = [data[1]]
+    #             train_data, train_label = EEGDataloader._concat_data(train_data)
+    #             test_data, test_label = EEGDataloader._concat_data(test_data)
+    #
+    #             train_data, test_data = EEGDataloader.normalize(train_data, test_data)
+    #
+    #             train_dataloader = self._get_dataloader(train_data, train_label)
+    #             test_dataloader = self._get_dataloader(test_data, test_label)
+    #             yield {
+    #                 "train": train_dataloader,
+    #                 "test": test_dataloader,
+    #                 "test_subject_id": subject_id,
+    #                 "test_video_indexes": test_video_trial,
+    #                 "train_video_indexes": video_idxs - set(test_video_trial),
+    #             }
 
     @staticmethod
     def _concat_data(
@@ -58,14 +82,20 @@ class EEGDataloader:
         Returns:
             x,y (torch.Tensor):
         """
-        x = np.concatenate([v for d in data for v in d[0].values()], axis=0)
+        # x = np.concatenate([v for d in data for v in d[0].values()], axis=0)  # LOSO
+        x = np.concatenate([v for v in data[0].values()], axis=0)
         x = torch.from_numpy(x).float()
 
         # TODO: refactor
         y = []
-        for i in data:
-            for k, v in i[1].items():
-                y.extend(list(np.repeat(v, i[0][k].shape[0])))
+        # for i in data:  # LOSO
+        for i in data[1].items():
+            # for k, v in i[1].items():  # LOSO
+            # for k, v in i:  # LOSO
+            #     y.extend(list(np.repeat(v, i[0][k].shape[0])))  # LOSO
+            k = i[0]
+            v = i[1]
+            y.extend(list(np.repeat(v, data[0][k].shape[0])))
         y = torch.tensor(y)
 
         return x, y
