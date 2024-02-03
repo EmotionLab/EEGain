@@ -9,6 +9,8 @@ from torch.utils.data import DataLoader
 from .datasets import EEGDataset, EEGDatasetBase
 
 logger = logging.getLogger("Dataloader")
+logging.getLogger('matplotlib').setLevel(logging.WARNING)
+logging.getLogger('sklearn').setLevel(logging.WARNING)
 
 
 class EEGDataloader:
@@ -25,8 +27,8 @@ class EEGDataloader:
             test_data = self.dataset.__get_videos__(test_session)
             train_data = self.dataset.__get_videos__(train_sessions)
 
-            train_data, train_label = EEGDataloader._concat_data(train_data)
-            test_data, test_label = EEGDataloader._concat_data(test_data)
+            train_data, train_label = EEGDataloader._concat_data(train_data, loader_type="LOTO")
+            test_data, test_label = EEGDataloader._concat_data(test_data, loader_type="LOTO")
 
 
             train_data, test_data = EEGDataloader.normalize(train_data, test_data)
@@ -71,7 +73,7 @@ class EEGDataloader:
     @staticmethod
     def _concat_data(
         data: List[Tuple[Dict[int, np.ndarray], Dict[int, int]]]
-    ) -> Tuple[torch.Tensor, torch.Tensor]:
+    , loader_type="LOSO") -> Tuple[torch.Tensor, torch.Tensor]:
         """
         concatenate data from several subjects and make one tensor
 
@@ -82,21 +84,27 @@ class EEGDataloader:
         Returns:
             x,y (torch.Tensor):
         """
-        # x = np.concatenate([v for d in data for v in d[0].values()], axis=0)  # LOSO
-        x = np.concatenate([v for v in data[0].values()], axis=0)
+        
+        if loader_type == "LOTO":
+            x = np.concatenate([v for v in data[0].values()], axis=0)
+        else:
+            x = np.concatenate([v for d in data for v in d[0].values()], axis=0)             
         x = torch.from_numpy(x).float()
 
         # TODO: refactor
         y = []
-        # for i in data:  # LOSO
-        for i in data[1].items():
-            # for k, v in i[1].items():  # LOSO
-            # for k, v in i:  # LOSO
-            #     y.extend(list(np.repeat(v, i[0][k].shape[0])))  # LOSO
-            k = i[0]
-            v = i[1]
-            y.extend(list(np.repeat(v, data[0][k].shape[0])))
-        y = torch.tensor(y)
+        if loader_type == "LOTO":
+            for i in data[1].items():
+                k = i[0]
+                v = i[1]
+                y.extend(list(np.repeat(v, data[0][k].shape[0])))
+            y = torch.tensor(y) 
+        else:
+            for i in data:
+                for k, v in i[1].items():
+                    y.extend(list(np.repeat(v, i[0][k].shape[0])))
+            y = torch.tensor(y)
+
 
         return x, y
 

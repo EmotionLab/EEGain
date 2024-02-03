@@ -12,6 +12,7 @@ from eegain.data.datasets import DEAP, MAHNOB, SeedIV
 from eegain.logger import EmotionLogger
 from eegain.models import DeepConvNet, EEGNet, ShallowConvNet, TSception
 from collections import defaultdict
+from sklearn.metrics import *
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -76,7 +77,7 @@ def run(
     optimizer,
     loss_fn,
     epoch,
-    split_type,
+    split_type="LOTO",
 ):
 
     for i in range(epoch):
@@ -88,14 +89,14 @@ def run(
         test_pred, test_actual, test_loss = test_one_epoch(
             model, test_dataloader, loss_fn
         )
-
-        # in the end of epoch it logs metrics for this specific epoch. test_ids is test_session_ids
-        logger.log(test_ids[0], train_pred, train_actual, i, "train", split_type, train_loss)
-        logger.log(test_ids[0], test_pred, test_actual, i, "val", split_type, test_loss)
-
-    return train_pred, train_actual, test_pred, test_actual
+        if split_type != "LOTO":
+            # in the end of epoch it logs metrics for this specific epoch. test_ids is test_session_ids
+            logger.log(test_ids[0], train_pred, train_actual, i, "train", train_loss)
+            logger.log(test_ids[0], test_pred, test_actual, i, "val", test_loss)
+    if split_type == "LOTO": 
+        return train_pred, train_actual, test_pred, test_actual
     # for loso
-    # logger.log_summary()
+    logger.log_summary()
 
 
 # -------------- Preprocessing --------------
@@ -131,36 +132,35 @@ transform = eegain.transforms.Construct(
 
 # -------------- Dataset --------------
 mahnob_dataset = MAHNOB(
-    "/Users/rango/Desktop/Sessions",
+    "../../eegain/EEGain/Sessions/",
     label_type="V",
     transform=transform,
 )
 
 subject_video_mapping = mahnob_dataset.mapping_list
 logger = EmotionLogger(log_dir="logs/", class_names=["low", "high"])
-
-subject_video_mapping = defaultdict(list)
+# subject_video_mapping = defaultdict(list)
 all_model_state_dicts = []
 all_train_preds, all_test_preds, all_train_actuals, all_test_actuals = [], [], [], []
-
+f1_tests, f1_weighted_tests, accuracy_tests = [], [], []
 for subject_id, session_ids in subject_video_mapping.items():
     eegloader = EEGDataloader(mahnob_dataset, batch_size=32).loto(subject_id, session_ids)
-    model = TSception(
-        num_classes=2,
-        input_size=(1, 32, 512),
-        sampling_r=128,
-        num_t=15,
-        num_s=15,
-        hidden=32,
-        dropout_rate=0.5,
-    )
-    model = model.to(device)
-    optimizer = torch.optim.Adam(model.parameters(), lr=1e-3, weight_decay=0)
-    loss_fn = nn.CrossEntropyLoss()
-    num_epoch = 1
+    num_epoch = 5
     all_train_preds_for_subject, all_train_actuals_for_subject, all_test_preds_for_subject, all_test_actuals_for_subject = [], [], [], []
     for i, loader in enumerate(eegloader):
-        train_pred, train_actual, test_pred, test_actual = run(
+        model = TSception(
+                        num_classes=2,
+                        input_size=(1, 32, 512),
+                        sampling_r=128,
+                        num_t=15,
+                        num_s=15,
+                        hidden=32,
+                        dropout_rate=0.5,
+                        )
+        model = model.to(device)
+        optimizer = torch.optim.Adam(model.parameters(), lr=1e-4, weight_decay=0)
+        loss_fn = nn.CrossEntropyLoss()
+        _, _, test_pred, test_actual = run(
             model=model,
             train_dataloader=loader["train"],
             test_dataloader=loader["test"],
@@ -170,48 +170,31 @@ for subject_id, session_ids in subject_video_mapping.items():
             epoch=num_epoch,
             split_type="LOTO"  # for loto
         )
-        all_train_preds_for_subject.append(train_pred)
-        all_train_actuals_for_subject.append(train_actual)
         all_test_preds_for_subject.append(test_pred)
         all_test_actuals_for_subject.append(test_actual)
 
-    all_model_state_dicts.append(model.state_dict())
-
-    all_train_preds_for_subject = [item for sublist in all_train_preds_for_subject for item in sublist]
-    all_train_actuals_for_subject = [item for sublist in all_train_actuals_for_subject for item in sublist]
+    # all_model_state_dicts.append(model.state_dict())
     all_test_preds_for_subject = [item for sublist in all_test_preds_for_subject for item in sublist]
     all_test_actuals_for_subject = [item for sublist in all_test_actuals_for_subject for item in sublist]
+        
+    logger.log(subject_id, all_test_preds_for_subject, all_test_actuals_for_subject, num_epoch, "val")
 
-    all_train_preds.append(all_train_preds_for_subject)
-    all_test_preds.append(all_test_preds_for_subject)
-    all_train_actuals.append(all_train_actuals_for_subject)
-    all_test_actuals.append(all_test_actuals_for_subject)
+logger.log_summary(overal_log_file="overal_log", log_dir="logs/")
 
-    logger.log(subject_id, all_train_preds_for_subject, all_train_actuals_for_subject, num_epoch, "train", "LOTO")
-    logger.log(subject_id, all_test_preds_for_subject, all_test_actuals_for_subject, num_epoch, "val", "LOTO")
+# average_state_dict = {}
+# for key in all_model_state_dicts[0]:
+#     element_sum = sum(model_state_dict[key] for model_state_dict in all_model_state_dicts)
+#     average_state_dict[key] = element_sum / len(all_model_state_dicts)
 
-all_train_preds = [item for sublist in all_train_preds for item in sublist]
-all_test_preds = [item for sublist in all_test_preds for item in sublist]
-all_train_actuals = [item for sublist in all_train_actuals for item in sublist]
-all_test_actuals = [item for sublist in all_test_actuals for item in sublist]
-
-logger.log(0, all_train_preds, all_train_actuals, 0, "train", "LOTO")
-logger.log(0, all_test_preds, all_test_actuals, 0, "val", "LOTO")
-
-average_state_dict = {}
-for key in all_model_state_dicts[0]:
-    element_sum = sum(model_state_dict[key] for model_state_dict in all_model_state_dicts)
-    average_state_dict[key] = element_sum / len(all_model_state_dicts)
-
-average_model = TSception(
-        num_classes=2,
-        input_size=(1, 32, 512),
-        sampling_r=128,
-        num_t=15,
-        num_s=15,
-        hidden=32,
-        dropout_rate=0.5,
-    )
-average_model.load_state_dict(average_state_dict)
-average_model = average_model.to(device)
+# average_model = TSception(
+#         num_classes=2,
+#         input_size=(1, 32, 512),
+#         sampling_r=128,
+#         num_t=15,
+#         num_s=15,
+#         hidden=32,
+#         dropout_rate=0.5,
+#     )
+# average_model.load_state_dict(average_state_dict)
+# average_model = average_model.to(device)
 
