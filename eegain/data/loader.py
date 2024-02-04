@@ -19,7 +19,7 @@ class EEGDataloader:
         self.dataset = dataset
         self.batch_size = batch_size
 
-    def loto(self, subject_id, session_ids, n_fold):
+    def loto(self, subject_id, session_ids, n_fold, subject_video_mapping=None):
         fold_size = len(session_ids) // n_fold
 
         folds = [session_ids[i:i + fold_size] for i in range(0, len(session_ids), fold_size)]
@@ -28,8 +28,8 @@ class EEGDataloader:
             train_sessions = session_ids.copy()
             train_sessions = [item for item in session_ids if item not in test_sessions]
 
-            test_data = self.dataset.__get_videos__(test_sessions)
-            train_data = self.dataset.__get_videos__(train_sessions)
+            test_data = self.dataset.__get_videos__(test_sessions, subject_video_mapping)
+            train_data = self.dataset.__get_videos__(train_sessions, subject_video_mapping)
             train_data, train_label = EEGDataloader._concat_data(train_data, loader_type="LOTO")
             test_data, test_label = EEGDataloader._concat_data(test_data, loader_type="LOTO")
 
@@ -120,6 +120,8 @@ class EEGDataloader:
             normalized training and testing data
         """
         # data: sample x 1 x channel x data
+        train_data = train_data.unsqueeze(1)
+        test_data = test_data.unsqueeze(1)
         for channel in range(train_data.shape[2]):
             std, mean = torch.std_mean(train_data[:, :, channel, :])
             train_data[:, :, channel, :] = (train_data[:, :, channel, :] - mean) / std
