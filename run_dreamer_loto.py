@@ -112,7 +112,7 @@ transform = eegain.transforms.Construct(
 
 # -------------- Dataset --------------
 dreamer_dataset = DREAMER(
-    "/Users/rango/Desktop/DREAMER.mat",
+    "path_to_dreamer",
     label_type="V",
     transform=transform
 )
