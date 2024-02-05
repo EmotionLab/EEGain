@@ -63,7 +63,7 @@ class EEGDataloader:
         if loader_type == "LOTO":
             x = np.concatenate([v for v in data[0].values()], axis=0)
         else:
-            x = np.concatenate([v for d in data for v in d[0].values()], axis=0)             
+            x = np.concatenate([v for d in data for v in d[0].values()], axis=0)
         x = torch.from_numpy(x).float()
 
         # TODO: refactor
@@ -146,7 +146,8 @@ class EEGDataloader:
             test_data, test_label = EEGDataloader._concat_data(test_data)
             logger.debug(f"test data shape {test_data.shape}")
 
-            train_data, test_data = EEGDataloader.normalize(train_data, test_data)
+            if len(train_data.shape) != 4: # DREAMER has already shape that is needed and it doesn't need normalization
+                train_data, test_data = EEGDataloader.normalize(train_data, test_data)
 
             train_dataloader = self._get_dataloader(train_data, train_label)
             test_dataloader = self._get_dataloader(test_data, test_label)

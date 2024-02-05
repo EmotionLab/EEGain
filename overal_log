@@ -1,0 +1,34 @@
+====================================================================================================
+log_dir=logs/
+overal_log_file=overal_log log_dir=logs/
+accuracy=0.5767326732673267
+accuracy_std=0.0
+f1=0.7315541601255887
+f1_std=0.0
+f1_weighted=0.4219111864090648
+f1_weighted_std=0.0
+recall=1.0
+recall_std=0.0
+precision=0.5767326732673267
+precision_std=0.0
+kappa=0.0
+kappa_std=0.0
+matthews_corrcoef=0.0
+matthews_corrcoef_std=0.0
+====================================================================================================
+log_dir=logs/
+overal_log_file=overal_log log_dir=logs/
+accuracy=0.5606435643564356
+accuracy_std=0.016089108910891048
+f1=0.718341182626897
+f1_std=0.01321297749869177
+f1_weighted=0.4029459460859744
+f1_weighted_std=0.018965240323090382
+recall=1.0
+recall_std=0.0
+precision=0.5606435643564356
+precision_std=0.016089108910891048
+kappa=0.0
+kappa_std=0.0
+matthews_corrcoef=0.0
+matthews_corrcoef_std=0.0

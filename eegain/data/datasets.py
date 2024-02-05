@@ -488,7 +488,7 @@ class DREAMER(EEGDataset):
             if self.transform:
                 raw_data = self.transform(raw_data)
 
-            data_array[video_idx] = raw_data
+            data_array[video_idx] = raw_data.get_data()
 
             target_label = int(subject_eeg_full_info[idx][video_idx][0])
             target_label = 0 if target_label <= self.threshold else 1
