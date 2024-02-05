@@ -28,13 +28,13 @@ class EEGDataloader:
             train_sessions = session_ids.copy()
             train_sessions = [item for item in session_ids if item not in test_sessions]
 
-            test_data = self.dataset.__get_videos__(test_sessions, subject_video_mapping)
-            train_data = self.dataset.__get_videos__(train_sessions, subject_video_mapping)
+            test_data = self.dataset.__get_videos__(test_sessions, subject_id)
+            train_data = self.dataset.__get_videos__(train_sessions, subject_id)
             train_data, train_label = EEGDataloader._concat_data(train_data, loader_type="LOTO")
             test_data, test_label = EEGDataloader._concat_data(test_data, loader_type="LOTO")
 
-
-            train_data, test_data = EEGDataloader.normalize(train_data, test_data)
+            if len(train_data.shape) != 4:  # DREAMER has already shape that is needed and it doesn't need normalization
+                train_data, test_data = EEGDataloader.normalize(train_data, test_data)
 
             train_dataloader = self._get_dataloader(train_data, train_label)
             test_dataloader = self._get_dataloader(test_data, test_label)

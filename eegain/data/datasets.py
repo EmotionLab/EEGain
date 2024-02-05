@@ -443,6 +443,9 @@ class DREAMER(EEGDataset):
         self.label_type = label_type
         self.num_videos = 18
         self.threshold = 3
+        self.user_mapping = self._create_user_csv_mapping(
+            self.root, self.transform, self.label_type
+        )
 
     def __get_subject_ids__(self) -> List[int]:
         """Method returns list of subject ids"""
@@ -478,6 +481,60 @@ class DREAMER(EEGDataset):
         subject_eeg_full_info = mat_data["DREAMER"][0][0][0][0][subject_index][0][0]
 
         for video_idx in range(self.num_videos):
+            person_eeg_recording = subject_eeg_full_info[2][0][0][1][video_idx][0]
+            person_eeg_recording = (
+                person_eeg_recording.transpose()
+            )  # This is necessary to convert numpy ndarray to mne object
+            info = mne.create_info(ch_names=channels, sfreq=128, ch_types="eeg")
+            raw_data = mne.io.RawArray(person_eeg_recording, info)
+
+            if self.transform:
+                raw_data = self.transform(raw_data)
+
+            data_array[video_idx] = raw_data.get_data()
+
+            target_label = int(subject_eeg_full_info[idx][video_idx][0])
+            target_label = 0 if target_label <= self.threshold else 1
+            label_array[video_idx] = target_label
+
+        # expand dims
+        data_array = {
+            key: np.expand_dims(value, axis=-3) for key, value in data_array.items()
+        }
+
+        return data_array, label_array
+
+    @staticmethod
+    def _create_user_csv_mapping(data_path: Path, transform, label_type) -> Dict[int, List[str]]:
+        user_session_info = {}
+
+        mat_data = scipy.io.loadmat(data_path)
+
+        num_subjects = len(list(mat_data["DREAMER"][0][0][0][0]))
+        for curr_subject_idx in range(num_subjects):
+            num_videos_curr_subject = len(list(mat_data["DREAMER"][0][0][0][0][curr_subject_idx][0][0][2][0][0][1]))
+            video_idxs = [i for i in range(num_videos_curr_subject)]
+            user_session_info[curr_subject_idx] = video_idxs
+
+        return user_session_info
+
+    def __get_videos__(self, video_ids, subject_id):
+        data_array, label_array = {}, {}
+
+        # choose label
+        idx = 4 if self.label_type == "V" else 5
+
+        path_to_dreamer = self.root
+        mat_data = scipy.io.loadmat(path_to_dreamer)
+        channels = [
+            channel_name[0] for channel_name in list(mat_data["DREAMER"][0][0][3])[0]
+        ]
+
+        # subject_eeg_full_info contains EEG & ECG recordings of specific person, age, gender and
+        # valence/arousal/dominance scores so here is full info about the person
+        subject_eeg_full_info = mat_data["DREAMER"][0][0][0][0][subject_id][0][0]
+
+        for video_idx in video_ids:
             person_eeg_recording = subject_eeg_full_info[2][0][0][1][video_idx][0]
             person_eeg_recording = (
                 person_eeg_recording.transpose()
