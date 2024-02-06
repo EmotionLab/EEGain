@@ -126,6 +126,10 @@ class EmotionLogger:
             subject_id, "accuracy",
             accuracy_score(test_actual, test_pred), i, data_part
         )
+        """ TODO: this if else statement is for seed iv dataset. as there are 4 labels, average='binary' is not working
+            here but how we detect is this is seed dataset or not, is not correct. Here I'm checking if label 2 or 3
+            is in test_actual or test_pred. Maybe model predicted just 1 or 2, in that case this won't be correct  
+        """
         if 3 in test_actual or 3 in test_pred or 2 in test_actual or 2 in test_pred:
             self.log_metric(
                 subject_id, "f1",
