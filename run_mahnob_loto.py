@@ -132,7 +132,7 @@ transform = eegain.transforms.Construct(
 
 # -------------- Dataset --------------
 mahnob_dataset = MAHNOB(
-    "/Users/rango/Desktop/Sessions",
+    "path_to_mahnob",
     label_type="V",
     transform=transform,
 )

@@ -90,30 +90,30 @@ def run(
         logger.log(test_subject_ids[0], train_pred, train_actual, i, "train", train_loss)
         logger.log(test_subject_ids[0], test_pred, test_actual, i, "val", test_loss)
 
-    logger.log_summary()
+    logger.log_summary(overal_log_file="overal_log", log_dir="logs/")
 
 
 transform = eegain.transforms.Construct(
     [
-        eegain.transforms.DropChannels(
-            [
-                "EXG1",
-                "EXG2",
-                "EXG3",
-                "EXG4",
-                "GSR1",
-                "Plet",
-                "Resp",
-                "Temp",
-            ]
-        ),
+        # eegain.transforms.DropChannels(
+        #     [
+        #         "EXG1",
+        #         "EXG2",
+        #         "EXG3",
+        #         "EXG4",
+        #         "GSR1",
+        #         "Plet",
+        #         "Resp",
+        #         "Temp",
+        #     ]
+        # ),
         eegain.transforms.Segment(duration=4, overlap=0),
     ]
 )
 
 
 deap_dataset = DEAP(
-    "path/to/deap/",
+    "path_to_deap",
     label_type="A",
     transform=transform,
 )
@@ -146,5 +146,5 @@ for loader in eegloader:
         test_subject_ids=loader["test_subject_indexes"],
         optimizer=optimizer,
         loss_fn=loss_fn,
-        epoch=100,
+        epoch=3,
     )

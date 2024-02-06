@@ -28,8 +28,9 @@ class EEGDataloader:
             train_sessions = session_ids.copy()
             train_sessions = [item for item in session_ids if item not in test_sessions]
 
-            test_data = self.dataset.__get_videos__(test_sessions, subject_id)
-            train_data = self.dataset.__get_videos__(train_sessions, subject_id)
+            # TODO - deap loto shouldn't be different
+            test_data = self.dataset.__get_videos__(test_sessions, subject_id)  # instead of subject_id here should be subject_video_mapping for deap_loto
+            train_data = self.dataset.__get_videos__(train_sessions, subject_id)  # instead of subject_id here should be subject_video_mapping for deap_loto
             train_data, train_label = EEGDataloader._concat_data(train_data, loader_type="LOTO")
             test_data, test_label = EEGDataloader._concat_data(test_data, loader_type="LOTO")
 

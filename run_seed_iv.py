@@ -140,7 +140,7 @@ transform = eegain.transforms.Construct(
 
 # -------------- Dataset --------------
 seed_dataset = SeedIV(
-    "/Users/rango/Desktop/seed-iv",
+    "path_to_seed",
     label_type="V",
     transform=transform,
 )

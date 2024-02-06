@@ -350,14 +350,14 @@ class DEAP(EEGDataset):
             "P8",
             "PO4",
             "O2",
-            "EXG1",
-            "EXG2",
-            "EXG3",
-            "EXG4",
-            "GSR1",
-            "Resp",
-            "Plet",
-            "Temp",
+            # "EXG1",
+            # "EXG2",
+            # "EXG3",
+            # "EXG4",
+            # "GSR1",
+            # "Resp",
+            # "Plet",
+            # "Temp",
         ]
 
         self._sfreq = 128
@@ -379,6 +379,7 @@ class DEAP(EEGDataset):
         for i in range(0, datas.shape[0]):
             data = datas[i]
             data = mne.io.RawArray(data, self.info, verbose=False)
+
             if self.transform:
                 data = self.transform(data)
             data_array[i] = data.get_data()
