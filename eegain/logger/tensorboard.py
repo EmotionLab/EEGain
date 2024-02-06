@@ -126,10 +126,16 @@ class EmotionLogger:
             subject_id, "accuracy",
             accuracy_score(test_actual, test_pred), i, data_part
         )
-        self.log_metric(
-            subject_id, "f1",
-            f1_score(test_actual, test_pred, average='binary'), i, data_part
-        )
+        if 3 in test_actual or 3 in test_pred or 2 in test_actual or 2 in test_pred:
+            self.log_metric(
+                subject_id, "f1",
+                f1_score(test_actual, test_pred, average='micro'), i, data_part
+            )
+        else:
+            self.log_metric(
+                subject_id, "f1",
+                f1_score(test_actual, test_pred, average='binary'), i, data_part
+            )
         self.log_metric(
             subject_id, "f1_weighted",
             f1_score(test_actual, test_pred, average='weighted'), i, data_part

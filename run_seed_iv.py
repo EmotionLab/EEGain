@@ -90,7 +90,7 @@ def run(
         logger.log(test_subject_ids[0], train_pred, train_actual, i, "train", train_loss)
         logger.log(test_subject_ids[0], test_pred, test_actual, i, "val", test_loss)
 
-    logger.log_summary()
+    logger.log_summary(overal_log_file="overal_log", log_dir="logs/")
 
 
 # -------------- Preprocessing --------------
@@ -140,7 +140,7 @@ transform = eegain.transforms.Construct(
 
 # -------------- Dataset --------------
 seed_dataset = SeedIV(
-    "/Users/raphaelkalandadze/Downloads/seed-iv",
+    "/Users/rango/Desktop/seed-iv",
     label_type="V",
     transform=transform,
 )
@@ -155,7 +155,7 @@ logger = EmotionLogger(log_dir="logs/", class_names=[0, 1, 2, 3])
 for loader in eegloader:
     # -------------- Model --------------
     model = TSception(
-        num_classes=2,
+        num_classes=4,
         input_size=(1, 32, 512),
         sampling_r=128,
         num_t=15,
@@ -173,5 +173,5 @@ for loader in eegloader:
         test_subject_ids=loader["test_subject_indexes"],
         optimizer=optimizer,
         loss_fn=loss_fn,
-        epoch=100,
+        epoch=3,
     )
