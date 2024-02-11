@@ -11,7 +11,8 @@ from typing import Dict, List, Tuple
 import mne
 import numpy as np
 import pandas as pd
-import scipy.io
+import scipy.io 
+from scipy.io import loadmat
 import torch
 from torch.utils.data import Dataset
 
@@ -551,6 +552,128 @@ class DREAMER(EEGDataset):
             target_label = int(subject_eeg_full_info[idx][video_idx][0])
             target_label = 0 if target_label <= self.threshold else 1
             label_array[video_idx] = target_label
+
+        # expand dims
+        data_array = {
+            key: np.expand_dims(value, axis=-3) for key, value in data_array.items()
+        }
+
+        return data_array, label_array
+    
+class AMIGOS(EEGDataset):
+    @staticmethod
+    def _create_user_csv_mapping(
+        file_paths: List[str], data_path: Path, transform, preprocessed: bool = True
+    ) -> Dict[int, List[str]]:
+        """
+        this functions creates mapping dictionary {user_id: [read file for each subject which contains all sessions]}
+        """
+        user_session_info = {}
+        data = loadmat(data_path)
+        if preprocessed:
+            for subj in file_paths:
+                if ".mat" in subj:
+                    id = subj.split("/")[-1].split(".")[0].split("_")[-1][1:]
+                    data = loadmat(subj)
+                    _data = {"data": data["joined_data"][0], "labels": data["labels_selfassessment"][0]}
+                    user_session_info[id] = _data
+        return user_session_info
+
+    def __init__(
+        self,
+        root: str,
+        label_type: str,
+        preprocessed: bool = True,
+        transform: Construct = None,
+    ):
+        self.root = Path(root)
+        self.transform = transform
+        self.file_paths = os.listdir(self.root)
+        self.label_type = label_type
+        self.user_mapping = self._create_user_csv_mapping(
+            self.file_paths, self.root, self.transform, preprocessed
+        )
+        self._ch_names = [
+            "AF3",
+            "F7",
+            "F3",
+            "FC5",
+            "T7",
+            "P7",
+            "O1",
+            "O2",
+            "P8",
+            "T8",
+            "FC6",
+            "F4",
+            "F8",
+            "AF4",
+            "ECG_Right",
+            "ECG_Left",
+            "GSR"
+        ]
+
+        self._sfreq = 128
+        self.info = mne.create_info(
+            self._ch_names, self._sfreq, ch_types="misc", verbose=None
+        )
+
+    def __get_subject_ids__(self) -> List[int]:
+        return self.user_mapping.keys()
+
+    def __get_subject__(
+        self, subject_index: int
+    ) -> Tuple[Dict[int, np.ndarray], Dict[int, int]]:
+        subject_data = self.user_mapping[subject_index]
+        datas = subject_data["data"]
+        labels = subject_data["labels"]
+        data_array, label_array = {}, {}
+
+        for i in range(0, datas.shape[0]):
+            data = datas[i]
+            data = mne.io.RawArray(data.T, self.info, verbose=False)
+
+            if self.transform:
+                data = self.transform(data)
+            data_array[i] = data.get_data()
+
+            felt_arousal = float(labels[i][0][0])
+            felt_valence = float(labels[i][0][1])
+            normal = float(labels[i][0][5])
+            label_array[i] = np.array([felt_arousal, felt_valence])
+
+        # choose label and split into binary
+        idx = 0 if self.label_type == "A" else 1
+        for session_id, data in label_array.items():
+            target_label = data[idx]
+            target_label = 0 if target_label <= 4.5 else 1
+            label_array[session_id] = target_label
+
+        # expand dims
+        data_array = {
+            key: np.expand_dims(value, axis=-3) for key, value in data_array.items()
+        }
+
+        return data_array, label_array
+
+    def __get_videos__(self, session_ids: List, subject_video_mapping: Dict):
+        data_array, label_array = {}, {}
+        for session_id in session_ids:
+            curr_labels = subject_video_mapping['labels'][session_id]
+            curr_data = subject_video_mapping['data'][session_id]
+
+            felt_valence = curr_labels[0]
+            felt_arousal = curr_labels[1]
+
+            data_array[session_id] = curr_data
+            label_array[session_id] = np.array([felt_arousal, felt_valence])
+
+        # choose label and split into binary
+        idx = 0 if self.label_type == "A" else 1
+        for session_id, data in label_array.items():
+            target_label = data[idx]
+            target_label = 0 if target_label <= 5 else 1
+            label_array[session_id] = target_label
 
         # expand dims
         data_array = {
