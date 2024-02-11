@@ -10,3 +10,4 @@ dist/
 .pytest_cache/
 logs/
 log.log
+overal_log
