@@ -569,12 +569,11 @@ class AMIGOS(EEGDataset):
         this functions creates mapping dictionary {user_id: [read file for each subject which contains all sessions]}
         """
         user_session_info = {}
-        data = loadmat(data_path)
         if preprocessed:
             for subj in file_paths:
                 if ".mat" in subj:
                     id = subj.split("/")[-1].split(".")[0].split("_")[-1][1:]
-                    data = loadmat(subj)
+                    data = loadmat(os.path.join(data_path, subj))
                     _data = {"data": data["joined_data"][0], "labels": data["labels_selfassessment"][0]}
                     user_session_info[id] = _data
         return user_session_info

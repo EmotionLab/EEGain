@@ -108,7 +108,7 @@ transform = eegain.transforms.Construct(
 
 
 amigos_dataset = AMIGOS(
-    "path_to_deap",
+    "path_to_amigo",
     label_type="A",
     transform=transform,
 )
