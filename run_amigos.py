@@ -129,7 +129,7 @@ for loader in eegloader:
         sampling_r=128,
         num_t=15,
         num_s=15,
-        hidden=32,
+        hidden=num_eeg_channels,
         dropout_rate=0.5,
     )
     model = model.to(device)

@@ -627,15 +627,14 @@ class AMIGOS(EEGDataset):
         datas = subject_data["data"]
         labels = subject_data["labels"]
         data_array, label_array = {}, {}
-
-        for i in range(0, datas.shape[0]):
+        shp = 16 if  datas.shape[0] > 16 else  datas.shape[0] # this is because remaining videos are long ones and not everyone have that
+        for i in range(0, shp):
             data = datas[i]
             data = mne.io.RawArray(data.T, self.info, verbose=False)
 
             if self.transform:
                 data = self.transform(data)
             data_array[i] = data.get_data()
-
             felt_arousal = float(labels[i][0][0])
             felt_valence = float(labels[i][0][1])
             normal = float(labels[i][0][5])

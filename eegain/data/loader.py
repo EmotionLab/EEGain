@@ -121,9 +121,15 @@ class EEGDataloader:
             normalized training and testing data
         """
         # data: sample x 1 x channel x data
-        train_data = train_data.unsqueeze(1)
-        test_data = test_data.unsqueeze(1)
+        if len(train_data.shape) != 4:
+          train_data = train_data.unsqueeze(1)
+          test_data = test_data.unsqueeze(1)
         for channel in range(train_data.shape[2]):
+            #this is for important for amigos and maybe dreame
+            #TODO: why do they have nan values???
+            nan_mask = torch.isnan(train_data[:, :, channel, :])  
+            train_data[:, :, channel, :][nan_mask] = 0
+
             std, mean = torch.std_mean(train_data[:, :, channel, :])
             train_data[:, :, channel, :] = (train_data[:, :, channel, :] - mean) / std
             test_data[:, :, channel, :] = (test_data[:, :, channel, :] - mean) / std
@@ -147,7 +153,6 @@ class EEGDataloader:
             test_data, test_label = EEGDataloader._concat_data(test_data)
             logger.debug(f"test data shape {test_data.shape}")
 
-            # if len(train_data.shape) != 4: # DREAMER has already shape that is needed and it doesn't need normalization
             train_data, test_data = EEGDataloader.normalize(train_data, test_data)
 
             train_dataloader = self._get_dataloader(train_data, train_label)
