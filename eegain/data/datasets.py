@@ -168,6 +168,59 @@ class SeedIV(EEGDataset):
 
         return data_array, label_array
 
+    def __get_videos__(self, sessions, subject_ids):
+        labels_file_path = self.root / Path("ReadMe.txt")
+        path_to_channels_excel = self.root / Path("Channel Order.xlsx")
+        channels_file = pd.read_excel(path_to_channels_excel, header=None)
+        channels = list(channels_file.iloc[:, 0])
+
+        num_trials = self._num_trials
+        sampling_rate = self._sampling_rate
+        data_array, label_array = {}, {}
+
+        for session in sessions:
+            path_to_mat = self.root / Path("eeg_raw_data") / Path(str(session))  # eeg_raw_data
+            mat_data = scipy.io.loadmat(path_to_mat)  # Get Matlab File
+            mat_data_values = list(mat_data.values())[
+                              3:]  # Matlab file contains some not necessary info so let's remove it
+            for trial in range(1, num_trials + 1):
+                eeg_data = mat_data_values[
+                    trial - 1
+                    ]  # each matlab file contains 24 trials. Here we take one trial
+                info = mne.create_info(
+                    ch_names=channels, sfreq=sampling_rate, ch_types="eeg"
+                )
+                raw_data = mne.io.RawArray(
+                    eeg_data, info, verbose=False
+                )  # convert numpy ndarray to mne object
+
+                if self.transform:  # apply transformations
+                    raw_data = self.transform(raw_data)
+
+                session_trial = session + "/" + str(trial)
+                data_array[session_trial] = raw_data.get_data()
+
+                with open(labels_file_path, "r") as file:
+                    labels_file_content = file.read()
+
+                # Extract label from file and add to label_array
+                session_id = session[: session.index("/")]
+                session_start_idx = labels_file_content.index(
+                    f"session{session_id}_label"
+                )
+                session_end_idx = labels_file_content.index(";", session_start_idx)
+                session_labels = labels_file_content[session_start_idx:session_end_idx]
+                session_labels = eval(session_labels[session_labels.index("["):])
+
+                emotional_label = session_labels[trial - 1]
+                label_array[session_trial] = emotional_label
+
+        data_array = {
+            key: np.expand_dims(value, axis=-3) for key, value in data_array.items()
+        }
+
+        return data_array, label_array
+
 
 class MAHNOB(EEGDataset):
     @staticmethod
