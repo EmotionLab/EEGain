@@ -126,21 +126,15 @@ deap_dataset = DEAP(
     transform=transform,
 )
 
-subject_video_mapping = deap_dataset.user_mapping
-
-keys = list(subject_video_mapping.keys())
-values = [list(subject_video_mapping.values())[i]['labels'].shape[0] for i in range(len(keys))]
-values = [list(range(0, i)) for i in values]
-subject_video_ids_mapping = dict(zip(keys, values))
-
+subject_video_mapping = deap_dataset.mapping_list
 logger = EmotionLogger(log_dir="logs/", class_names=["low", "high"])
 
 all_model_state_dicts = []
 all_train_preds, all_test_preds, all_train_actuals, all_test_actuals = [], [], [], []
 f1_tests, f1_weighted_tests, accuracy_tests = [], [], []
 
-for subject_id, session_ids in subject_video_ids_mapping.items():
-    eegloader = EEGDataloader(deap_dataset, batch_size=32).loto(subject_id, session_ids, n_fold=len(session_ids), subject_video_mapping=subject_video_mapping[subject_id]) # pass n_fold=len(session_ids) for LOTO
+for subject_id, session_ids in subject_video_mapping.items():
+    eegloader = EEGDataloader(deap_dataset, batch_size=32).loto(subject_id, session_ids, n_fold=len(session_ids)) # pass n_fold=len(session_ids) for LOTO
     num_epoch = 5
     all_train_preds_for_subject, all_train_actuals_for_subject, all_test_preds_for_subject, all_test_actuals_for_subject = [], [], [], []
     for i, loader in enumerate(eegloader):

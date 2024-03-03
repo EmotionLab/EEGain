@@ -1,22 +1,21 @@
-import logging
 import os
 import re
-import pickle
-import xml.etree.ElementTree as ET
-from abc import ABC, abstractmethod
-from collections import defaultdict
-from pathlib import Path
-from typing import Dict, List, Tuple
-
 import mne
+import torch
+import pickle
+import logging
+import scipy.io
 import numpy as np
 import pandas as pd
-import scipy.io 
-from scipy.io import loadmat
-import torch
-from torch.utils.data import Dataset
+import xml.etree.ElementTree as ET
 
+from pathlib import Path
+from scipy.io import loadmat
 from ..transforms import Construct
+from abc import ABC, abstractmethod
+from collections import defaultdict
+from typing import Dict, List, Tuple
+from torch.utils.data import Dataset
 
 logger = logging.getLogger("Dataset")
 
@@ -53,7 +52,7 @@ class EEGDataset(ABC):
 
 class SeedIV(EEGDataset):
     @staticmethod
-    def _create_user_mat_mapping(data_path: Path) -> Dict[int, List[str]]:
+    def _create_user_recording_mapping(data_path: Path) -> Dict[int, List[str]]:
         """This method creates mapping between users and user_recordings
         Args:
             data_path(Path): path to SEED IV dataset
@@ -79,6 +78,7 @@ class SeedIV(EEGDataset):
                     str(session) + "/" + subject_file_name
                 )
 
+        logger.debug(f"Subject id -> sessions: {user_session_info}")
         return user_session_info
 
     def __init__(self, root: str, label_type: str, transform: Construct = None):
@@ -93,14 +93,16 @@ class SeedIV(EEGDataset):
 
         self.root = Path(root)
         self.transform = transform
-        self.mapping_list = SeedIV._create_user_mat_mapping(self.root)
+        self.mapping_list = SeedIV._create_user_recording_mapping(self.root)
         self.label_type = label_type
         self._num_trials = 24
         self._sampling_rate = 1000
 
+        logger.info(f"Using Dataset: {self.__class__.__name__}")
+        logger.info(f"Using label: {self.label_type}")
+
     def __get_subject_ids__(self) -> List[int]:
         """Method returns list of subject ids"""
-
         return list(self.mapping_list.keys())
 
     def __get_subject__(
@@ -166,6 +168,10 @@ class SeedIV(EEGDataset):
             key: np.expand_dims(value, axis=-3) for key, value in data_array.items()
         }
 
+        logger.debug(
+            f"subj index: {subject_index} data {data_array.keys()}, label {label_array.keys()}"
+        )
+
         return data_array, label_array
 
     def __get_videos__(self, sessions, subject_ids):
@@ -224,9 +230,14 @@ class SeedIV(EEGDataset):
 
 class MAHNOB(EEGDataset):
     @staticmethod
-    def _create_user_csv_mapping(data_path: Path) -> Dict[int, List[str]]:
-        """
-        this functions creates mapping dictionary {user_id: [all csv files names for this user_id]}
+    def _create_user_recording_mapping(data_path: Path) -> Dict[int, List[str]]:
+        """This method creates mapping between users and user_recordings
+        Args:
+            data_path(Path): path to MAHNOB-HCI dataset
+
+        Returns:
+            user_session_info(Dict[int, List[str]]): This is the dictionary where key is user_id and value is list
+                                                     of file_names that's associated to this particular user
         """
         user_session_info: Dict[int, List[str]] = defaultdict(list)
 
@@ -242,20 +253,38 @@ class MAHNOB(EEGDataset):
         return user_session_info
 
     def __init__(self, root: str, label_type: str, transform: Construct = None):
+        """This is just constructor for MAHNOB class
+        Args:
+            root(str): Path to MAHNOB HCI dataset folder
+            label_type(str): 'V' for Valence and 'A' for Arousal
+            transform(Construct): transformations to apply on dataset
+
+        Return:
+        """
         self.root = Path(root)
         self.transform = transform
-        self.mapping_list = MAHNOB._create_user_csv_mapping(self.root)
+        self.mapping_list = MAHNOB._create_user_recording_mapping(self.root)
         self.label_type = label_type
 
         logger.info(f"Using Dataset: {self.__class__.__name__}")
         logger.info(f"Using label: {self.label_type}")
 
     def __get_subject_ids__(self) -> List[int]:
+        """Method returns list of subject ids"""
         return list(self.mapping_list.keys())
 
     def __get_subject__(
         self, subject_index: int
     ) -> Tuple[Dict[int, np.ndarray], Dict[int, int]]:
+        """This method returns data and associated labels for specific subject
+
+        Args:
+            subject_index(int): user id
+
+        Returns:
+            data_array(Dict[int, np.ndarray]): Dictionary of files and data associated to specific user
+            label_array(Dict[int, int]): labels for each recording
+        """
         sessions = self.mapping_list[subject_index]
 
         data_array, label_array = {}, {}
@@ -297,7 +326,7 @@ class MAHNOB(EEGDataset):
         )
         return data_array, label_array
 
-    def __get_videos__(self, session_ids: List, subject_video_mapping = None):
+    def __get_videos__(self, session_ids: List, subject_video_mapping=None):
         data_array, label_array = {}, {}
         for session_id in session_ids:
 
@@ -336,25 +365,31 @@ class MAHNOB(EEGDataset):
 
 class DEAP(EEGDataset):
     @staticmethod
-    def _create_user_csv_mapping(
-        file_paths: List[str], data_path: Path, transform, preprocessed: bool = True
-    ) -> Dict[int, List[str]]:
-        """
-        this functions creates mapping dictionary {user_id: [read file for each subject which contains all sessions]}
-        """
-        user_session_info = {}
-        if preprocessed:
-            for subj in file_paths:
-                if ".dat" in subj:
-                    id = subj[1:-4]
-                    with open(os.path.join(data_path, subj), "rb") as file:
-                        data = pickle.load(file, encoding="latin-1")
-                        if transform:
-                            # TODO - this should be done with transform itself but transform doesn't work with
-                            # this data because it's read by pickle and type of data['data'] is numpy ndarray
-                            data['data'] = data['data'][:, :32, :]
-                        user_session_info[id] = data
+    def _create_user_recording_mapping(data_path: Path) -> Dict[str, List[str]]:
+        """This method creates mapping between users and user_recordings
+        Args:
+            data_path(Path): path to DEAP dataset
 
+        Returns:
+            user_session_info(Dict[str, List[str]]): This is the dictionary where key is user_id and value is list
+                                                     of file_names that's associated to this particular user
+        """
+        file_paths = os.listdir(data_path)
+        user_session_info = {}
+        for subj in file_paths:
+            if ".dat" in subj:
+                id = subj[1:-4]
+                # user_session_info[id] = [i for i in range(40)] this is the same as below, just this is hardcoded
+                with open(os.path.join(data_path, subj), "rb") as file:
+                    data = pickle.load(file, encoding="latin-1")
+                    num_sessions = int(data['labels'].shape[0])
+                    user_session_info[id] = [i for i in range(num_sessions)]
+                    # if transform:
+                    #     # TODO - this should be done with transform itself but transform doesn't work with
+                    #     # this data because it's read by pickle and type of data['data'] is numpy ndarray
+                    #     data['data'] = data['data'][:, :32, :]
+
+        logger.debug(f"Subject id -> sessions: {user_session_info}")
         return user_session_info
 
     def __init__(
@@ -366,11 +401,8 @@ class DEAP(EEGDataset):
     ):
         self.root = Path(root)
         self.transform = transform
-        self.file_paths = os.listdir(self.root)
         self.label_type = label_type
-        self.user_mapping = self._create_user_csv_mapping(
-            self.file_paths, self.root, self.transform, preprocessed
-        )
+        self.mapping_list = self._create_user_recording_mapping(self.root)
         self._ch_names = [
             "Fp1",
             "AF3",
@@ -404,14 +436,14 @@ class DEAP(EEGDataset):
             "P8",
             "PO4",
             "O2",
-            # "EXG1",
-            # "EXG2",
-            # "EXG3",
-            # "EXG4",
-            # "GSR1",
-            # "Resp",
-            # "Plet",
-            # "Temp",
+            "EXG1",
+            "EXG2",
+            "EXG3",
+            "EXG4",
+            "GSR1",
+            "Resp",
+            "Plet",
+            "Temp",
         ]
 
         self._sfreq = 128
@@ -419,13 +451,26 @@ class DEAP(EEGDataset):
             self._ch_names, self._sfreq, ch_types="misc", verbose=None
         )
 
+        logger.info(f"Using Dataset: {self.__class__.__name__}")
+        logger.info(f"Using label: {self.label_type}")
+
     def __get_subject_ids__(self) -> List[int]:
-        return self.user_mapping.keys()
+        """Method returns list of subject ids"""
+        return self.mapping_list.keys()
 
     def __get_subject__(
         self, subject_index: int
     ) -> Tuple[Dict[int, np.ndarray], Dict[int, int]]:
-        subject_data = self.user_mapping[subject_index]
+        """This method returns data and associated labels for specific subject
+
+        Args:
+            subject_index(int): user id
+
+        Returns:
+            data_array(Dict[int, np.ndarray]): Dictionary of files and data associated to specific user
+            label_array(Dict[int, int]): labels for each recording
+        """
+        subject_data = self.mapping_list[subject_index]
         datas = subject_data["data"]
         labels = subject_data["labels"]
         data_array, label_array = {}, {}
@@ -454,13 +499,26 @@ class DEAP(EEGDataset):
             key: np.expand_dims(value, axis=-3) for key, value in data_array.items()
         }
 
+        logger.debug(
+            f"subj index: {subject_index} data {data_array.keys()}, label {label_array.keys()}"
+        )
         return data_array, label_array
 
-    def __get_videos__(self, session_ids: List, subject_video_mapping: Dict):
+    def __get_videos__(self, session_ids: List, subject_id: str):
         data_array, label_array = {}, {}
+        path_to_subject = (
+                self.root / f's{subject_id}.dat'
+        )
+        with open(path_to_subject, "rb") as file:
+            subject_data = pickle.load(file, encoding="latin-1")
         for session_id in session_ids:
-            curr_labels = subject_video_mapping['labels'][session_id]
-            curr_data = subject_video_mapping['data'][session_id]
+            curr_labels = subject_data['labels'][session_id]
+            curr_data = subject_data['data'][session_id]
+
+            curr_data = mne.io.RawArray(curr_data, self.info)
+
+            if self.transform:
+                curr_data = self.transform(curr_data)
 
             felt_valence = curr_labels[0]
             felt_arousal = curr_labels[1]
@@ -484,6 +542,29 @@ class DEAP(EEGDataset):
 
 
 class DREAMER(EEGDataset):
+    @staticmethod
+    def _create_user_recording_mapping(data_path: Path) -> Dict[int, List[str]]:
+        """This method creates mapping between users and user_recordings
+        Args:
+            data_path(Path): path to DREAMER dataset
+
+        Returns:
+            user_session_info(Dict[int, List[str]]): This is the dictionary where key is user_id and value is list
+                                                     of file_names that's associated to this particular user
+        """
+        user_session_info = {}
+
+        mat_data = scipy.io.loadmat(data_path)
+
+        num_subjects = len(list(mat_data["DREAMER"][0][0][0][0]))
+        for curr_subject_idx in range(num_subjects):
+            num_videos_curr_subject = len(list(mat_data["DREAMER"][0][0][0][0][curr_subject_idx][0][0][2][0][0][1]))
+            video_idxs = [i for i in range(num_videos_curr_subject)]
+            user_session_info[curr_subject_idx] = video_idxs
+
+        logger.debug(f"Subject id -> sessions: {user_session_info}")
+        return user_session_info
+
     def __init__(self, root: str, label_type: str, transform: Construct = None):
         """This is just constructor for DREAMER class
         Args:
@@ -498,9 +579,12 @@ class DREAMER(EEGDataset):
         self.label_type = label_type
         self.num_videos = 18
         self.threshold = 3
-        self.user_mapping = self._create_user_csv_mapping(
+        self.mapping_list = self._create_user_recording_mapping(
             self.root, self.transform, self.label_type
         )
+
+        logger.info(f"Using Dataset: {self.__class__.__name__}")
+        logger.info(f"Using label: {self.label_type}")
 
     def __get_subject_ids__(self) -> List[int]:
         """Method returns list of subject ids"""
@@ -557,21 +641,11 @@ class DREAMER(EEGDataset):
             key: np.expand_dims(value, axis=-3) for key, value in data_array.items()
         }
 
+        logger.debug(
+            f"subj index: {subject_index} data {data_array.keys()}, label {label_array.keys()}"
+        )
+
         return data_array, label_array
-
-    @staticmethod
-    def _create_user_csv_mapping(data_path: Path, transform, label_type) -> Dict[int, List[str]]:
-        user_session_info = {}
-
-        mat_data = scipy.io.loadmat(data_path)
-
-        num_subjects = len(list(mat_data["DREAMER"][0][0][0][0]))
-        for curr_subject_idx in range(num_subjects):
-            num_videos_curr_subject = len(list(mat_data["DREAMER"][0][0][0][0][curr_subject_idx][0][0][2][0][0][1]))
-            video_idxs = [i for i in range(num_videos_curr_subject)]
-            user_session_info[curr_subject_idx] = video_idxs
-
-        return user_session_info
 
     def __get_videos__(self, video_ids, subject_id):
         data_array, label_array = {}, {}
@@ -612,14 +686,20 @@ class DREAMER(EEGDataset):
         }
 
         return data_array, label_array
-    
+
+
 class AMIGOS(EEGDataset):
     @staticmethod
     def _create_user_csv_mapping(
         file_paths: List[str], data_path: Path, transform, preprocessed: bool = True
     ) -> Dict[int, List[str]]:
-        """
-        this functions creates mapping dictionary {user_id: [read file for each subject which contains all sessions]}
+        """This method creates mapping between users and user_recordings
+        Args:
+            data_path(Path): path to AMIGOS dataset
+
+        Returns:
+            user_session_info(Dict[int, List[str]]): This is the dictionary where key is user_id and value is list
+                                                     of file_names that's associated to this particular user
         """
         user_session_info = {}
         if preprocessed:
@@ -629,6 +709,8 @@ class AMIGOS(EEGDataset):
                     data = loadmat(os.path.join(data_path, subj))
                     _data = {"data": data["joined_data"][0], "labels": data["labels_selfassessment"][0]}
                     user_session_info[id] = _data
+
+        logger.debug(f"Subject id -> sessions: {user_session_info}")
         return user_session_info
 
     def __init__(
@@ -642,7 +724,7 @@ class AMIGOS(EEGDataset):
         self.transform = transform
         self.file_paths = os.listdir(self.root)
         self.label_type = label_type
-        self.user_mapping = self._create_user_csv_mapping(
+        self.mapping_list = self._create_user_csv_mapping(
             self.file_paths, self.root, self.transform, preprocessed
         )
         self._ch_names = [
@@ -670,17 +752,30 @@ class AMIGOS(EEGDataset):
             self._ch_names, self._sfreq, ch_types="misc", verbose=None
         )
 
+        logger.info(f"Using Dataset: {self.__class__.__name__}")
+        logger.info(f"Using label: {self.label_type}")
+
     def __get_subject_ids__(self) -> List[int]:
-        return self.user_mapping.keys()
+        """Method returns list of subject ids"""
+        return self.mapping_list.keys()
 
     def __get_subject__(
         self, subject_index: int
     ) -> Tuple[Dict[int, np.ndarray], Dict[int, int]]:
-        subject_data = self.user_mapping[subject_index]
+        """This method returns data and associated labels for specific subject
+
+        Args:
+            subject_index(int): user id
+
+        Returns:
+            data_array(Dict[int, np.ndarray]): Dictionary of files and data associated to specific user
+            label_array(Dict[int, int]): labels for each recording
+        """
+        subject_data = self.mapping_list[subject_index]
         datas = subject_data["data"]
         labels = subject_data["labels"]
         data_array, label_array = {}, {}
-        shp = 16 if  datas.shape[0] > 16 else  datas.shape[0] # this is because remaining videos are long ones and not everyone have that
+        shp = 16 if datas.shape[0] > 16 else datas.shape[0] # this is because remaining videos are long ones and not everyone have that
         for i in range(0, shp):
             data = datas[i]
             data = mne.io.RawArray(data.T, self.info, verbose=False)
@@ -690,7 +785,6 @@ class AMIGOS(EEGDataset):
             data_array[i] = data.get_data()
             felt_arousal = float(labels[i][0][0])
             felt_valence = float(labels[i][0][1])
-            normal = float(labels[i][0][5])
             label_array[i] = np.array([felt_arousal, felt_valence])
 
         # choose label and split into binary
@@ -704,6 +798,10 @@ class AMIGOS(EEGDataset):
         data_array = {
             key: np.expand_dims(value, axis=-3) for key, value in data_array.items()
         }
+
+        logger.debug(
+            f"subj index: {subject_index} data {data_array.keys()}, label {label_array.keys()}"
+        )
 
         return data_array, label_array
 

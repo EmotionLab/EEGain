@@ -157,6 +157,7 @@ logger = EmotionLogger(log_dir="logs/", class_names=["low", "high"])
 all_model_state_dicts = []
 all_train_preds, all_test_preds, all_train_actuals, all_test_actuals = [], [], [], []
 f1_tests, f1_weighted_tests, accuracy_tests = [], [], []
+
 for subject_id, session_ids in subject_video_mapping.items():
     eegloader = EEGDataloader(seed_iv_dataset, batch_size=32).loto(subject_id, session_ids, n_fold=len(session_ids)) # pass n_fold=len(session_ids) for LOTO
     num_epoch = 5

@@ -19,7 +19,7 @@ class EEGDataloader:
         self.dataset = dataset
         self.batch_size = batch_size
 
-    def loto(self, subject_id, session_ids, n_fold, subject_video_mapping=None):
+    def loto(self, subject_id, session_ids, n_fold):
         fold_size = len(session_ids) // n_fold
 
         folds = [session_ids[i:i + fold_size] for i in range(0, len(session_ids), fold_size)]
@@ -29,8 +29,8 @@ class EEGDataloader:
             train_sessions = [item for item in session_ids if item not in test_sessions]
 
             # TODO - deap loto shouldn't be different
-            test_data = self.dataset.__get_videos__(test_sessions, subject_id)  # instead of subject_id here should be subject_video_mapping for deap_loto
-            train_data = self.dataset.__get_videos__(train_sessions, subject_id)  # instead of subject_id here should be subject_video_mapping for deap_loto
+            test_data = self.dataset.__get_videos__(test_sessions, subject_id)
+            train_data = self.dataset.__get_videos__(train_sessions, subject_id)
             train_data, train_label = EEGDataloader._concat_data(train_data, loader_type="LOTO")
             test_data, test_label = EEGDataloader._concat_data(test_data, loader_type="LOTO")
 
