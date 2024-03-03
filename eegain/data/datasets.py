@@ -175,7 +175,7 @@ class SeedIV(EEGDataset):
 
         return data_array, label_array
 
-    def __get_videos__(self, sessions, subject_ids):
+    def __get_trials__(self, sessions, subject_ids):
         labels_file_path = self.root / Path("ReadMe.txt")
         path_to_channels_excel = self.root / Path("Channel Order.xlsx")
         channels_file = pd.read_excel(path_to_channels_excel, header=None)
@@ -328,7 +328,7 @@ class MAHNOB(EEGDataset):
         )
         return data_array, label_array
 
-    def __get_videos__(self, session_ids: List, subject_video_mapping=None):
+    def __get_trials__(self, session_ids: List, subject_video_mapping=None):
         data_array, label_array = {}, {}
         for session_id in session_ids:
 
@@ -507,7 +507,7 @@ class DEAP(EEGDataset):
         )
         return data_array, label_array
 
-    def __get_videos__(self, session_ids: List, subject_id: str):
+    def __get_trials__(self, session_ids: List, subject_id: str):
         data_array, label_array = {}, {}
         path_to_subject = (
                 self.root / f's{subject_id}.dat'
@@ -651,7 +651,7 @@ class DREAMER(EEGDataset):
 
         return data_array, label_array
 
-    def __get_videos__(self, video_ids, subject_id):
+    def __get_trials__(self, video_ids, subject_id):
         data_array, label_array = {}, {}
 
         # choose label
@@ -811,7 +811,7 @@ class AMIGOS(EEGDataset):
 
         return data_array, label_array
 
-    def __get_videos__(self, session_ids: List, subject_video_mapping: Dict):
+    def __get_trials__(self, session_ids: List, subject_video_mapping: Dict):
         data_array, label_array = {}, {}
         for session_id in session_ids:
             curr_labels = subject_video_mapping['labels'][session_id]
