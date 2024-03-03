@@ -81,7 +81,7 @@ class SeedIV(EEGDataset):
         logger.debug(f"Subject id -> sessions: {user_session_info}")
         return user_session_info
 
-    def __init__(self, root: str, label_type: str, transform: Construct = None):
+    def __init__(self, root: str, label_type: str, ground_truth_threshold, transform: Construct = None):
         """This is just constructor for SEED IV class
         Args:
             root(str): Path to SEED IV dataset folder
@@ -92,6 +92,7 @@ class SeedIV(EEGDataset):
         """
 
         self.root = Path(root)
+        self.ground_truth_threshold = ground_truth_threshold
         self.transform = transform
         self.mapping_list = SeedIV._create_user_recording_mapping(self.root)
         self.label_type = label_type
@@ -252,7 +253,7 @@ class MAHNOB(EEGDataset):
         logger.debug(f"Subject id -> sessions: {user_session_info}")
         return user_session_info
 
-    def __init__(self, root: str, label_type: str, transform: Construct = None):
+    def __init__(self, root: str, label_type: str, ground_truth_threshold, transform: Construct = None):
         """This is just constructor for MAHNOB class
         Args:
             root(str): Path to MAHNOB HCI dataset folder
@@ -262,6 +263,7 @@ class MAHNOB(EEGDataset):
         Return:
         """
         self.root = Path(root)
+        self.ground_truth_threshold = ground_truth_threshold
         self.transform = transform
         self.mapping_list = MAHNOB._create_user_recording_mapping(self.root)
         self.label_type = label_type
@@ -313,7 +315,7 @@ class MAHNOB(EEGDataset):
         idx = 0 if self.label_type == "A" else 1
         for session_id, data in label_array.items():
             target_label = data[idx]
-            target_label = 0 if target_label <= 4.5 else 1
+            target_label = 0 if target_label <= self.ground_truth_threshold else 1
             label_array[session_id] = target_label
 
         # expand dims
@@ -352,7 +354,7 @@ class MAHNOB(EEGDataset):
         idx = 0 if self.label_type == "A" else 1
         for session_id, data in label_array.items():
             target_label = data[idx]
-            target_label = 0 if target_label <= 5 else 1
+            target_label = 0 if target_label <= self.ground_truth_threshold else 1
             label_array[session_id] = target_label
 
         # expand dims
@@ -396,10 +398,11 @@ class DEAP(EEGDataset):
         self,
         root: str,
         label_type: str,
-        preprocessed: bool = True,
+        ground_truth_threshold,
         transform: Construct = None,
     ):
         self.root = Path(root)
+        self.ground_truth_threshold = ground_truth_threshold
         self.transform = transform
         self.label_type = label_type
         self.mapping_list = self._create_user_recording_mapping(self.root)
@@ -491,7 +494,7 @@ class DEAP(EEGDataset):
         idx = 0 if self.label_type == "A" else 1
         for session_id, data in label_array.items():
             target_label = data[idx]
-            target_label = 0 if target_label <= 4.5 else 1
+            target_label = 0 if target_label <= self.ground_truth_threshold else 1
             label_array[session_id] = target_label
 
         # expand dims
@@ -530,7 +533,7 @@ class DEAP(EEGDataset):
         idx = 0 if self.label_type == "A" else 1
         for session_id, data in label_array.items():
             target_label = data[idx]
-            target_label = 0 if target_label <= 5 else 1
+            target_label = 0 if target_label <= self.ground_truth_threshold else 1
             label_array[session_id] = target_label
 
         # expand dims
@@ -565,7 +568,7 @@ class DREAMER(EEGDataset):
         logger.debug(f"Subject id -> sessions: {user_session_info}")
         return user_session_info
 
-    def __init__(self, root: str, label_type: str, transform: Construct = None):
+    def __init__(self, root: str, label_type: str, ground_truth_threshold, transform: Construct = None):
         """This is just constructor for DREAMER class
         Args:
             root(str): Path to DREAMER.mat file
@@ -575,6 +578,7 @@ class DREAMER(EEGDataset):
         Return:
         """
         self.root = Path(root)
+        self.ground_truth_threshold = ground_truth_threshold
         self.transform = transform
         self.label_type = label_type
         self.num_videos = 18
@@ -633,7 +637,7 @@ class DREAMER(EEGDataset):
             data_array[video_idx] = raw_data.get_data()
 
             target_label = int(subject_eeg_full_info[idx][video_idx][0])
-            target_label = 0 if target_label <= self.threshold else 1
+            target_label = 0 if target_label <= self.ground_truth_threshold else 1
             label_array[video_idx] = target_label
 
         # expand dims
@@ -677,7 +681,7 @@ class DREAMER(EEGDataset):
             data_array[video_idx] = raw_data.get_data()
 
             target_label = int(subject_eeg_full_info[idx][video_idx][0])
-            target_label = 0 if target_label <= self.threshold else 1
+            target_label = 0 if target_label <= self.ground_truth_threshold else 1
             label_array[video_idx] = target_label
 
         # expand dims
@@ -717,10 +721,12 @@ class AMIGOS(EEGDataset):
         self,
         root: str,
         label_type: str,
+        ground_truth_threshold,
         preprocessed: bool = True,
         transform: Construct = None,
     ):
         self.root = Path(root)
+        self.ground_truth_threshold = ground_truth_threshold
         self.transform = transform
         self.file_paths = os.listdir(self.root)
         self.label_type = label_type
@@ -791,7 +797,7 @@ class AMIGOS(EEGDataset):
         idx = 0 if self.label_type == "A" else 1
         for session_id, data in label_array.items():
             target_label = data[idx]
-            target_label = 0 if target_label <= 4.5 else 1
+            target_label = 0 if target_label <= self.ground_truth_threshold else 1
             label_array[session_id] = target_label
 
         # expand dims
@@ -821,7 +827,7 @@ class AMIGOS(EEGDataset):
         idx = 0 if self.label_type == "A" else 1
         for session_id, data in label_array.items():
             target_label = data[idx]
-            target_label = 0 if target_label <= 5 else 1
+            target_label = 0 if target_label <= self.ground_truth_threshold else 1
             label_array[session_id] = target_label
 
         # expand dims
