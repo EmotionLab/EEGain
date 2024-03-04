@@ -11,10 +11,10 @@ from eegain.data import EEGDataloader
 from eegain.data.datasets import DEAP, MAHNOB, SeedIV
 from eegain.logger import EmotionLogger
 from eegain.models import DeepConvNet, EEGNet, ShallowConvNet, TSception
-from collections import defaultdict
-from sklearn.metrics import *
+
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 
 def test_one_epoch(model, loader, loss_fn):
     model.eval()
@@ -72,13 +72,11 @@ def run(
     model,
     train_dataloader,
     test_dataloader,
-    test_ids,
+    test_subject_ids,
     optimizer,
     loss_fn,
     epoch,
-    split_type="LOTO",
 ):
-
     for i in range(epoch):
         print(f"\nEpoch {i}/{epoch}")
 
@@ -88,47 +86,65 @@ def run(
         test_pred, test_actual, test_loss = test_one_epoch(
             model, test_dataloader, loss_fn
         )
-        if split_type != "LOTO":
-            # in the end of epoch it logs metrics for this specific epoch. test_ids is test_session_ids
-            logger.log(test_ids[0], train_pred, train_actual, i, "train", train_loss)
-            logger.log(test_ids[0], test_pred, test_actual, i, "val", test_loss)
-    if split_type == "LOTO":
-        return train_pred, train_actual, test_pred, test_actual
-    # for loso
-    logger.log_summary()
 
-
-def main(dataset, model):
-    subject_video_mapping = dataset.mapping_list
-    logger = EmotionLogger(log_dir="logs/", class_names=["low", "high"])
-
-    for subject_id, session_ids in subject_video_mapping.items():
-        eegloader = EEGDataloader(dataset, batch_size=32).loto(subject_id, session_ids,
-                                                                      n_fold=10)  # pass n_fold=len(session_ids) for LOTO
-        num_epoch = 5
-        all_train_preds_for_subject, all_train_actuals_for_subject, all_test_preds_for_subject, all_test_actuals_for_subject = [], [], [], []
-        for i, loader in enumerate(eegloader):
-            model = model
-            model = model.to(device)
-            optimizer = torch.optim.Adam(model.parameters(), lr=1e-4, weight_decay=0)
-            loss_fn = nn.CrossEntropyLoss()
-            _, _, test_pred, test_actual = run(
-                model=model,
-                train_dataloader=loader["train"],
-                test_dataloader=loader["test"],
-                test_ids=loader["test_session_indexes"],
-                optimizer=optimizer,
-                loss_fn=loss_fn,
-                epoch=num_epoch,
-                split_type="LOTO"  # for loto
-            )
-            all_test_preds_for_subject.append(test_pred)
-            all_test_actuals_for_subject.append(test_actual)
-
-        # all_model_state_dicts.append(model.state_dict())
-        all_test_preds_for_subject = [item for sublist in all_test_preds_for_subject for item in sublist]
-        all_test_actuals_for_subject = [item for sublist in all_test_actuals_for_subject for item in sublist]
-
-        logger.log(subject_id, all_test_preds_for_subject, all_test_actuals_for_subject, num_epoch, "val")
+        logger.log(test_subject_ids[0], train_pred, train_actual, i, "train", train_loss)
+        logger.log(test_subject_ids[0], test_pred, test_actual, i, "val", test_loss)
 
     logger.log_summary(overal_log_file="overal_log", log_dir="logs/")
+
+
+transform = eegain.transforms.Construct(
+    [
+        # eegain.transforms.DropChannels(
+        #     [
+        #         "EXG1",
+        #         "EXG2",
+        #         "EXG3",
+        #         "EXG4",
+        #         "GSR1",
+        #         "Plet",
+        #         "Resp",
+        #         "Temp",
+        #     ]
+        # ),
+        eegain.transforms.Segment(duration=4, overlap=0),
+    ]
+)
+
+
+deap_dataset = DEAP(
+    "path_to_deap",
+    label_type="A",
+    transform=transform,
+)
+
+
+# # -------------- Dataloader --------------
+eegloader = EEGDataloader(deap_dataset, batch_size=32).loso()
+
+
+# -------------- Training --------------
+logger = EmotionLogger(log_dir="logs/", class_names=["low", "high"])
+for loader in eegloader:
+    # # -------------- Model --------------
+    model = TSception(
+        num_classes=2,
+        input_size=(1, 32, 512),
+        sampling_r=128,
+        num_t=15,
+        num_s=15,
+        hidden=32,
+        dropout_rate=0.5,
+    )
+    model = model.to(device)
+    optimizer = torch.optim.Adam(model.parameters(), lr=1e-3, weight_decay=0)
+    loss_fn = nn.CrossEntropyLoss()
+    run(
+        model=model,
+        train_dataloader=loader["train"],
+        test_dataloader=loader["test"],
+        test_subject_ids=loader["test_subject_indexes"],
+        optimizer=optimizer,
+        loss_fn=loss_fn,
+        epoch=3,
+    )

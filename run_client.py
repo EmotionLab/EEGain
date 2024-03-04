@@ -13,7 +13,7 @@ from eegain.logger import EmotionLogger
 from eegain.models import DeepConvNet, EEGNet, ShallowConvNet, TSception
 from collections import defaultdict
 from sklearn.metrics import *
-from run_loto import main
+from helpers import main_loso, main_loto
 
 # -------------- Preprocessing --------------
 transform = eegain.transforms.Construct(
@@ -65,4 +65,5 @@ model = TSception(
                 dropout_rate=config.TScepctionConfig.dropout_rate,
             )
 
-main(mahnob_dataset, model)
+
+main_loto(mahnob_dataset, model)
