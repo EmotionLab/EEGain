@@ -8,7 +8,7 @@ from tqdm import tqdm
 
 import eegain
 from eegain.data import EEGDataloader
-from eegain.data.datasets import DEAP, MAHNOB, SeedIV, DREAMER
+from eegain.data.datasets import DEAP, MAHNOB, SeedIV
 from eegain.logger import EmotionLogger
 from eegain.models import DeepConvNet, EEGNet, ShallowConvNet, TSception
 from collections import defaultdict
@@ -102,6 +102,26 @@ def run(
 # -------------- Preprocessing --------------
 transform = eegain.transforms.Construct(
     [
+        eegain.transforms.Crop(t_min=30, t_max=-30),
+        eegain.transforms.DropChannels(
+            [
+                "EXG1",
+                "EXG2",
+                "EXG3",
+                "EXG4",
+                "EXG5",
+                "EXG6",
+                "EXG7",
+                "EXG8",
+                "GSR1",
+                "GSR2",
+                "Erg1",
+                "Erg2",
+                "Resp",
+                "Temp",
+                "Status",
+            ]
+        ),
         eegain.transforms.Filter(l_freq=0.3, h_freq=45),
         eegain.transforms.NotchFilter(freq=50),
         eegain.transforms.Resample(s_rate=128),
@@ -111,13 +131,14 @@ transform = eegain.transforms.Construct(
 
 
 # -------------- Dataset --------------
-dreamer_dataset = DREAMER(
-    "path_to_dreamer",
+mahnob_dataset = MAHNOB(
+    "path_to_mahnob",
     label_type="V",
-    transform=transform
+    transform=transform,
+    ground_truth_threshold=4.5
 )
 
-subject_video_mapping = dreamer_dataset.mapping_list
+subject_video_mapping = mahnob_dataset.mapping_list
 logger = EmotionLogger(log_dir="logs/", class_names=["low", "high"])
 
 all_model_state_dicts = []
@@ -125,13 +146,13 @@ all_train_preds, all_test_preds, all_train_actuals, all_test_actuals = [], [], [
 f1_tests, f1_weighted_tests, accuracy_tests = [], [], []
 
 for subject_id, session_ids in subject_video_mapping.items():
-    eegloader = EEGDataloader(dreamer_dataset, batch_size=32).loto(subject_id, session_ids, n_fold=len(session_ids)) # pass n_fold=len(session_ids) for LOTO
+    eegloader = EEGDataloader(mahnob_dataset, batch_size=32).loto(subject_id, session_ids, n_fold=10) # pass n_fold=len(session_ids) for LOTO
     num_epoch = 5
     all_train_preds_for_subject, all_train_actuals_for_subject, all_test_preds_for_subject, all_test_actuals_for_subject = [], [], [], []
     for i, loader in enumerate(eegloader):
         model = TSception(
                         num_classes=2,
-                        input_size=(1, 14, 512),
+                        input_size=(1, 32, 512),
                         sampling_r=128,
                         num_t=15,
                         num_s=15,
@@ -169,7 +190,7 @@ logger.log_summary(overal_log_file="overal_log", log_dir="logs/")
 
 # average_model = TSception(
 #         num_classes=2,
-#         input_size=(1, 14, 512),
+#         input_size=(1, 32, 512),
 #         sampling_r=128,
 #         num_t=15,
 #         num_s=15,

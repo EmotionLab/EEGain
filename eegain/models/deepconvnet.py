@@ -64,7 +64,7 @@ class DeepConvNet(nn.Module):
         out = model(data).shape
         return out[2:]
 
-    def __init__(self, n_chan, n_time, n_class, dropout_rate):
+    def __init__(self, n_chan, n_time, n_class, dropout_rate, **kwargs):
         super(DeepConvNet, self).__init__()
 
         # Please note that the kernel size in the original paper is (1, 10),

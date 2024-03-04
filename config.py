@@ -6,16 +6,50 @@ class TransformConfig:
     s_rate: int = 128
     window: int = 4
 
-
 @dataclass
-class DataConfig:
-    data_path: str = "/Users/rango/Desktop/GAIN Datasets/Sessions"
+class MAHNOBConfig:
+    data_path: str = ""
     label_type: str = "V"
-    split_type: str = "loso"
+    split_type: str = "LOSO"
     class_names: list[str] = field(default_factory=lambda: ["low", "high"])
     ground_truth_threshold: float = 4.5  # inclusive
     n_classes: int = 2
 
+@dataclass
+class DEAPConfig:
+    data_path: str = ""
+    label_type: str = "V"
+    split_type: str = "LOSO"
+    class_names: list[str] = field(default_factory=lambda: ["low", "high"])
+    ground_truth_threshold: float = 4.5  # inclusive
+    n_classes: int = 2
+    
+@dataclass
+class AMIGOSConfig:
+    data_path: str = ""
+    label_type: str = "V"
+    split_type: str = "LOSO"
+    class_names: list[str] = field(default_factory=lambda: ["low", "high"])
+    ground_truth_threshold: float = 4.5  # inclusive
+    n_classes: int = 2
+
+@dataclass
+class DREAMERConfig:
+    data_path: str = ""
+    label_type: str = "V"
+    split_type: str = "LOSO"
+    class_names: list[str] = field(default_factory=lambda: ["low", "high"])
+    ground_truth_threshold: float = 3 # inclusive
+    n_classes: int = 2
+    
+@dataclass
+class SeedIVConfig:
+    data_path: str = ""
+    label_type: str = "V"
+    split_type: str = "LOSO"
+    class_names: list[str] = field(default_factory=lambda: ["low", "high"])
+    ground_truth_threshold: float = 4.5  # inclusive
+    n_classes: int = 2
 
 @dataclass
 class TrainingConfig:
@@ -30,28 +64,30 @@ class TrainingConfig:
 
 @dataclass
 class EEGNetConfig:
+    n_classes: int = 2
     samples: int = 512
     dropout_rate: float = 0.5
     channels: int = 32
 
-
 @dataclass
-class TScepctionConfig:
+class TSceptionConfig:
+    num_classes: int = 2
     sampling_r: int = 128
     num_t: int = 15
     num_s: int = 15
     hidden: int = 32
     dropout_rate: float = 0.5
-    input_size: tuple = (1, 32, 512)
 
 @dataclass
 class  DeepConvNetConfig:
     n_chan: int = 32
-    n_time: int = 512
+    n_time: int = 512 
+    n_class: int = 2
     dropout_rate: int = 0.5
     
 @dataclass
 class ShallowConvNetConfig:
     n_chan: int = 32
-    n_time: int = 512
-    dropout_rate: int = 0.5
+    n_time: int = 512 
+    n_class: int = 2
+    dropout_rate: int = 0.5   

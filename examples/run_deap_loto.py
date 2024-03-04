@@ -102,42 +102,32 @@ def run(
 # -------------- Preprocessing --------------
 transform = eegain.transforms.Construct(
     [
-        eegain.transforms.Crop(t_min=30, t_max=-30),
         eegain.transforms.DropChannels(
             [
                 "EXG1",
                 "EXG2",
                 "EXG3",
                 "EXG4",
-                "EXG5",
-                "EXG6",
-                "EXG7",
-                "EXG8",
                 "GSR1",
-                "GSR2",
-                "Erg1",
-                "Erg2",
+                "Plet",
                 "Resp",
                 "Temp",
-                "Status",
             ]
         ),
-        eegain.transforms.Filter(l_freq=0.3, h_freq=45),
-        eegain.transforms.NotchFilter(freq=50),
-        eegain.transforms.Resample(s_rate=128),
         eegain.transforms.Segment(duration=4, overlap=0),
     ]
 )
 
 
 # -------------- Dataset --------------
-mahnob_dataset = MAHNOB(
-    "path_to_mahnob",
+deap_dataset = DEAP(
+    "path_to_deap",
     label_type="V",
     transform=transform,
+    ground_truth_threshold=4.5
 )
 
-subject_video_mapping = mahnob_dataset.mapping_list
+subject_video_mapping = deap_dataset.mapping_list
 logger = EmotionLogger(log_dir="logs/", class_names=["low", "high"])
 
 all_model_state_dicts = []
@@ -145,7 +135,7 @@ all_train_preds, all_test_preds, all_train_actuals, all_test_actuals = [], [], [
 f1_tests, f1_weighted_tests, accuracy_tests = [], [], []
 
 for subject_id, session_ids in subject_video_mapping.items():
-    eegloader = EEGDataloader(mahnob_dataset, batch_size=32).loto(subject_id, session_ids, n_fold=10) # pass n_fold=len(session_ids) for LOTO
+    eegloader = EEGDataloader(deap_dataset, batch_size=32).loto(subject_id, session_ids, n_fold=len(session_ids)) # pass n_fold=len(session_ids) for LOTO
     num_epoch = 5
     all_train_preds_for_subject, all_train_actuals_for_subject, all_test_preds_for_subject, all_test_actuals_for_subject = [], [], [], []
     for i, loader in enumerate(eegloader):

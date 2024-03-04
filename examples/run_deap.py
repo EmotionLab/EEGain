@@ -8,7 +8,7 @@ from tqdm import tqdm
 
 import eegain
 from eegain.data import EEGDataloader
-from eegain.data.datasets import DEAP, MAHNOB, SeedIV, AMIGOS
+from eegain.data.datasets import DEAP, MAHNOB, SeedIV
 from eegain.logger import EmotionLogger
 from eegain.models import DeepConvNet, EEGNet, ShallowConvNet, TSception
 
@@ -97,9 +97,14 @@ transform = eegain.transforms.Construct(
     [
         eegain.transforms.DropChannels(
             [
-            "ECG_Right",
-            "ECG_Left",
-            "GSR"
+                "EXG1",
+                "EXG2",
+                "EXG3",
+                "EXG4",
+                "GSR1",
+                "Plet",
+                "Resp",
+                "Temp",
             ]
         ),
         eegain.transforms.Segment(duration=4, overlap=0),
@@ -107,29 +112,29 @@ transform = eegain.transforms.Construct(
 )
 
 
-amigos_dataset = AMIGOS(
-    "path_to_amigo",
+deap_dataset = DEAP(
+    "path_to_deap",
     label_type="A",
     transform=transform,
+    ground_truth_threshold=4.5
 )
 
 
 # # -------------- Dataloader --------------
-eegloader = EEGDataloader(amigos_dataset, batch_size=32).loso()
+eegloader = EEGDataloader(deap_dataset, batch_size=32).loso()
 
 
 # -------------- Training --------------
 logger = EmotionLogger(log_dir="logs/", class_names=["low", "high"])
-num_eeg_channels = 14
 for loader in eegloader:
     # # -------------- Model --------------
     model = TSception(
         num_classes=2,
-        input_size=(1, num_eeg_channels, 512),
+        input_size=(1, 32, 512),
         sampling_r=128,
         num_t=15,
         num_s=15,
-        hidden=num_eeg_channels,
+        hidden=32,
         dropout_rate=0.5,
     )
     model = model.to(device)

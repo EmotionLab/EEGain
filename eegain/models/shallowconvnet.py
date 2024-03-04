@@ -46,7 +46,7 @@ class ShallowConvNet(nn.Module):
         out = out.view(out.size()[0], -1)
         return out.size()
 
-    def __init__(self, n_chan, n_time, n_class, dropout_rate):
+    def __init__(self, n_chan, n_time, n_class, dropout_rate, **kwargs):
         super(ShallowConvNet, self).__init__()
 
         kernel_size = (1, 25)

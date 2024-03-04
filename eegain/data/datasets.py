@@ -81,7 +81,7 @@ class SeedIV(EEGDataset):
         logger.debug(f"Subject id -> sessions: {user_session_info}")
         return user_session_info
 
-    def __init__(self, root: str, label_type: str, ground_truth_threshold, transform: Construct = None):
+    def __init__(self, root: str, label_type: str, ground_truth_threshold, transform: Construct = None, **kwargs):
         """This is just constructor for SEED IV class
         Args:
             root(str): Path to SEED IV dataset folder
@@ -253,7 +253,7 @@ class MAHNOB(EEGDataset):
         logger.debug(f"Subject id -> sessions: {user_session_info}")
         return user_session_info
 
-    def __init__(self, root: str, label_type: str, ground_truth_threshold, transform: Construct = None):
+    def __init__(self, root: str, label_type: str, ground_truth_threshold, transform: Construct = None, **kwargs):
         """This is just constructor for MAHNOB class
         Args:
             root(str): Path to MAHNOB HCI dataset folder
@@ -400,6 +400,7 @@ class DEAP(EEGDataset):
         label_type: str,
         ground_truth_threshold,
         transform: Construct = None,
+        **kwargs
     ):
         self.root = Path(root)
         self.ground_truth_threshold = ground_truth_threshold
@@ -518,7 +519,7 @@ class DEAP(EEGDataset):
             curr_labels = subject_data['labels'][session_id]
             curr_data = subject_data['data'][session_id]
 
-            curr_data = mne.io.RawArray(curr_data, self.info)
+            curr_data = mne.io.RawArray(curr_data, self.info, verbose=False)
 
             if self.transform:
                 curr_data = self.transform(curr_data)
@@ -568,7 +569,7 @@ class DREAMER(EEGDataset):
         logger.debug(f"Subject id -> sessions: {user_session_info}")
         return user_session_info
 
-    def __init__(self, root: str, label_type: str, ground_truth_threshold, transform: Construct = None):
+    def __init__(self, root: str, label_type: str, ground_truth_threshold, transform: Construct = None, **kwargs):
         """This is just constructor for DREAMER class
         Args:
             root(str): Path to DREAMER.mat file
@@ -584,7 +585,8 @@ class DREAMER(EEGDataset):
         self.num_videos = 18
         self.threshold = 3
         self.mapping_list = self._create_user_recording_mapping(
-            self.root, self.transform, self.label_type
+            self.root
+            # , self.transform, self.label_type
         )
 
         logger.info(f"Using Dataset: {self.__class__.__name__}")
@@ -629,7 +631,7 @@ class DREAMER(EEGDataset):
                 person_eeg_recording.transpose()
             )  # This is necessary to convert numpy ndarray to mne object
             info = mne.create_info(ch_names=channels, sfreq=128, ch_types="eeg")
-            raw_data = mne.io.RawArray(person_eeg_recording, info)
+            raw_data = mne.io.RawArray(person_eeg_recording, info, verbose=False)
 
             if self.transform:
                 raw_data = self.transform(raw_data)
@@ -673,7 +675,7 @@ class DREAMER(EEGDataset):
                 person_eeg_recording.transpose()
             )  # This is necessary to convert numpy ndarray to mne object
             info = mne.create_info(ch_names=channels, sfreq=128, ch_types="eeg")
-            raw_data = mne.io.RawArray(person_eeg_recording, info)
+            raw_data = mne.io.RawArray(person_eeg_recording, info, verbose=False)
 
             if self.transform:
                 raw_data = self.transform(raw_data)
@@ -724,6 +726,7 @@ class AMIGOS(EEGDataset):
         ground_truth_threshold,
         preprocessed: bool = True,
         transform: Construct = None,
+        **kwargs
     ):
         self.root = Path(root)
         self.ground_truth_threshold = ground_truth_threshold

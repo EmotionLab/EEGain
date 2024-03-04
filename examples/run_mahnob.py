@@ -93,40 +93,54 @@ def run(
     logger.log_summary(overal_log_file="overal_log", log_dir="logs/")
 
 
+# -------------- Preprocessing --------------
 transform = eegain.transforms.Construct(
     [
-        # eegain.transforms.DropChannels(
-        #     [
-        #         "EXG1",
-        #         "EXG2",
-        #         "EXG3",
-        #         "EXG4",
-        #         "GSR1",
-        #         "Plet",
-        #         "Resp",
-        #         "Temp",
-        #     ]
-        # ),
+        eegain.transforms.Crop(t_min=30, t_max=-30),
+        eegain.transforms.DropChannels(
+            [
+                "EXG1",
+                "EXG2",
+                "EXG3",
+                "EXG4",
+                "EXG5",
+                "EXG6",
+                "EXG7",
+                "EXG8",
+                "GSR1",
+                "GSR2",
+                "Erg1",
+                "Erg2",
+                "Resp",
+                "Temp",
+                "Status",
+            ]
+        ),
+        eegain.transforms.Filter(l_freq=0.3, h_freq=45),
+        eegain.transforms.NotchFilter(freq=50),
+        eegain.transforms.Resample(s_rate=128),
         eegain.transforms.Segment(duration=4, overlap=0),
     ]
 )
 
 
-deap_dataset = DEAP(
-    "path_to_deap",
-    label_type="A",
+# -------------- Dataset --------------
+mahnob_dataset = MAHNOB(
+    "../../eegain/EEGain/Sessions/",
+    label_type="V",
     transform=transform,
+    ground_truth_threshold=4.5
 )
 
 
-# # -------------- Dataloader --------------
-eegloader = EEGDataloader(deap_dataset, batch_size=32).loso()
+# -------------- Dataloader --------------
+eegloader = EEGDataloader(mahnob_dataset, batch_size=32).loso()  # .loto()
 
 
 # -------------- Training --------------
 logger = EmotionLogger(log_dir="logs/", class_names=["low", "high"])
 for loader in eegloader:
-    # # -------------- Model --------------
+    # -------------- Model --------------
     model = TSception(
         num_classes=2,
         input_size=(1, 32, 512),
@@ -143,8 +157,8 @@ for loader in eegloader:
         model=model,
         train_dataloader=loader["train"],
         test_dataloader=loader["test"],
-        test_subject_ids=loader["test_subject_indexes"],
+        test_subject_ids=loader["test_subject_indexes"],  # loader["test_video_indexes"] - for loto
         optimizer=optimizer,
         loss_fn=loss_fn,
-        epoch=3,
+        epoch=5,
     )

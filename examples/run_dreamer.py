@@ -8,7 +8,7 @@ from tqdm import tqdm
 
 import eegain
 from eegain.data import EEGDataloader
-from eegain.data.datasets import DEAP, MAHNOB, SeedIV
+from eegain.data.datasets import DEAP, MAHNOB, SeedIV, DREAMER
 from eegain.logger import EmotionLogger
 from eegain.models import DeepConvNet, EEGNet, ShallowConvNet, TSception
 
@@ -96,26 +96,6 @@ def run(
 # -------------- Preprocessing --------------
 transform = eegain.transforms.Construct(
     [
-        eegain.transforms.Crop(t_min=30, t_max=-30),
-        eegain.transforms.DropChannels(
-            [
-                "EXG1",
-                "EXG2",
-                "EXG3",
-                "EXG4",
-                "EXG5",
-                "EXG6",
-                "EXG7",
-                "EXG8",
-                "GSR1",
-                "GSR2",
-                "Erg1",
-                "Erg2",
-                "Resp",
-                "Temp",
-                "Status",
-            ]
-        ),
         eegain.transforms.Filter(l_freq=0.3, h_freq=45),
         eegain.transforms.NotchFilter(freq=50),
         eegain.transforms.Resample(s_rate=128),
@@ -125,15 +105,16 @@ transform = eegain.transforms.Construct(
 
 
 # -------------- Dataset --------------
-mahnob_dataset = MAHNOB(
-    "../../eegain/EEGain/Sessions/",
+dreamer_dataset = DREAMER(
+    "path_to_dreamer",
     label_type="V",
     transform=transform,
+    ground_truth_threshold=3
 )
 
 
 # -------------- Dataloader --------------
-eegloader = EEGDataloader(mahnob_dataset, batch_size=32).loso()  # .loto()
+eegloader = EEGDataloader(dreamer_dataset, batch_size=32).loso()  # .loto()
 
 
 # -------------- Training --------------
@@ -142,7 +123,7 @@ for loader in eegloader:
     # -------------- Model --------------
     model = TSception(
         num_classes=2,
-        input_size=(1, 32, 512),
+        input_size=(1, 14, 512),
         sampling_r=128,
         num_t=15,
         num_s=15,

@@ -6,6 +6,7 @@ import torch
 from torch import nn
 from tqdm import tqdm
 
+import config
 import eegain
 from eegain.data import EEGDataloader
 from eegain.data.datasets import DEAP, MAHNOB, SeedIV
@@ -77,6 +78,7 @@ def run_loto(
         optimizer,
         loss_fn,
         epoch,
+        logger,
         split_type="LOTO",
 ):
     for i in range(epoch):
@@ -106,6 +108,7 @@ def run_loso(
         optimizer,
         loss_fn,
         epoch,
+        logger
 ):
     for i in range(epoch):
         print(f"\nEpoch {i}/{epoch}")
@@ -145,6 +148,7 @@ def main_loto(dataset, model):
                 optimizer=optimizer,
                 loss_fn=loss_fn,
                 epoch=num_epoch,
+                logger=logger,
                 split_type="LOTO"  # for loto
             )
             all_test_preds_for_subject.append(test_pred)
@@ -162,6 +166,7 @@ def main_loto(dataset, model):
 def main_loso(dataset, model):
     eegloader = EEGDataloader(dataset, batch_size=32).loso()
 
+    logger = EmotionLogger(log_dir="logs/", class_names=["low", "high"])
     for loader in eegloader:
         # -------------- Model --------------
         model = model.to(device)
@@ -176,4 +181,5 @@ def main_loso(dataset, model):
             optimizer=optimizer,
             loss_fn=loss_fn,
             epoch=config.TrainingConfig.num_epochs,
+            logger=logger
         )

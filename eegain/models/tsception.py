@@ -24,7 +24,7 @@ class TSception(nn.Module):
         )
 
     def __init__(
-        self, num_classes, input_size, sampling_r, num_t, num_s, hidden, dropout_rate
+        self, num_classes, input_size, sampling_r, num_t, num_s, hidden, dropout_rate, **kwargs
     ):
         # input_size: 1 x EEG channel x datapoint
         super(TSception, self).__init__()

@@ -102,6 +102,7 @@ class EEGNet(nn.Module):
         f1=8,
         d=2,
         f2=16,
+        **kwargs
     ):
         super(EEGNet, self).__init__()
 

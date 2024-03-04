@@ -8,7 +8,7 @@ from tqdm import tqdm
 
 import eegain
 from eegain.data import EEGDataloader
-from eegain.data.datasets import DEAP, MAHNOB, SeedIV, DREAMER
+from eegain.data.datasets import DEAP, MAHNOB, SeedIV, AMIGOS
 from eegain.logger import EmotionLogger
 from eegain.models import DeepConvNet, EEGNet, ShallowConvNet, TSception
 
@@ -93,40 +93,44 @@ def run(
     logger.log_summary(overal_log_file="overal_log", log_dir="logs/")
 
 
-# -------------- Preprocessing --------------
 transform = eegain.transforms.Construct(
     [
-        eegain.transforms.Filter(l_freq=0.3, h_freq=45),
-        eegain.transforms.NotchFilter(freq=50),
-        eegain.transforms.Resample(s_rate=128),
+        eegain.transforms.DropChannels(
+            [
+            "ECG_Right",
+            "ECG_Left",
+            "GSR"
+            ]
+        ),
         eegain.transforms.Segment(duration=4, overlap=0),
     ]
 )
 
 
-# -------------- Dataset --------------
-dreamer_dataset = DREAMER(
-    "path_to_dreamer",
-    label_type="V",
-    transform=transform
+amigos_dataset = AMIGOS(
+    "path_to_amigo",
+    label_type="A",
+    transform=transform,
+    ground_truth_threshold=4.5
 )
 
 
-# -------------- Dataloader --------------
-eegloader = EEGDataloader(dreamer_dataset, batch_size=32).loso()  # .loto()
+# # -------------- Dataloader --------------
+eegloader = EEGDataloader(amigos_dataset, batch_size=32).loso()
 
 
 # -------------- Training --------------
 logger = EmotionLogger(log_dir="logs/", class_names=["low", "high"])
+num_eeg_channels = 14
 for loader in eegloader:
-    # -------------- Model --------------
+    # # -------------- Model --------------
     model = TSception(
         num_classes=2,
-        input_size=(1, 14, 512),
+        input_size=(1, num_eeg_channels, 512),
         sampling_r=128,
         num_t=15,
         num_s=15,
-        hidden=32,
+        hidden=num_eeg_channels,
         dropout_rate=0.5,
     )
     model = model.to(device)
@@ -136,8 +140,8 @@ for loader in eegloader:
         model=model,
         train_dataloader=loader["train"],
         test_dataloader=loader["test"],
-        test_subject_ids=loader["test_subject_indexes"],  # loader["test_video_indexes"] - for loto
+        test_subject_ids=loader["test_subject_indexes"],
         optimizer=optimizer,
         loss_fn=loss_fn,
-        epoch=5,
+        epoch=3,
     )
