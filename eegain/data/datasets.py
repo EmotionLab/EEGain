@@ -718,7 +718,8 @@ class AMIGOS(EEGDataset):
                     id = subj.split("/")[-1].split(".")[0].split("_")[-1][1:]
                     data = loadmat(os.path.join(data_path, subj))
                     _data = {"data": data["joined_data"][0], "labels": data["labels_selfassessment"][0]}
-                    user_session_info[id] = _data
+                    num_videos = len(_data['data'])
+                    user_session_info[id] = [i for i in range(num_videos)]  # _data
 
         logger.debug(f"Subject id -> sessions: {user_session_info}")
         return user_session_info
@@ -784,7 +785,9 @@ class AMIGOS(EEGDataset):
             data_array(Dict[int, np.ndarray]): Dictionary of files and data associated to specific user
             label_array(Dict[int, int]): labels for each recording
         """
-        subject_data = self.mapping_list[subject_index]
+        subject_data = loadmat(os.path.join(self.root, f"Data_Preprocessed_P{subject_index}.mat"))
+        subject_data = {"data": subject_data["joined_data"][0], "labels": subject_data["labels_selfassessment"][0]}
+        # subject_data = self.mapping_list[subject_index]
         datas = subject_data["data"]
         labels = subject_data["labels"]
         data_array, label_array = {}, {}
@@ -818,14 +821,26 @@ class AMIGOS(EEGDataset):
 
         return data_array, label_array
 
-    def __get_trials__(self, session_ids: List, subject_video_mapping: Dict):
+    def __get_trials__(self, session_ids: List, subject_id: Dict):
         data_array, label_array = {}, {}
         for session_id in session_ids:
-            curr_labels = subject_video_mapping['labels'][session_id]
-            curr_data = subject_video_mapping['data'][session_id]
+            # TODO This will work only for AMIGOS Preprocessed data
+            data = loadmat(os.path.join(self.root, f"Data_Preprocessed_P{subject_id}.mat"))
+            _data = {"data": data["joined_data"][0], "labels": data["labels_selfassessment"][0]}
 
-            felt_valence = curr_labels[0]
-            felt_arousal = curr_labels[1]
+            curr_labels = _data['labels'][session_id][0]
+            curr_data = _data['data'][session_id]
+
+            felt_valence = curr_labels[1]
+            felt_arousal = curr_labels[0]
+
+            curr_data = curr_data.T
+            curr_data = mne.io.RawArray(
+                curr_data, self.info, verbose=False
+            )  # convert numpy ndarray to mne object
+
+            if self.transform:
+                curr_data = self.transform(curr_data)
 
             data_array[session_id] = curr_data
             label_array[session_id] = np.array([felt_arousal, felt_valence])
