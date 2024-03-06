@@ -95,27 +95,28 @@ def run(
 
 transform = eegain.transforms.Construct(
     [
-        # eegain.transforms.DropChannels(
-        #     [
-        #         "EXG1",
-        #         "EXG2",
-        #         "EXG3",
-        #         "EXG4",
-        #         "GSR1",
-        #         "Plet",
-        #         "Resp",
-        #         "Temp",
-        #     ]
-        # ),
-        eegain.transforms.Segment(duration=4, overlap=0),
+        eegain.transforms.DropChannels(
+            [
+                "EXG1",
+                "EXG2",
+                "EXG3",
+                "EXG4",
+                "GSR1",
+                "Plet",
+                "Resp",
+                "Temp",
+            ]
+        ),
+        # eegain.transforms.Segment(duration=4, overlap=0),
     ]
 )
 
 
 deap_dataset = DEAP(
-    "path_to_deap",
+    "/Users/rango/Desktop/GAIN Datasets/deap",
     label_type="A",
     transform=transform,
+    ground_truth_threshold=4
 )
 
 

@@ -474,7 +474,11 @@ class DEAP(EEGDataset):
             data_array(Dict[int, np.ndarray]): Dictionary of files and data associated to specific user
             label_array(Dict[int, int]): labels for each recording
         """
-        subject_data = self.mapping_list[subject_index]
+        path_to_subject = (
+                self.root / f's{subject_index}.dat'
+        )
+        with open(path_to_subject, "rb") as file:
+            subject_data = pickle.load(file, encoding="latin-1")
         datas = subject_data["data"]
         labels = subject_data["labels"]
         data_array, label_array = {}, {}
