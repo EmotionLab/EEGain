@@ -49,7 +49,16 @@ class SeedIVConfig:
     split_type: str = "LOSO"
     class_names: list[str] = field(default_factory=lambda: ["low", "high"])
     ground_truth_threshold: float = 4.5  # inclusive
-    n_classes: int = 2
+    n_classes: int = 4
+
+@dataclass
+class SeedConfig:
+    data_path: str = ""
+    label_type: str = "V"
+    split_type: str = "LOSO"
+    class_names: list[str] = field(default_factory=lambda: ["low", "high"])
+    ground_truth_threshold: float = 4.5  # inclusive
+    n_classes: int = 3
 
 @dataclass
 class TrainingConfig:

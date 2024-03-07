@@ -126,19 +126,19 @@ def run_loso(
     logger.log_summary(overal_log_file="overal_log", log_dir="logs/")
 
 
-def main_loto(dataset, model):
+def main_loto(dataset, model, classes):
     subject_video_mapping = dataset.mapping_list
-    logger = EmotionLogger(log_dir="logs/", class_names=["low", "high"])
+    logger = EmotionLogger(log_dir="logs/", class_names=classes)
 
     for subject_id, session_ids in subject_video_mapping.items():
         eegloader = EEGDataloader(dataset, batch_size=32).loto(subject_id, session_ids,
-                                                               n_fold=10)  # pass n_fold=len(session_ids) for LOTO
+                                                               n_fold=len(session_ids))  # pass n_fold=len(session_ids) for LOTO
         num_epoch = 5
         all_train_preds_for_subject, all_train_actuals_for_subject, all_test_preds_for_subject, all_test_actuals_for_subject = [], [], [], []
         for i, loader in enumerate(eegloader):
             model = model
             model = model.to(device)
-            optimizer = torch.optim.Adam(model.parameters(), lr=1e-4, weight_decay=0)
+            optimizer = torch.optim.Adam(model.parameters(), lr=config.TrainingConfig.lr, weight_decay=config.TrainingConfig.weight_decay)
             loss_fn = nn.CrossEntropyLoss()
             _, _, test_pred, test_actual = run_loto(
                 model=model,
@@ -163,10 +163,10 @@ def main_loto(dataset, model):
     logger.log_summary(overal_log_file="overal_log", log_dir="logs/")
 
 
-def main_loso(dataset, model):
+def main_loso(dataset, model, classes):
     eegloader = EEGDataloader(dataset, batch_size=32).loso()
 
-    logger = EmotionLogger(log_dir="logs/", class_names=["low", "high"])
+    logger = EmotionLogger(log_dir="logs/", class_names=classes)
     for loader in eegloader:
         # -------------- Model --------------
         model = model.to(device)

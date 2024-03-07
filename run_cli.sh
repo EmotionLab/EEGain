@@ -20,6 +20,7 @@ python3 run_cli.py \
 --label_smoothing=0.01 \
 --dropout_rate=0.5 \
 --num_classes=2 \
+--n_class=2 \
 --channels=14 \
 --n_chan=14 \
 --num_t=15 \

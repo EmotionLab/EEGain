@@ -126,19 +126,9 @@ class EmotionLogger:
             subject_id, "accuracy",
             accuracy_score(test_actual, test_pred), i, data_part
         )
-        """ TODO: this if else statement is for seed iv dataset. as there are 4 labels, average='binary' is not working
-            here but how we detect is this is seed dataset or not, is not correct. Here I'm checking if label 2 or 3
-            is in test_actual or test_pred. Maybe model predicted just 1 or 2, in that case this won't be correct  
-        """
-        if 3 in test_actual or 3 in test_pred or 2 in test_actual or 2 in test_pred:
-            self.log_metric(
+        self.log_metric(
                 subject_id, "f1",
-                f1_score(test_actual, test_pred, average='micro'), i, data_part
-            )
-        else:
-            self.log_metric(
-                subject_id, "f1",
-                f1_score(test_actual, test_pred, average='binary'), i, data_part
+                f1_score(test_actual, test_pred, average='binary' if self.num_class <= 2 else 'micro'), i, data_part
             )
         self.log_metric(
             subject_id, "f1_weighted",
@@ -146,12 +136,12 @@ class EmotionLogger:
         )
         self.log_metric(
             subject_id, "recall",
-            recall_score(test_actual, test_pred, average='binary' if self.num_class <= 2 else 'weighted'), i, data_part
+            recall_score(test_actual, test_pred, average='binary' if self.num_class <= 2 else 'micro'), i, data_part
         )
         self.log_metric(
             subject_id,
             "precision",
-            precision_score(test_actual, test_pred, average='binary' if self.num_class <= 2 else 'weighted'), i,
+            precision_score(test_actual, test_pred, average='binary' if self.num_class <= 2 else 'micro'), i,
             data_part
         )
         self.log_metric(
