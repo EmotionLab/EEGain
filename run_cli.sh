@@ -5,7 +5,7 @@
 python3 run_cli.py \
 --model_name=TSception \
 --data_name=AMIGOS \
---data_path='/Users/rango/Desktop/GAIN Datasets/AMIGOS' \
+--data_path='path_to_data' \
 --log_dir="logs/" \
 --overal_log_file="logs_amigos_loso.txt" \
 --label_type="V" \

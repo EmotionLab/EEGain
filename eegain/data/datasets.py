@@ -860,7 +860,6 @@ class AMIGOS(EEGDataset):
         return data_array, label_array
 
 
-
 class Seed(EEGDataset):
     @staticmethod
     def _create_user_mat_mapping(data_path: Path) -> Dict[int, List[str]]:
@@ -875,18 +874,17 @@ class Seed(EEGDataset):
 
         num_sessions = 3  # There are three sessions in SEED IV dataset
         user_session_info: Dict[int, List[str]] = defaultdict(list)
-
-        for session in range(1, num_sessions + 1):
-            path = (
-                data_path / Path("Preprocessed_EEG") / Path(str(session)) # eeg_raw_data
-            )  # Path to particular sessions mat files
-            for mat_file_path in path.glob("*.mat"):
-                subject_file_name = mat_file_path.name
+        path = (
+                data_path / Path("SEED_EEG/Preprocessed_EEG")  # eeg_preprocessed_data
+        )
+        file_paths = os.listdir(path)
+        for mat_file_name in file_paths:
+            if "label" not in mat_file_name and "channel" not in mat_file_name:
                 subject_id = int(
-                    subject_file_name[: subject_file_name.index("_")]
+                    mat_file_name[: mat_file_name.index("_")]
                 )  # file name starts with user_id
                 user_session_info[subject_id].append(
-                    str(session) + "/" + subject_file_name
+                    str(path) + "/" + mat_file_name
                 )
 
         return user_session_info
@@ -925,7 +923,7 @@ class Seed(EEGDataset):
             label_array(Dict[str, int]): labels for each recording
         """
 
-        path_to_channels_excel = self.root / Path("channel-order.xlsx")
+        path_to_channels_excel = self.root / Path("SEED_EEG/channel-order.xlsx")
         channels_file = pd.read_excel(path_to_channels_excel, header=None)
         channels = list(channels_file.iloc[:, 0])
 
@@ -969,7 +967,7 @@ class Seed(EEGDataset):
         return data_array, label_array
 
     def __get_trials__(self, sessions, subject_ids):
-        path_to_channels_excel = self.root / Path("channel-order.xlsx")
+        path_to_channels_excel = self.root / Path("SEED_EEG/channel-order.xlsx")
         channels_file = pd.read_excel(path_to_channels_excel, header=None)
         channels = list(channels_file.iloc[:, 0])
 
