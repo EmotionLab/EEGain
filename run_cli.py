@@ -109,9 +109,11 @@ def main(**kwargs):
     # -------------- Model --------------
     model = globals()[kwargs['model_name']](input_size=[1, kwargs["channels"], kwargs["window"]*kwargs["s_rate"]], **kwargs) 
     if kwargs["split_type"] == "LOSO":
-        main_loso(dataset, model)
+        classes = [i for i in range(kwargs["n_class"])]
+        main_loso(dataset, model, classes, **kwargs)
     else:
-        main_loto(dataset, model)
+        classes = [i for i in range(kwargs["n_class"])]
+        main_loto(dataset, model, classes, **kwargs)
 
 if __name__ == "__main__":
     main()
