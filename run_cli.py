@@ -111,6 +111,9 @@ def main(**kwargs):
     if kwargs["split_type"] == "LOSO":
         classes = [i for i in range(kwargs["n_class"])]
         main_loso(dataset, model, classes, **kwargs)
+    elif kwards["split_type"] == "LOSO_Fixed":
+        classes = [i for i in range(kwargs["n_class"])]
+        main_loso_fixed(dataset, model, classes, **kwargs)
     else:
         classes = [i for i in range(kwargs["n_class"])]
         main_loto(dataset, model, classes, **kwargs)

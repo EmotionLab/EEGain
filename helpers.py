@@ -8,6 +8,7 @@ from tqdm import tqdm
 
 import config
 import eegain
+import json
 from eegain.data import EEGDataloader
 from eegain.data.datasets import DEAP, MAHNOB, SeedIV
 from eegain.logger import EmotionLogger
@@ -183,3 +184,34 @@ def main_loso(dataset, model, classes, **kwargs):
             epoch=kwargs["num_epochs"],
             logger=logger
         )
+
+
+def main_loso_fixed(dataset, model, classes, **kwargs):
+    dataset_name = dataset.__class__.__name__
+    test_subjects_json_path = 'test_subjects.json'
+
+    with open(test_subjects_json_path, 'r') as file:
+        train_test_split_json = json.load(file)
+
+    train_set = train_test_split_json[dataset_name]['train']
+    test_set = train_test_split_json[dataset_name]['test']
+
+    eegloader = EEGDataloader(dataset, batch_size=32).loso_fixed(train_set, test_set)
+
+    logger = EmotionLogger(log_dir="logs/", class_names=classes)
+
+    # -------------- Model --------------
+    model = model.to(device)
+    optimizer = torch.optim.Adam(model.parameters(), lr=kwargs["lr"],
+                                 weight_decay=kwargs["weight_decay"])
+    loss_fn = nn.CrossEntropyLoss(label_smoothing=kwargs["label_smoothing"])
+    run_loso(
+        model=model,
+        train_dataloader=eegloader["train"],
+        test_dataloader=eegloader["test"],
+        test_subject_ids=eegloader["test_subject_indexes"],
+        optimizer=optimizer,
+        loss_fn=loss_fn,
+        epoch=kwargs["num_epochs"],
+        logger=logger
+    )

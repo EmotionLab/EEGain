@@ -162,3 +162,28 @@ class EEGDataloader:
                 "test_subject_indexes": test_subject_ids,
                 "train_subject_indexes": train_subject_ids,
             }
+
+    def loso_fixed(self, train_subject_ids, test_subject_ids) -> Dict[str, Any]:
+        logger.info(f"Splitting type: leave-one-subject-out-fixed")
+
+        logger.debug(f"Preparing: train subjects: {train_subject_ids}")
+        train_data = [self.dataset.__get_subject__(i) for i in train_subject_ids]
+        train_data, train_label = EEGDataloader._concat_data(train_data)
+        logger.debug(f"train data shape {train_data.shape}")
+
+        logger.debug(f"Preparing: test subjects: {test_subject_ids}")
+        test_data = [self.dataset.__get_subject__(i) for i in test_subject_ids]
+        test_data, test_label = EEGDataloader._concat_data(test_data)
+        logger.debug(f"test data shape {test_data.shape}")
+
+        train_data, test_data = EEGDataloader.normalize(train_data, test_data)
+
+        train_dataloader = self._get_dataloader(train_data, train_label)
+        test_dataloader = self._get_dataloader(test_data, test_label)
+        return {
+            "train": train_dataloader,
+            "test": test_dataloader,
+            "test_subject_indexes": test_subject_ids,
+            "train_subject_indexes": train_subject_ids,
+        }
+

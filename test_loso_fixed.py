@@ -11,6 +11,7 @@ from eegain.data import EEGDataloader
 from eegain.data.datasets import DEAP, MAHNOB, SeedIV
 from eegain.logger import EmotionLogger
 from eegain.models import DeepConvNet, EEGNet, ShallowConvNet, TSception
+from helpers import main_loso_fixed
 
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -93,55 +94,32 @@ def run(
     logger.log_summary(overal_log_file="overal_log", log_dir="logs/")
 
 
-# -------------- Preprocessing --------------
 transform = eegain.transforms.Construct(
     [
-        eegain.transforms.Crop(t_min=30, t_max=-30),
         eegain.transforms.DropChannels(
             [
                 "EXG1",
                 "EXG2",
                 "EXG3",
                 "EXG4",
-                "EXG5",
-                "EXG6",
-                "EXG7",
-                "EXG8",
                 "GSR1",
-                "GSR2",
-                "Erg1",
-                "Erg2",
+                "Plet",
                 "Resp",
                 "Temp",
-                "Status",
             ]
         ),
-        eegain.transforms.Filter(l_freq=0.3, h_freq=45),
-        eegain.transforms.NotchFilter(freq=50),
-        eegain.transforms.Resample(s_rate=128),
-        eegain.transforms.Segment(duration=4, overlap=0),
+        # eegain.transforms.Segment(duration=4, overlap=0),
     ]
 )
 
 
-# -------------- Dataset --------------
-mahnob_dataset = MAHNOB(
-    "../../eegain/EEGain/Sessions/",
-    label_type="V",
+deap_dataset = DEAP(
+    "/Users/rango/Desktop/GAIN/GAIN Datasets/deap",
+    label_type="A",
     transform=transform,
     ground_truth_threshold=4
 )
-
-
-# -------------- Dataloader --------------
-eegloader = EEGDataloader(mahnob_dataset, batch_size=32).loso()  # .loto()
-
-
-# -------------- Training --------------
-logger = EmotionLogger(log_dir="logs/", class_names=["low", "high"])
-for loader in eegloader:
-    # -------------- Model --------------
-    model = TSception(
+model = TSception(
         num_classes=2,
         input_size=(1, 32, 512),
         sampling_r=128,
@@ -150,15 +128,5 @@ for loader in eegloader:
         hidden=32,
         dropout_rate=0.5,
     )
-    model = model.to(device)
-    optimizer = torch.optim.Adam(model.parameters(), lr=1e-3, weight_decay=0)
-    loss_fn = nn.CrossEntropyLoss()
-    run(
-        model=model,
-        train_dataloader=loader["train"],
-        test_dataloader=loader["test"],
-        test_subject_ids=loader["test_subject_indexes"],  # loader["test_video_indexes"] - for loto
-        optimizer=optimizer,
-        loss_fn=loss_fn,
-        epoch=5,
-    )
+classes = [i for i in range(2)]
+main_loso_fixed(deap_dataset, model, classes)
