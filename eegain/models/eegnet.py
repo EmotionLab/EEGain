@@ -93,10 +93,9 @@ class EEGNet(nn.Module):
 
     def __init__(
         self,
-        n_classes,
+        num_classes,
         channels,
         dropout_rate,
-        samples,
         kernel_length=64,
         kernel_length2=16,
         f1=8,
@@ -105,12 +104,12 @@ class EEGNet(nn.Module):
         **kwargs
     ):
         super(EEGNet, self).__init__()
-
+        samples = kwargs["sampling_r"]*kwargs["window"]
         self.F1 = f1
         self.F2 = f2
         self.D = d
         self.samples = samples
-        self.n_classes = n_classes
+        self.n_classes = num_classes
         self.channels = channels
         self.kernelLength = kernel_length
         self.kernelLength2 = kernel_length2
@@ -119,7 +118,7 @@ class EEGNet(nn.Module):
         self.blocks = self.initial_block(dropout_rate)
         self.blockOutputSize = EEGNet.calculate_out_size(self.blocks, channels, samples)
         self.classifierBlock = EEGNet.classifier_block(
-            self.F2 * self.blockOutputSize[1], n_classes
+            self.F2 * self.blockOutputSize[1], num_classes
         )
 
     def forward(self, x):

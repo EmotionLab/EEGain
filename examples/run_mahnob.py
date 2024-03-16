@@ -126,7 +126,7 @@ transform = eegain.transforms.Construct(
 
 # -------------- Dataset --------------
 mahnob_dataset = MAHNOB(
-    "../../eegain/EEGain/Sessions/",
+    "path_to_mahnob",
     label_type="V",
     transform=transform,
     ground_truth_threshold=4.5

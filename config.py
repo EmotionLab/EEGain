@@ -73,7 +73,7 @@ class TrainingConfig:
 
 @dataclass
 class EEGNetConfig:
-    n_classes: int = 2
+    num_classes: int = 2
     samples: int = 512
     dropout_rate: float = 0.5
     channels: int = 32
@@ -89,14 +89,12 @@ class TSceptionConfig:
 
 @dataclass
 class  DeepConvNetConfig:
-    n_chan: int = 32
-    n_time: int = 512 
-    n_class: int = 2
+    channels: int = 32
+    num_classes: int = 2
     dropout_rate: int = 0.5
     
 @dataclass
 class ShallowConvNetConfig:
-    n_chan: int = 32
-    n_time: int = 512 
-    n_class: int = 2
+    channels: int = 32
+    num_classes: int = 2
     dropout_rate: int = 0.5   

@@ -115,7 +115,7 @@ transform = eegain.transforms.Construct(
 
 # -------------- Dataset --------------
 dreamer_dataset = AMIGOS(
-    "/Users/rango/Desktop/GAIN Datasets/AMIGOS",
+    "path_to_amigos",
     label_type="V",
     transform=transform,
     ground_truth_threshold=3

@@ -108,7 +108,7 @@ transform = eegain.transforms.Construct(
 
 
 amigos_dataset = AMIGOS(
-    "/Users/rango/Desktop/GAIN Datasets/AMIGOS",
+    "path_to_amigos",
     label_type="A",
     transform=transform,
     ground_truth_threshold=4.5
