@@ -46,19 +46,19 @@ class ShallowConvNet(nn.Module):
         out = out.view(out.size()[0], -1)
         return out.size()
 
-    def __init__(self, n_chan, n_time, n_class, dropout_rate, **kwargs):
+    def __init__(self, channels, num_classes, dropout_rate, **kwargs):
         super(ShallowConvNet, self).__init__()
-
+        n_time = kwargs["sampling_r"]*kwargs["window"]
         kernel_size = (1, 25)
         n_filt_first_layer = 40
 
         self.firstLayer = ShallowConvNet.first_block(
-            n_filt_first_layer, kernel_size, n_chan
+            n_filt_first_layer, kernel_size, channels
         )
         self.avgpool = nn.AvgPool2d((1, 75), stride=(1, 15))
         self.dp = nn.Dropout(p=dropout_rate)
-        self.fSize = self.calculate_out_size(n_chan, n_time)
-        self.lastLayer = nn.Linear(self.fSize[-1], n_class)
+        self.fSize = self.calculate_out_size(channels, n_time)
+        self.lastLayer = nn.Linear(self.fSize[-1], num_classes)
 
     def forward(self, x):
         x = self.firstLayer(x)

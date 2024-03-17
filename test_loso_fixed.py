@@ -114,7 +114,7 @@ transform = eegain.transforms.Construct(
 
 
 deap_dataset = DEAP(
-    "/Users/rango/Desktop/GAIN/GAIN Datasets/deap",
+    "path_to_deap",
     label_type="A",
     transform=transform,
     ground_truth_threshold=4

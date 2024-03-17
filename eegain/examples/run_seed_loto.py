@@ -146,7 +146,7 @@ transform = eegain.transforms.Construct(
 
 # -------------- Dataset --------------
 seed_iv_dataset = Seed(
-    "/Users/rango/Desktop/GAIN/SEED",
+    "path_to_seed",
     label_type="V",
     transform=transform,
 )

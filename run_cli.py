@@ -16,7 +16,7 @@ from collections import defaultdict
 from dataclasses import asdict
 
 from sklearn.metrics import *
-from helpers import main_loso, main_loto
+from helpers import main_loso, main_loto, main_loso_fixed
 from config import *
 
 MAHNOB_transform = [
@@ -109,13 +109,13 @@ def main(**kwargs):
     # -------------- Model --------------
     model = globals()[kwargs['model_name']](input_size=[1, kwargs["channels"], kwargs["window"]*kwargs["s_rate"]], **kwargs) 
     if kwargs["split_type"] == "LOSO":
-        classes = [i for i in range(kwargs["n_class"])]
+        classes = [i for i in range(kwargs["num_classes"])]
         main_loso(dataset, model, classes, **kwargs)
     elif kwargs["split_type"] == "LOSO_Fixed":
-        classes = [i for i in range(kwargs["n_class"])]
+        classes = [i for i in range(kwargs["num_classes"])]
         main_loso_fixed(dataset, model, classes, **kwargs)
     else:
-        classes = [i for i in range(kwargs["n_class"])]
+        classes = [i for i in range(kwargs["num_classes"])]
         main_loto(dataset, model, classes, **kwargs)
 
 if __name__ == "__main__":

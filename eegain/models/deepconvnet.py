@@ -64,9 +64,9 @@ class DeepConvNet(nn.Module):
         out = model(data).shape
         return out[2:]
 
-    def __init__(self, n_chan, n_time, n_class, dropout_rate, **kwargs):
+    def __init__(self, channels, num_classes, dropout_rate, **kwargs):
         super(DeepConvNet, self).__init__()
-
+        n_time = kwargs["sampling_r"]*kwargs["window"]
         # Please note that the kernel size in the original paper is (1, 10),
         # we found when the segment length is shorter than 4s (1s, 2s, 3s) larger kernel size will  cause network error.
         # Besides using (1, 5) when EEG segment is 4s gives slightly higher ACC and F1 with a smaller model size.
@@ -74,7 +74,7 @@ class DeepConvNet(nn.Module):
         n_filt_first_layer = 25
         n_filt_later_layer = [25, 50, 100, 200]
 
-        first_layer = DeepConvNet.first_block(n_filt_first_layer, kernel_size, n_chan)
+        first_layer = DeepConvNet.first_block(n_filt_first_layer, kernel_size, channels)
         middle_layers = nn.Sequential(
             *[
                 DeepConvNet.conv_block(inF, outF, dropout_rate, kernel_size)
@@ -85,10 +85,10 @@ class DeepConvNet(nn.Module):
         self.allButLastLayers = nn.Sequential(first_layer, middle_layers)
 
         self.fSize = DeepConvNet.calculate_out_size(
-            self.allButLastLayers, n_chan, n_time
+            self.allButLastLayers, channels, n_time
         )
         self.lastLayer = DeepConvNet.last_block(
-            n_filt_later_layer[-1], n_class, (1, self.fSize[1])
+            n_filt_later_layer[-1], num_classes, (1, self.fSize[1])
         )
 
     def forward(self, x):
