@@ -716,8 +716,8 @@ class AMIGOS(EEGDataset):
 
         for curr_path in file_paths:
             if "Preprocessed" in curr_path or "Original" in curr_path:
-                curr_full_path = data_path / Path(curr_path) / Path(f"{curr_path}.mat")
-                id = curr_path.split("/")[-1].split("_")[-1][1:]
+                curr_full_path = data_path / Path(f"{curr_path}")
+                id = curr_path.split("/")[-1].split("_")[-1][1:-4]
                 data = loadmat(curr_full_path)
                 # TODO - data original doesn't have "joined_data
                 _data = {"data": data["joined_data"][0], "labels": data["labels_selfassessment"][0]}
@@ -792,9 +792,9 @@ class AMIGOS(EEGDataset):
             label_array(Dict[int, int]): labels for each recording
         """
         if self.preprocessed:
-            subject_data = loadmat(os.path.join(self.root, f"Data_Preprocessed_P{subject_index}/Data_Preprocessed_P{subject_index}.mat"))
+            subject_data = loadmat(os.path.join(self.root, f"Data_Preprocessed_P{subject_index}.mat"))
         else:
-            subject_data = loadmat(os.path.join(self.root, f"Data_Original_P{subject_index}/Data_Original_P{subject_index}.mat"))
+            subject_data = loadmat(os.path.join(self.root, f"/Data_Original_P{subject_index}.mat"))
         # TODO - data original doesn't have "joined_data
         subject_data = {"data": subject_data["joined_data"][0], "labels": subject_data["labels_selfassessment"][0]}
         # subject_data = self.mapping_list[subject_index]
@@ -835,9 +835,9 @@ class AMIGOS(EEGDataset):
         data_array, label_array = {}, {}
         for session_id in session_ids:
             if self.preprocessed:
-                data = loadmat(os.path.join(self.root, f"Data_Preprocessed_P{subject_id}/Data_Preprocessed_P{subject_id}.mat"))
+                data = loadmat(os.path.join(self.root, f"/Data_Preprocessed_P{subject_id}.mat"))
             else:
-                data = loadmat(os.path.join(self.root, f"Data_Original_P{subject_id}/Data_Original_P{subject_id}.mat"))
+                data = loadmat(os.path.join(self.root, f"/Data_Original_P{subject_id}.mat"))
             # TODO - data original doesn't have "joined_data
             _data = {"data": data["joined_data"][0], "labels": data["labels_selfassessment"][0]}
 
@@ -892,7 +892,7 @@ class Seed(EEGDataset):
         )
         file_paths = os.listdir(path)
         for mat_file_name in file_paths:
-            if "label" not in mat_file_name and "channel" not in mat_file_name:
+            if "label" not in mat_file_name and "channel" not in mat_file_name and ".mat" in mat_file_name:
                 subject_id = int(
                     mat_file_name[: mat_file_name.index("_")]
                 )  # file name starts with user_id
