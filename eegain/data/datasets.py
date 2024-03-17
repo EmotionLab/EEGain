@@ -719,6 +719,7 @@ class AMIGOS(EEGDataset):
                 curr_full_path = data_path / Path(curr_path) / Path(f"{curr_path}.mat")
                 id = curr_path.split("/")[-1].split("_")[-1][1:]
                 data = loadmat(curr_full_path)
+                # TODO - data original doesn't have "joined_data
                 _data = {"data": data["joined_data"][0], "labels": data["labels_selfassessment"][0]}
                 num_videos = len(_data['data'])
                 user_session_info[id] = [i for i in range(num_videos)]  # _data
