@@ -713,14 +713,15 @@ class AMIGOS(EEGDataset):
                                                      of file_names that's associated to this particular user
         """
         user_session_info = {}
-        if preprocessed:
-            for subj in file_paths:
-                if ".mat" in subj:
-                    id = subj.split("/")[-1].split(".")[0].split("_")[-1][1:]
-                    data = loadmat(os.path.join(data_path, subj))
-                    _data = {"data": data["joined_data"][0], "labels": data["labels_selfassessment"][0]}
-                    num_videos = len(_data['data'])
-                    user_session_info[id] = [i for i in range(num_videos)]  # _data
+
+        for curr_path in file_paths:
+            if "Preprocessed" in curr_path or "Original" in curr_path:
+                curr_full_path = data_path / Path(curr_path) / Path(f"{curr_path}.mat")
+                id = curr_path.split("/")[-1].split("_")[-1][1:]
+                data = loadmat(curr_full_path)
+                _data = {"data": data["joined_data"][0], "labels": data["labels_selfassessment"][0]}
+                num_videos = len(_data['data'])
+                user_session_info[id] = [i for i in range(num_videos)]  # _data
 
         logger.debug(f"Subject id -> sessions: {user_session_info}")
         return user_session_info
@@ -734,7 +735,10 @@ class AMIGOS(EEGDataset):
         transform: Construct = None,
         **kwargs
     ):
-        self.root = Path(root)
+        root_path = Path(root) / Path("Physiological Recordings") / Path("Matlab Preprocessed Data") if preprocessed \
+            else Path(root) / Path("Physiological Recordings") / Path("Matlab Original Data")
+        self.root = root_path
+        self.preprocessed = preprocessed
         self.ground_truth_threshold = ground_truth_threshold
         self.transform = transform
         self.file_paths = os.listdir(self.root)
@@ -786,7 +790,11 @@ class AMIGOS(EEGDataset):
             data_array(Dict[int, np.ndarray]): Dictionary of files and data associated to specific user
             label_array(Dict[int, int]): labels for each recording
         """
-        subject_data = loadmat(os.path.join(self.root, f"Data_Preprocessed_P{subject_index}.mat"))
+        if self.preprocessed:
+            subject_data = loadmat(os.path.join(self.root, f"Data_Preprocessed_P{subject_index}/Data_Preprocessed_P{subject_index}.mat"))
+        else:
+            subject_data = loadmat(os.path.join(self.root, f"Data_Original_P{subject_index}/Data_Original_P{subject_index}.mat"))
+        # TODO - data original doesn't have "joined_data
         subject_data = {"data": subject_data["joined_data"][0], "labels": subject_data["labels_selfassessment"][0]}
         # subject_data = self.mapping_list[subject_index]
         datas = subject_data["data"]
@@ -825,8 +833,11 @@ class AMIGOS(EEGDataset):
     def __get_trials__(self, session_ids: List, subject_id: Dict):
         data_array, label_array = {}, {}
         for session_id in session_ids:
-            # TODO This will work only for AMIGOS Preprocessed data
-            data = loadmat(os.path.join(self.root, f"Data_Preprocessed_P{subject_id}.mat"))
+            if self.preprocessed:
+                data = loadmat(os.path.join(self.root, f"Data_Preprocessed_P{subject_id}/Data_Preprocessed_P{subject_id}.mat"))
+            else:
+                data = loadmat(os.path.join(self.root, f"Data_Original_P{subject_id}/Data_Original_P{subject_id}.mat"))
+            # TODO - data original doesn't have "joined_data
             _data = {"data": data["joined_data"][0], "labels": data["labels_selfassessment"][0]}
 
             curr_labels = _data['labels'][session_id][0]
