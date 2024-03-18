@@ -226,6 +226,7 @@ def loso_loop(model, loader, logger, **kwargs):
     )
 
 
+
 def main_loso(dataset, model, classes, **kwargs):
     eegloader = EEGDataloader(dataset, batch_size=32).loso()
 
@@ -234,7 +235,7 @@ def main_loso(dataset, model, classes, **kwargs):
         if kwargs["model_name"]=="RANDOM":
             model = RandomModel(loader["train"])
         loso_loop(model, loader, logger, **kwargs)
-
+    logger.log_summary(overal_log_file=kwargs["overal_log_file"], log_dir=kwargs["log_dir"])
 
 def main_loso_fixed(dataset, model, classes, **kwargs):
     dataset_name = dataset.__class__.__name__
@@ -252,3 +253,4 @@ def main_loso_fixed(dataset, model, classes, **kwargs):
     if kwargs["model_name"]=="RANDOM":
         model = RandomModel(eegloader["train"])
     loso_loop(model, eegloader, logger, **kwargs)
+    logger.log_summary(overal_log_file=kwargs["overal_log_file"], log_dir=kwargs["log_dir"])
