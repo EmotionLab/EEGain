@@ -1,5 +1,5 @@
 # !python run_client.py --model_name="TSception"
-## example model names : EEGNet, TSception, DeepConvNet, Shallow
+## example model names : EEGNet, TSception, DeepConvNet, ShallowConvNet, RANDOM
 ## example data names: DEAP, MAHNOB, SeedIV, AMIGOS, DREAMER
 ## set channel and n_chan to 14 for amigos and dreamer and 32 for mahnob and deap, seedIV - 62 
 python run_cli.py \
