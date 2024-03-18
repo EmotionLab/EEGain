@@ -839,9 +839,9 @@ class AMIGOS(EEGDataset):
         for session_id in session_ids:
             if self.preprocessed:
                 if subject_index < 10:
-                    subject_data = loadmat(os.path.join(self.root, f"Data_Preprocessed_P0{subject_index}.mat"))
+                    data = loadmat(os.path.join(self.root, f"Data_Preprocessed_P0{subject_index}.mat"))
                 else:
-                    subject_data = loadmat(os.path.join(self.root, f"Data_Preprocessed_P{subject_index}.mat"))
+                    data = loadmat(os.path.join(self.root, f"Data_Preprocessed_P{subject_index}.mat"))
             else:
                 data = loadmat(os.path.join(self.root, f"/Data_Original_P{subject_id}.mat"))
             # TODO - data original doesn't have "joined_data
