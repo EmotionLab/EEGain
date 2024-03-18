@@ -164,7 +164,7 @@ class EEGDataloader:
             }
 
     def loso_fixed(self, train_subject_ids, test_subject_ids) -> Dict[str, Any]:
-        logger.info(f"Splitting type: leave-one-subject-out-fixed")
+        logger.info(f"Splitting type: leave-n-subject-out-fixed")
 
         logger.debug(f"Preparing: train subjects: {train_subject_ids}")
         train_data = [self.dataset.__get_subject__(i) for i in train_subject_ids]
