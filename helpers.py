@@ -12,7 +12,7 @@ import json
 from eegain.data import EEGDataloader
 from eegain.data.datasets import DEAP, MAHNOB, SeedIV
 from eegain.logger import EmotionLogger
-from eegain.models import DeepConvNet, EEGNet, ShallowConvNet, TSception
+from eegain.models import DeepConvNet, EEGNet, ShallowConvNet, TSception, RandomModel
 from collections import defaultdict
 from sklearn.metrics import *
 
@@ -39,6 +39,27 @@ def test_one_epoch(model, loader, loss_fn):
             all_actuals.extend(y_batch.data.tolist())
             running_loss += loss.item() * batch_size
             epoch_loss = running_loss / dataset_size
+            pbar.set_postfix(loss=f"{epoch_loss:0.4f}")
+
+    return all_preds, all_actuals, epoch_loss
+
+def test_one_epoch_random(model, loader, loss_fn):
+    all_preds, all_actuals = [], []
+    dataset_size, running_loss, epoch_loss = 0, 0, None
+
+    pbar = tqdm(enumerate(loader), total=len(loader), desc="Test ")
+    with torch.no_grad():
+        for i, (x_batch, y_batch) in pbar:
+            x_batch = x_batch.to(device)
+            y_batch = y_batch.to(device)
+            pred = model(x_batch)
+
+            batch_size = x_batch.size(0)
+            dataset_size += batch_size
+
+            all_preds.extend(pred.data.tolist())
+            all_actuals.extend(y_batch.data.tolist())
+            epoch_loss = 0
             pbar.set_postfix(loss=f"{epoch_loss:0.4f}")
 
     return all_preds, all_actuals, epoch_loss
@@ -80,17 +101,23 @@ def run_loto(
         loss_fn,
         epoch,
         logger,
+        random_baseline,
         split_type="LOTO",
 ):
     for i in range(epoch):
         print(f"\nEpoch {i}/{epoch}")
-
-        train_pred, train_actual, train_loss = train_one_epoch(
-            model, train_dataloader, optimizer, loss_fn
-        )
-        test_pred, test_actual, test_loss = test_one_epoch(
+        if not random_baseline:
+            train_pred, train_actual, train_loss = train_one_epoch(
+                model, train_dataloader, optimizer, loss_fn
+            )
+            test_pred, test_actual, test_loss = test_one_epoch(
             model, test_dataloader, loss_fn
-        )
+            )
+        else:
+            test_pred, test_actual, test_loss = test_one_epoch_random(
+            model, test_dataloader, loss_fn
+            )
+            train_pred, train_actual, train_loss = test_pred, test_actual, test_loss
         if split_type != "LOTO":
             # in the end of epoch it logs metrics for this specific epoch. test_ids is test_session_ids
             logger.log(test_ids[0], train_pred, train_actual, i, "train", train_loss)
@@ -109,17 +136,23 @@ def run_loso(
         optimizer,
         loss_fn,
         epoch,
-        logger
+        logger,
+        random_baseline
 ):
     for i in range(epoch):
         print(f"\nEpoch {i}/{epoch}")
-
-        train_pred, train_actual, train_loss = train_one_epoch(
-            model, train_dataloader, optimizer, loss_fn
-        )
-        test_pred, test_actual, test_loss = test_one_epoch(
+        if not random_baseline:
+            train_pred, train_actual, train_loss = train_one_epoch(
+                model, train_dataloader, optimizer, loss_fn
+            )
+            test_pred, test_actual, test_loss = test_one_epoch(
             model, test_dataloader, loss_fn
-        )
+            )
+        else:
+            test_pred, test_actual, test_loss = test_one_epoch_random(
+            model, test_dataloader, loss_fn
+            )
+            train_pred, train_actual, train_loss = test_pred, test_actual, test_loss
 
         logger.log(test_subject_ids[0], train_pred, train_actual, i, "train", train_loss)
         logger.log(test_subject_ids[0], test_pred, test_actual, i, "val", test_loss)
@@ -137,9 +170,14 @@ def main_loto(dataset, model, classes, **kwargs):
         num_epoch = kwargs["num_epochs"]
         all_train_preds_for_subject, all_train_actuals_for_subject, all_test_preds_for_subject, all_test_actuals_for_subject = [], [], [], []
         for i, loader in enumerate(eegloader):
-            model = model
-            model = model.to(device)
-            optimizer = torch.optim.Adam(model.parameters(), lr=kwargs["lr"], weight_decay=kwargs["weight_decay"])
+            if kwargs["model_name"]=="RANDOM":
+                model = RandomModel(loader["train"])
+                optimizer = None
+                is_random=True
+            else:
+                model = model.to(device)
+                optimizer = torch.optim.Adam(model.parameters(), lr=kwargs["lr"], weight_decay=kwargs["weight_decay"])
+                is_random=False
             loss_fn = nn.CrossEntropyLoss(label_smoothing=kwargs["label_smoothing"])
             _, _, test_pred, test_actual = run_loto(
                 model=model,
@@ -150,6 +188,7 @@ def main_loto(dataset, model, classes, **kwargs):
                 loss_fn=loss_fn,
                 epoch=num_epoch,
                 logger=logger,
+                random_baseline=is_random,
                 split_type="LOTO"  # for loto
             )
             all_test_preds_for_subject.append(test_pred)
@@ -164,10 +203,15 @@ def main_loto(dataset, model, classes, **kwargs):
     logger.log_summary(overal_log_file="overal_log", log_dir="logs/")
 
 
-def loso_loop(model, loader, logger,  **kwargs):
-    model = model.to(device)
-    optimizer = torch.optim.Adam(model.parameters(), lr=kwargs["lr"],
-                                 weight_decay=kwargs["weight_decay"])
+def loso_loop(model, loader, logger, **kwargs):
+    if kwargs["model_name"]=="RANDOM":
+        optimizer = None
+        is_random = True
+    else:
+        model = model.to(device)
+        optimizer = torch.optim.Adam(model.parameters(), lr=kwargs["lr"],
+                                     weight_decay=kwargs["weight_decay"])
+        is_random = False
     loss_fn = nn.CrossEntropyLoss(label_smoothing=kwargs["label_smoothing"])
     run_loso(
         model=model,
@@ -177,7 +221,8 @@ def loso_loop(model, loader, logger,  **kwargs):
         optimizer=optimizer,
         loss_fn=loss_fn,
         epoch=kwargs["num_epochs"],
-        logger=logger
+        logger=logger,
+        random_baseline=is_random
     )
 
 
@@ -186,6 +231,8 @@ def main_loso(dataset, model, classes, **kwargs):
 
     logger = EmotionLogger(log_dir="logs/", class_names=classes)
     for loader in eegloader:
+        if kwargs["model_name"]=="RANDOM":
+            model = RandomModel(loader["train"])
         loso_loop(model, loader, logger, **kwargs)
 
 
@@ -202,5 +249,6 @@ def main_loso_fixed(dataset, model, classes, **kwargs):
     eegloader = EEGDataloader(dataset, batch_size=32).loso_fixed(train_set, test_set)
 
     logger = EmotionLogger(log_dir="logs/", class_names=classes)
-
+    if kwargs["model_name"]=="RANDOM":
+        model = RandomModel(eegloader["train"])
     loso_loop(model, eegloader, logger, **kwargs)
