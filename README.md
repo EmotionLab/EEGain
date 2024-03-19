@@ -35,6 +35,9 @@ When running different models (such as **DeepConvNet**, **ShallowConvNet**, **EE
 Our tests were conducted on Google Colab, utilizing a V100 GPU, with a batch size of 32 and a total of 30 epochs for each run. The following is an estimate of the time required to complete the entire pipeline, using a Leave-One-Trial-Out (LOTO) split, for each dataset:
 
 **DREAMER** Dataset: Approximately 2 to 3 hours.
+
 **DEAP** Dataset: About 2.5 to 3.5 hours.
+
 **MAHNOB** Dataset: Roughly 2 to 3 hours.
+
 **AMIGOS** Dataset: Around 5 to 6 hours.
