@@ -792,6 +792,7 @@ class AMIGOS(EEGDataset):
             label_array(Dict[int, int]): labels for each recording
         """
         if self.preprocessed:
+            subject_index = int(subject_index)
             if subject_index<10:
                 subject_data = loadmat(os.path.join(self.root, f"Data_Preprocessed_P0{subject_index}.mat"))
             else:
