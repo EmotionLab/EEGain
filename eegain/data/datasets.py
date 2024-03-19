@@ -130,7 +130,7 @@ class SeedIV(EEGDataset):
         data_array, label_array = {}, {}
 
         for session in sessions:
-            path_to_mat = self.root / Path("eeg_raw_data") / Path(str(session)) # eeg_raw_data
+            path_to_mat = self.root / Path(str(session)) # eeg_raw_data
             mat_data = scipy.io.loadmat(path_to_mat)  # Get Matlab File
             mat_data_values = list(mat_data.values())[3:]  # Matlab file contains some not necessary info so let's remove it
             for trial in range(1, num_trials + 1):
@@ -186,7 +186,7 @@ class SeedIV(EEGDataset):
         data_array, label_array = {}, {}
 
         for session in sessions:
-            path_to_mat = self.root / Path("eeg_raw_data") / Path(str(session))  # eeg_raw_data
+            path_to_mat = self.root / Path(str(session))  # eeg_raw_data
             mat_data = scipy.io.loadmat(path_to_mat)  # Get Matlab File
             mat_data_values = list(mat_data.values())[
                               3:]  # Matlab file contains some not necessary info so let's remove it
