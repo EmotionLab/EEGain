@@ -19,6 +19,7 @@ from sklearn.metrics import *
 from helpers import main_loso, main_loto, main_loso_fixed
 from config import *
 
+
 MAHNOB_transform = [
             eegain.transforms.Crop(t_min=30, t_max=-30),
             eegain.transforms.DropChannels(
@@ -83,7 +84,12 @@ SeedIV_transform = [
         eegain.transforms.Resample(s_rate=128),
     ]
 
-
+Seed_transform =  [
+        # eegain.transforms.DropChannels(channels_to_drop_seed),
+        eegain.transforms.Filter(l_freq=0.3, h_freq=45),
+        eegain.transforms.NotchFilter(freq=50),
+        eegain.transforms.Resample(s_rate=128),
+    ]
 
 def generate_options():
     def decorator(func):
@@ -105,12 +111,9 @@ def main(**kwargs):
     transform.append(eegain.transforms.Segment(duration=kwargs["window"], overlap=0))
     transform = eegain.transforms.Construct(transform)
     dataset = globals()[kwargs['data_name']](transform=transform, root=kwargs["data_path"], **kwargs)
-    if kwargs["model_name"]=="RANDOM":
-        print("initializing random model")
-        model = None
+
     # -------------- Model --------------
-    else:
-        model = globals()[kwargs['model_name']](input_size=[1, kwargs["channels"], kwargs["window"]*kwargs["s_rate"]], **kwargs)
+    model = globals()[kwargs['model_name']](input_size=[1, kwargs["channels"], kwargs["window"]*kwargs["s_rate"]], **kwargs)
     if kwargs["split_type"] == "LOSO":
         classes = [i for i in range(kwargs["num_classes"])]
         main_loso(dataset, model, classes, **kwargs)
