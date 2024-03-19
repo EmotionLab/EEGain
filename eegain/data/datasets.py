@@ -892,7 +892,7 @@ class Seed(EEGDataset):
         num_sessions = 3  # There are three sessions in SEED IV dataset
         user_session_info: Dict[int, List[str]] = defaultdict(list)
         path = (
-                data_path / Path("SEED_EEG/Preprocessed_EEG")  # eeg_preprocessed_data
+                data_path  # eeg_preprocessed_data
         )
         file_paths = os.listdir(path)
         for mat_file_name in file_paths:
@@ -940,7 +940,7 @@ class Seed(EEGDataset):
             label_array(Dict[str, int]): labels for each recording
         """
 
-        path_to_channels_excel = self.root / Path("SEED_EEG/channel-order.xlsx")
+        path_to_channels_excel = self.root / Path("channel-order.xlsx")
         channels_file = pd.read_excel(path_to_channels_excel, header=None)
         channels = list(channels_file.iloc[:, 0])
 
@@ -950,7 +950,7 @@ class Seed(EEGDataset):
         data_array, label_array = {}, {}
 
         for session in sessions:
-            path_to_mat = self.root / Path("Preprocessed_EEG") / Path(str(session)) # eeg_raw_data
+            path_to_mat = self.root / Path(str(session)) # eeg_raw_data
             mat_data = scipy.io.loadmat(path_to_mat)  # Get Matlab File
             mat_data_values = list(mat_data.values())[3:]  # Matlab file contains some not necessary info so let's remove it
             for trial in range(1, num_trials + 1):
@@ -984,7 +984,7 @@ class Seed(EEGDataset):
         return data_array, label_array
 
     def __get_trials__(self, sessions, subject_ids):
-        path_to_channels_excel = self.root / Path("SEED_EEG/channel-order.xlsx")
+        path_to_channels_excel = self.root / Path("channel-order.xlsx")
         channels_file = pd.read_excel(path_to_channels_excel, header=None)
         channels = list(channels_file.iloc[:, 0])
 
@@ -993,7 +993,7 @@ class Seed(EEGDataset):
         data_array, label_array = {}, {}
 
         for session in sessions:
-            path_to_mat = self.root / Path("SEED_EEG") / Path(str(session))  # eeg_raw_data
+            path_to_mat = self.root / Path(str(session))  # eeg_raw_data
             mat_data = scipy.io.loadmat(path_to_mat)  # Get Matlab File
             mat_data_values = list(mat_data.values())[
                               3:]  # Matlab file contains some not necessary info so let's remove it
