@@ -9,8 +9,8 @@ Datasets that are implemented in EEGain for now - DEAP, MAHNOB, AMIGOS, DREAMER,
 Some other models and datasets are comming.
 
 ### **QuickStart**
-to run framework quickly and test it, you can use this colab notebook - link
-https://colab.research.google.com/drive/1msoWvWbY_Ztrb2ny0SpibyaAbPKWp-9Q?usp=sharing
+to run framework quickly and test it, you can use this colab notebook - **[link](https://colab.research.google.com/drive/1msoWvWbY_Ztrb2ny0SpibyaAbPKWp-9Q?usp=sharing)** 
+
 You just need to clone this repo and run .sh file with proper parameters. 
 You can see results on tensorboard. 
 
