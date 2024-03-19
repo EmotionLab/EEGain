@@ -67,7 +67,7 @@ class SeedIV(EEGDataset):
 
         for session in range(1, num_sessions + 1):
             path = (
-                data_path / Path("eeg_raw_data") / Path(str(session)) # eeg_raw_data
+                data_path / Path(str(session)) # eeg_raw_data
             )  # Path to particular sessions mat files
             for mat_file_path in path.glob("*.mat"):
                 subject_file_name = mat_file_path.name
