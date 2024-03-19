@@ -474,7 +474,8 @@ class DEAP(EEGDataset):
             data_array(Dict[int, np.ndarray]): Dictionary of files and data associated to specific user
             label_array(Dict[int, int]): labels for each recording
         """
-        subject_index = str(subject_index)
+        if isinstance(subject_index, int):
+            subject_index = str(subject_index) if subject_index>9 else "0"+str(subject_index)
         path_to_subject = (
                 self.root / f's{subject_index}.dat'
         )
