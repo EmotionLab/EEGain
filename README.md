@@ -18,13 +18,46 @@ You just need to clone this repo and run .sh file with proper parameters.
 You can see results on tensorboard. 
 
 ### **How to run**
-1. clone the repo
-2. Enter in EEGain folder. run <code>pip install .</code>
-3. Change run_cli.sh based on dataset/splitting/model requirements
-4. Run run_cli.sh
-5. to check the results: <br>
-   - run <code>tensorboard --logdir ./logs </code>
-   - logs will be saved in **log.log** file as well<br> 
+   1. clone the repo
+   2. Enter in EEGain folder. run <code>pip install .</code>
+   3. Change run_cli.sh based on dataset/splitting/model requirements
+   4. Run run_cli.sh
+   5. to check the results: <br>
+      - run <code>tensorboard --logdir ./logs </code>
+      - logs will be saved in **log.log** file as well<br>
+   
+### **Key Arguments to Modify**<br>
+**SeedIV Setup:**
+- Data Path: Ensure your directory structure follows "your_path_to/eeg_raw_data", containing three session folders. Each session folder must include .mat files.<br/>
+- Data Name: SeedIV<br/>
+- Channels: 62<br/>
+- Number of Classes: 4<br/>
+**Seed Setup:** <br/>
+- Data Path: Use the structure "your_path_to/Preprocessed_EEG", which should contain .mat files, a channel-order.xlsx file, and a label.mat file.<br/>
+- Data Name: Seed<br/>
+- Channels: 62<br/>
+- Number of Classes: 3<br/>
+**MAHNOB Setup**: <br/>
+- Data Path: Follow "your_path_to/mahnob-hci-raw/Sessions", with session-associated folders. Each session folder must have a .xml file for labels and a .bdf file.<br/>
+- Data Name: MAHNOB <br/>
+- Channels: 32 <br/>
+- Number of Classes: 2 <br/>
+**DEAP Setup:** <br/>
+- Data Path: Structure your directory as "your_path_to/data_preprocessed_python", which should contain .mat files. <br/>
+- Data Name: DEAP <br/>
+- Channels: 32 <br/>
+- Number of Classes: 2 <br/>
+**DREAMER Setup:** <br/>
+- Data Path: Ensure your file path is "your_path_to/DREAMER.mat". <br/>
+- Data Name: DREAMER <br/>
+- Channels: 14 <br/>
+- Number of Classes: 2 <br/>
+**AMIGOS Setup:** <br/>
+- Data Path: Organize your path as "your_path_to/AMIGOS/", which should lead to a Physiological recordings folder, then to a "Matlab Preprocessed Data" folder containing .mat files. <br/>
+- Data Name: AMIGOS <br/>
+- Channels: 14 <br/>
+- Number of Classes: 2 <br/>
+
 
 **[Struture of the framework](https://miro.com/app/board/uXjVMEB2nB0=/?share_link_id=710707650624)** 
 
@@ -41,3 +74,5 @@ Our tests were conducted on Google Colab, utilizing a V100 GPU, with a batch siz
 **MAHNOB** Dataset: Roughly 2 to 3 hours.
 
 **AMIGOS** Dataset: Around 5 to 6 hours.
+
+estimated time for LOTO_Fixed approach is approximately 20 minutes for each dataset independently 
