@@ -51,11 +51,12 @@ You can see results on tensorboard.
 
 You can adapt arguments within the sh file according to your specific intentions:
 
-```--model_name``` - Selects a predefined model. The implemented predefined models are:
+```--model_name``` - Selects a model. The implemented predefined models are:
 - TSception
 - EEGNet
 - DeepconvNet
-- Shallow
+- ShallowConvNet
+- RANDOM ( for testing random baseline)
 
 You can add your custom model as well.
 
@@ -64,8 +65,8 @@ You can add your custom model as well.
 - MAHNOB
 - AMIGOS
 - DREAMER
-- SEED
-- SEEDIV
+- Seed
+- SeedIV
 
 You can add your custom dataset as well.
 
@@ -75,7 +76,7 @@ You can add your custom dataset as well.
 
 ```--overal_log_file``` - Specifies the name of the log file that will be created.
 
-```--label_type``` - Specifies whether data is separated into classes based on valence or arousal. This argument has no effect on the Seed and SEED IV dataset because these datasets have fixed splits based on categorical labels. You can choose the following options:
+```--label_type``` - Specifies whether data is separated into classes based on valence or arousal. This argument has no effect on the Seed and Seed IV dataset because these datasets have fixed splits based on categorical labels. You can choose the following options:
 - V: Valence
 - A: Arousal
 
