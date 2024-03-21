@@ -51,11 +51,13 @@ You can see results on tensorboard.
 
 You can adapt arguments within the sh file according to your specific intentions:
 
-```--model_name``` - Selects a custom or pre-trained model. The pretrained implemented pre-trained models are:
+```--model_name``` - Selects a predefined model. The pretrained implemented predefined models are:
 - TSception
 - EEGNet
 - DeepconvNet
 - Shallow
+
+You can add your custom model as well.
 
 ```--data_name``` - Chooses a custom name or a name of predefined datasets. The predefined datasets are:
 - DEAP
@@ -65,7 +67,9 @@ You can adapt arguments within the sh file according to your specific intentions
 - SEED
 - SEEDIV
 
-```--data_path``` - Specifies the directory where the data files are saved.
+You can add your custom dataset as well.
+
+```--data_path``` - Specifies the directory where the data files are saved. You can check exact path for each dataset below in "Key Arguments to Modify" section.
 
 ```--log_dir``` - Specifies the directory where the log files will be saved.
 
@@ -91,14 +95,14 @@ You can adapt arguments within the sh file according to your specific intentions
 
 ```--dropout_rate``` - Probability at which outputs of the layer are dropped out.
 
-```--num_classes``` - Specifies the number of classes of the classification problem. Please leave this argument at a value of 2 because we conceptualized the task as a binary classification problem.
+```--num_classes``` - Specifies the number of classes of the classification problem. Set this argument 2 for AMIGOS, MAHNOB, DEAP and DREAMER; 3 for SEED and 4 for SEED IV.
 
 ```--channels``` - Specifies the number of channels for the dataset. Set this argument to 14 for AMIGOS and DREAMER, 32 for MAHNOB and DEAP, and to 62 for SEED and SEED IV.
 
-```--split_type``` - Specifies the type of train-test splitting. Please use only the following two splitting types as any other splits will disqualify your submission:
+```--split_type``` - Specifies the type of train-test splitting. There are three different types of splitting:
 - LOTO: Leave one trial out. Use this split for the person-dependent task.
 - LOSO: Leave one subject out. Use this split for the person-independent task.
-- LOSO_Fixed: Creates a fixed 75/25 train-test split that is mandatory for the person-independent task (see below).
+- LOSO_Fixed: Creates a fixed 75/25 train-test split that is mandatory for the person-independent task.
 
 
 ### **Key Arguments to Modify**
