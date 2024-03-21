@@ -12,9 +12,32 @@ Datasets that are implemented in EEGain for now - DEAP, MAHNOB, AMIGOS, DREAMER,
 Some other models and datasets are comming. 
 
 ### **QuickStart**
-to run framework quickly and test it, you can use this colab notebook - **[link](https://colab.research.google.com/drive/1msoWvWbY_Ztrb2ny0SpibyaAbPKWp-9Q?usp=sharing)** 
-
-You just need to clone this repo and run .sh file with proper parameters. 
+You can simply run the code in Google Colab. First you need to clone repo with this command:
+```
+!git clone https://github.com/EmotionLab/EEGain.git
+```
+Then you can run it with this command:
+```
+!python3 run_cli.py \
+--model_name=TSception \
+--data_name=MAHNOB \
+--data_path="..." \
+--log_dir="logs/" \
+--overal_log_file="logs_mahnob_loto.txt" \
+--label_type="V" \
+--num_epochs=2 \
+--batch_size=32 \
+--lr=0.001 \
+--sampling_r=128 \
+--window=4 \
+--weight_decay=0 \
+--label_smoothing=0.01 \
+--dropout_rate=0.5 \
+--num_classes=2 \
+--channels=32 \
+--split_type="LOTO"
+```
+Here you can change some important arguments. For example, to change dataset here you need to change just 4 arguments - data_name, data_path, num_classes and channels. 
 You can see results on tensorboard. 
 
 ### **How to run**
