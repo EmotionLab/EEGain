@@ -51,7 +51,7 @@ You can see results on tensorboard.
 
 You can adapt arguments within the sh file according to your specific intentions:
 
-```--model_name``` - Selects a predefined model. The pretrained implemented predefined models are:
+```--model_name``` - Selects a predefined model. The implemented predefined models are:
 - TSception
 - EEGNet
 - DeepconvNet
