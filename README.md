@@ -97,6 +97,7 @@ You can adapt arguments within the sh file according to your specific intentions
 
 ```--split_type``` - Specifies the type of train-test splitting. Please use only the following two splitting types as any other splits will disqualify your submission:
 - LOTO: Leave one trial out. Use this split for the person-dependent task.
+- LOSO: Leave one subject out. Use this split for the person-independent task.
 - LOSO_Fixed: Creates a fixed 75/25 train-test split that is mandatory for the person-independent task (see below).
 
 
