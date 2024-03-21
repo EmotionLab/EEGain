@@ -50,6 +50,7 @@ You can see results on tensorboard.
       - logs will be saved in **log.log** file as well<br>
 
 You can adapt these arguments within the sh file according to your specific intentions:
+
 ```--model_name``` - Selects a custom or pre-trained model. The pretrained implemented pre-trained models are:
 - TSception
 - EEGNet
