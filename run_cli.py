@@ -113,7 +113,12 @@ def main(**kwargs):
     dataset = globals()[kwargs['data_name']](transform=transform, root=kwargs["data_path"], **kwargs)
 
     # -------------- Model --------------
-    model = globals()[kwargs['model_name']](input_size=[1, kwargs["channels"], kwargs["window"]*kwargs["s_rate"]], **kwargs)
+    if kwargs["model_name"]=="RANDOM":
+        print("initializing random model")
+        model = None
+    # -------------- Model --------------
+    else:
+        model = globals()[kwargs['model_name']](input_size=[1, kwargs["channels"], kwargs["window"]*kwargs["s_rate"]], **kwargs)
     if kwargs["split_type"] == "LOSO":
         classes = [i for i in range(kwargs["num_classes"])]
         main_loso(dataset, model, classes, **kwargs)
