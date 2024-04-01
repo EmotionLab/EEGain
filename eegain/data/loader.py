@@ -129,6 +129,9 @@ class EEGDataloader:
             nan_mask = torch.isnan(train_data[:, :, channel, :])  
             train_data[:, :, channel, :][nan_mask] = 0
 
+            nan_mask = torch.isnan(test_data[:, :, channel, :])  
+            test_data[:, :, channel, :][nan_mask] = 0
+            
             std, mean = torch.std_mean(train_data[:, :, channel, :])
             train_data[:, :, channel, :] = (train_data[:, :, channel, :] - mean) / std
             test_data[:, :, channel, :] = (test_data[:, :, channel, :] - mean) / std
