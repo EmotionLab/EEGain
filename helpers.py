@@ -200,7 +200,7 @@ def main_loto(dataset, model, classes, **kwargs):
 
         logger.log(subject_id, all_test_preds_for_subject, all_test_actuals_for_subject, num_epoch, "val")
 
-    logger.log_summary(overal_log_file="overal_log", log_dir="logs/")
+    logger.log_summary(overal_log_file=kwargs["overal_log_file"], log_dir="logs/")
 
 
 def loso_loop(model, loader, logger, **kwargs):
