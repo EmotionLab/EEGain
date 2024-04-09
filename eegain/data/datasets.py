@@ -722,7 +722,7 @@ class AMIGOS(EEGDataset):
                 data = loadmat(curr_full_path)
                 # TODO - data original doesn't have "joined_data
                 _data = {"data": data["joined_data"][0], "labels": data["labels_selfassessment"][0]}
-                num_videos = len(_data['data'])
+                num_videos = sum(len(arr[0]) > 0 for arr in _data['labels'])
                 user_session_info[id] = [i for i in range(num_videos)]  # _data
 
         logger.debug(f"Subject id -> sessions: {user_session_info}")
