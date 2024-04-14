@@ -20,12 +20,17 @@ class RandomModel:
         labels = []
         for x_batch, y_batch in train_dataloader:
             labels.extend(y_batch)
-
-        portion_0 = labels.count(0) / len(labels)
-        portion_1 = labels.count(1) / len(labels)
-
-        self.weights = [portion_0, portion_1]
+        labels_f = [int(x) for x in labels]
+        uniques = list(set(labels_f))
+        print("this is uniques : ", uniques)
+        self.num_classes = len(uniques)
+        weights = []
+        for i in range(0,len(uniques)):
+            portion_0 = labels.count(i) / len(labels)
+            weights.append(portion_0)
+        self.weights = weights
         print("weights", self.weights)
 
     def __call__(self, x):
-        return torch.tensor(np.random.choice([0, 1], size=x.shape[0], p=self.weights))
+        class_list = list(range(self.num_classes))
+        return torch.tensor(np.random.choice(class_list, size=x.shape[0], p=self.weights))
