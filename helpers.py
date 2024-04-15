@@ -98,6 +98,7 @@ def run_loto(
         test_dataloader,
         test_ids,
         optimizer,
+        scheduler,
         loss_fn,
         epoch,
         logger,
@@ -113,6 +114,7 @@ def run_loto(
             test_pred, test_actual, test_loss = test_one_epoch(
             model, test_dataloader, loss_fn
             )
+            scheduler.step()
         else:
             test_pred, test_actual, test_loss = test_one_epoch_random(
             model, test_dataloader, loss_fn
@@ -134,6 +136,7 @@ def run_loso(
         test_dataloader,
         test_subject_ids,
         optimizer,
+        scheduler,
         loss_fn,
         epoch,
         logger,
@@ -148,6 +151,7 @@ def run_loso(
             test_pred, test_actual, test_loss = test_one_epoch(
             model, test_dataloader, loss_fn
             )
+            scheduler.step()
         else:
             test_pred, test_actual, test_loss = test_one_epoch_random(
             model, test_dataloader, loss_fn
@@ -162,7 +166,7 @@ def run_loso(
 
 def main_loto(dataset, model, classes, **kwargs):
     subject_video_mapping = dataset.mapping_list
-    logger = EmotionLogger(log_dir="logs/", class_names=classes)
+    logger = EmotionLogger(log_dir=kwargs["log_dir"], class_names=classes)
 
     for subject_id, session_ids in subject_video_mapping.items():
         eegloader = EEGDataloader(dataset, batch_size=32).loto(subject_id, session_ids,
@@ -174,9 +178,11 @@ def main_loto(dataset, model, classes, **kwargs):
                 model = RandomModel(loader["train"])
                 optimizer = None
                 is_random=True
+                scheduler=None
             else:
                 model = model.to(device)
                 optimizer = torch.optim.Adam(model.parameters(), lr=kwargs["lr"], weight_decay=kwargs["weight_decay"])
+                scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=100, eta_min=0)
                 is_random=False
             loss_fn = nn.CrossEntropyLoss(label_smoothing=kwargs["label_smoothing"])
             _, _, test_pred, test_actual = run_loto(
@@ -185,6 +191,7 @@ def main_loto(dataset, model, classes, **kwargs):
                 test_dataloader=loader["test"],
                 test_ids=loader["test_session_indexes"],
                 optimizer=optimizer,
+                scheduler=scheduler,
                 loss_fn=loss_fn,
                 epoch=num_epoch,
                 logger=logger,
@@ -200,17 +207,20 @@ def main_loto(dataset, model, classes, **kwargs):
 
         logger.log(subject_id, all_test_preds_for_subject, all_test_actuals_for_subject, num_epoch, "val")
 
-    logger.log_summary(overal_log_file=kwargs["overal_log_file"], log_dir="logs/")
+    logger.log_summary(overal_log_file=kwargs["overal_log_file"], log_dir=kwargs["log_dir"])
 
 
 def loso_loop(model, loader, logger, **kwargs):
     if kwargs["model_name"]=="RANDOM":
         optimizer = None
         is_random = True
+        scheduler = None
     else:
         model = model.to(device)
         optimizer = torch.optim.Adam(model.parameters(), lr=kwargs["lr"],
                                      weight_decay=kwargs["weight_decay"])
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=100, eta_min=0)
+
         is_random = False
     loss_fn = nn.CrossEntropyLoss(label_smoothing=kwargs["label_smoothing"])
     run_loso(
@@ -219,6 +229,7 @@ def loso_loop(model, loader, logger, **kwargs):
         test_dataloader=loader["test"],
         test_subject_ids=loader["test_subject_indexes"],
         optimizer=optimizer,
+        scheduler=scheduler,
         loss_fn=loss_fn,
         epoch=kwargs["num_epochs"],
         logger=logger,
@@ -230,7 +241,7 @@ def loso_loop(model, loader, logger, **kwargs):
 def main_loso(dataset, model, classes, **kwargs):
     eegloader = EEGDataloader(dataset, batch_size=32).loso()
 
-    logger = EmotionLogger(log_dir="logs/", class_names=classes)
+    logger = EmotionLogger(log_dir=kwargs["log_dir"], class_names=classes)
     for loader in eegloader:
         if kwargs["model_name"]=="RANDOM":
             model = RandomModel(loader["train"])
@@ -249,7 +260,7 @@ def main_loso_fixed(dataset, model, classes, **kwargs):
 
     eegloader = EEGDataloader(dataset, batch_size=32).loso_fixed(train_set, test_set)
 
-    logger = EmotionLogger(log_dir="logs/", class_names=classes)
+    logger = EmotionLogger(log_dir=kwargs["log_dir"], class_names=classes)
     if kwargs["model_name"]=="RANDOM":
         model = RandomModel(eegloader["train"])
     loso_loop(model, eegloader, logger, **kwargs)
