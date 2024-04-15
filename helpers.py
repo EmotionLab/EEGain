@@ -167,18 +167,18 @@ def main_loto(dataset, model, classes, **kwargs):
     for subject_id, session_ids in subject_video_mapping.items():
         eegloader = EEGDataloader(dataset, batch_size=32).loto(subject_id, session_ids,
                                                                n_fold=len(session_ids))  # pass n_fold=len(session_ids) for LOTO
-        num_epoch = kwargs["num_epochs"]
+        num_epoch = 1
         all_train_preds_for_subject, all_train_actuals_for_subject, all_test_preds_for_subject, all_test_actuals_for_subject = [], [], [], []
         for i, loader in enumerate(eegloader):
-            if kwargs["model_name"]=="RANDOM":
+            if "RANDOM"=="RANDOM":
                 model = RandomModel(loader["train"])
                 optimizer = None
                 is_random=True
             else:
                 model = model.to(device)
-                optimizer = torch.optim.Adam(model.parameters(), lr=kwargs["lr"], weight_decay=kwargs["weight_decay"])
+                optimizer = torch.optim.Adam(model.parameters(), lr=0.01, weight_decay=0)
                 is_random=False
-            loss_fn = nn.CrossEntropyLoss(label_smoothing=kwargs["label_smoothing"])
+            loss_fn = nn.CrossEntropyLoss(label_smoothing=0)
             _, _, test_pred, test_actual = run_loto(
                 model=model,
                 train_dataloader=loader["train"],

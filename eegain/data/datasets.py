@@ -901,9 +901,10 @@ class Seed(EEGDataset):
                 subject_id = int(
                     mat_file_name[: mat_file_name.index("_")]
                 )  # file name starts with user_id
-                user_session_info[subject_id].append(
-                    str(path) + "/" + mat_file_name
-                )
+                session_file_name = str(path) + "/" + mat_file_name
+                for i in range(15):
+                    curr_session_trial_name = str(i) + '_' + session_file_name
+                    user_session_info[subject_id].append(curr_session_trial_name)
 
         return user_session_info
 
@@ -986,6 +987,9 @@ class Seed(EEGDataset):
         return data_array, label_array
 
     def __get_trials__(self, sessions, subject_ids):
+        trial_session = [str(i[:i.index('_')])+'/'+i.split('/')[-1] for i in sessions]
+        sessions = [i[i.index('_')+1:] for i in sessions]
+
         path_to_channels_excel = self.root / Path("channel-order.xlsx")
         channels_file = pd.read_excel(path_to_channels_excel, header=None)
         channels = list(channels_file.iloc[:, 0])
@@ -1001,26 +1005,30 @@ class Seed(EEGDataset):
             mat_data_values = list(mat_data.values())[
                               3:]  # Matlab file contains some not necessary info so let's remove it
             for trial in range(1, num_trials + 1):
-                eeg_data = mat_data_values[
-                    trial - 1
-                    ]  # each matlab file contains 15 trials. Here we take one trial
-                info = mne.create_info(
-                    ch_names=channels, sfreq=sampling_rate, ch_types="eeg"
-                )
-                raw_data = mne.io.RawArray(
-                    eeg_data, info, verbose=False
-                )  # convert numpy ndarray to mne object
+                for curr_trial_session in trial_session:
+                    curr_trial_id = curr_trial_session[:curr_trial_session.index('/')]
+                    curr_session = curr_trial_session[curr_trial_session.index('/')+1:]
+                    if str(trial-1) == curr_trial_id and session.split('/')[-1] == curr_session:
+                        eeg_data = mat_data_values[
+                            trial - 1
+                            ]  # each matlab file contains 15 trials. Here we take one trial
+                        info = mne.create_info(
+                            ch_names=channels, sfreq=sampling_rate, ch_types="eeg"
+                        )
+                        raw_data = mne.io.RawArray(
+                            eeg_data, info, verbose=False
+                        )  # convert numpy ndarray to mne object
 
-                if self.transform:  # apply transformations
-                    raw_data = self.transform(raw_data)
+                        if self.transform:  # apply transformations
+                            raw_data = self.transform(raw_data)
 
-                session_trial = session + "/" + str(trial)
-                data_array[session_trial] = raw_data.get_data()
-                session_id = session[: session.index("/")]
-                # session_labels = [ 1,  0, -1, -1,  0,  1, -1,  0,  1,  1,  0, -1,  0,  1, -1]
-                session_labels = [ 2,  1, 0, 0,  1,  2, 0,  1,  2,  2,  1, 0,  1,  2, 0]
-                emotional_label = session_labels[trial - 1]
-                label_array[session_trial] = emotional_label
+                        session_trial = session + "/" + str(trial)
+                        data_array[session_trial] = raw_data.get_data()
+                        session_id = session[: session.index("/")]
+                        # session_labels = [ 1,  0, -1, -1,  0,  1, -1,  0,  1,  1,  0, -1,  0,  1, -1]
+                        session_labels = [ 2,  1, 0, 0,  1,  2, 0,  1,  2,  2,  1, 0,  1,  2, 0]
+                        emotional_label = session_labels[trial - 1]
+                        label_array[session_trial] = emotional_label
 
         data_array = {
             key: np.expand_dims(value, axis=-3) for key, value in data_array.items()
