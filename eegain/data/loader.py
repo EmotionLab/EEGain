@@ -27,7 +27,7 @@ class EEGDataloader:
             logger.debug(f"subject_id is: {subject_id}, test sessions are: {test_sessions}")
             train_sessions = session_ids.copy()
             train_sessions = [item for item in session_ids if item not in test_sessions]
-
+            logger.debug(f"subject_id is: {subject_id}, train sessions are: {train_sessions}")
             test_data = self.dataset.__get_trials__(test_sessions, subject_id)
             train_data = self.dataset.__get_trials__(train_sessions, subject_id)
             train_data, train_label = EEGDataloader._concat_data(train_data, loader_type="LOTO")
