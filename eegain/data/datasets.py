@@ -52,7 +52,7 @@ class EEGDataset(ABC):
 
 class SeedIV(EEGDataset):
     @staticmethod
-    def _create_user_recording_mapping(data_path: Path) -> Dict[int, List[str]]:
+    def _create_user_recording_mapping(data_path: Path, unique_identifier: str) -> Dict[int, List[str]]:
         """This method creates mapping between users and user_recordings
         Args:
             data_path(Path): path to SEED IV dataset
@@ -63,23 +63,56 @@ class SeedIV(EEGDataset):
         """
 
         num_sessions = 3  # There are three sessions in SEED IV dataset
+        num_trials = 24
+        session = 1 # we decided to test just the first session 
         user_session_info: Dict[int, List[str]] = defaultdict(list)
 
-        for session in range(1, num_sessions + 1):
-            path = (
-                data_path / Path(str(session)) # eeg_raw_data
-            )  # Path to particular sessions mat files
-            for mat_file_path in path.glob("*.mat"):
-                subject_file_name = mat_file_path.name
+        # for session in range(1, num_sessions + 1):
+        path = (
+            data_path / Path(str(session)) # eeg_raw_data
+        )  # Path to particular sessions mat files
+        file_paths = os.listdir(path)
+        for mat_file_name in file_paths:
+            if "label" not in mat_file_name and "channel" not in mat_file_name and ".mat" in mat_file_name:
                 subject_id = int(
-                    subject_file_name[: subject_file_name.index("_")]
-                )  # file name starts with user_id
-                user_session_info[subject_id].append(
-                    str(session) + "/" + subject_file_name
+                    mat_file_name[: mat_file_name.index("_")]
                 )
+                subject_file_name = str(path) + "/" + mat_file_name
+                print(subject_file_name)
+                 # file name starts with user_id
+                # user_session_info[subject_id].append(
+                #     str(session) + "/" + subject_file_name
+                # )
+                session_file_name = subject_file_name
+                for i in range(num_trials):
+                    curr_session_trial_name = str(i) + unique_identifier + session_file_name
+                    user_session_info[subject_id].append(curr_session_trial_name)            
 
         logger.debug(f"Subject id -> sessions: {user_session_info}")
         return user_session_info
+
+    def read_mat_file(mapping_list, unique_identifier):
+        user_ids = mapping_list.keys()
+        already_read_sessions = {}
+        ids_and_read_data = {}
+        for user in user_ids:
+            trial_names = mapping_list[user] # "0_../Desktop/seed_data_cp/Preprocessed_EEG/1_20131027.mat"
+            for trial_name in trial_names:
+                session_name = "".join(trial_name.split(unique_identifier)[1])
+                trial_id = int("".join(trial_name.split(unique_identifier)[0][:len(unique_identifier)]))
+                if session_name in already_read_sessions:
+                    session = already_read_sessions[session_name]
+                    eg_data = session[trial_id]
+                    ids_and_read_data[trial_name] = eg_data
+                else:
+                    path_to_mat = Path(str(session_name))
+                    mat_data = scipy.io.loadmat(path_to_mat)  # Get Matlab File
+                    mat_data_values = list(mat_data.values())[
+                                3:] 
+                    already_read_sessions[session_name] = mat_data_values
+                    eg_data = mat_data_values[trial_id]
+                    ids_and_read_data[trial_name] = eg_data
+        return ids_and_read_data 
 
     def __init__(self, root: str, label_type: str, ground_truth_threshold, transform: Construct = None, **kwargs):
         """This is just constructor for SEED IV class
@@ -94,7 +127,9 @@ class SeedIV(EEGDataset):
         self.root = Path(root)
         self.ground_truth_threshold = ground_truth_threshold
         self.transform = transform
-        self.mapping_list = SeedIV._create_user_recording_mapping(self.root)
+        self.unique_identifier = "<EOF>"
+        self.mapping_list = SeedIV._create_user_recording_mapping(self.root, self.unique_identifier)
+        self.read_files = Seed.read_mat_file(self.mapping_list, self.unique_identifier)
         self.label_type = label_type
         self._num_trials = 24
         self._sampling_rate = 1000
@@ -130,40 +165,38 @@ class SeedIV(EEGDataset):
         data_array, label_array = {}, {}
 
         for session in sessions:
-            path_to_mat = self.root / Path(str(session)) # eeg_raw_data
-            mat_data = scipy.io.loadmat(path_to_mat)  # Get Matlab File
-            mat_data_values = list(mat_data.values())[3:]  # Matlab file contains some not necessary info so let's remove it
-            for trial in range(1, num_trials + 1):
-                eeg_data = mat_data_values[
-                    trial - 1
-                ]  # each matlab file contains 24 trials. Here we take one trial
-                info = mne.create_info(
-                    ch_names=channels, sfreq=sampling_rate, ch_types="eeg"
-                )
-                raw_data = mne.io.RawArray(
-                    eeg_data, info, verbose=False
-                )  # convert numpy ndarray to mne object
+            session_name = "".join(session.split(self.unique_identifier)[1])
+            trial_id = int("".join(session.split(self.unique_identifier)[0][:len(self.unique_identifier)]))            
+            eeg_data = self.read_files[session] # each matlab file contains 15 trials. Here we take one trial
+            info = mne.create_info(
+                ch_names=channels, sfreq=sampling_rate, ch_types="eeg"
+            )
+            raw_data = mne.io.RawArray(
+                eeg_data, info, verbose=False
+            )  # convert numpy ndarray to mne object
 
-                if self.transform:  # apply transformations
-                    raw_data = self.transform(raw_data)
+            if self.transform:  # apply transformations
+                raw_data = self.transform(raw_data)
 
-                session_trial = session + "/" + str(trial)
-                data_array[session_trial] = raw_data.get_data()
+            session_trial = session + "/" + str(trial_id)
+            data_array[session_trial] = raw_data.get_data()
 
-                with open(labels_file_path, "r") as file:
-                    labels_file_content = file.read()
+            with open(labels_file_path, "r") as file:
+                labels_file_content = file.read()
 
-                # Extract label from file and add to label_array
-                session_id = session[: session.index("/")]
-                session_start_idx = labels_file_content.index(
-                    f"session{session_id}_label"
-                )
-                session_end_idx = labels_file_content.index(";", session_start_idx)
-                session_labels = labels_file_content[session_start_idx:session_end_idx]
-                session_labels = eval(session_labels[session_labels.index("[") :])
+            # Extract label from file and add to label_array
+            session_id = session[: session.index("/")]
+            # since we are using just first session :  session1_label = [1,2,3,0,2,0,0,1,0,1,2,1,1,1,2,3,2,2,3,3,0,3,0,3];
+            session_id = 1
+            session_start_idx = labels_file_content.index(
+                f"session{session_id}_label"
+            )
+            session_end_idx = labels_file_content.index(";", session_start_idx)
+            session_labels = labels_file_content[session_start_idx:session_end_idx]
+            session_labels = eval(session_labels[session_labels.index("[") :])
 
-                emotional_label = session_labels[trial - 1]
-                label_array[session_trial] = emotional_label
+            emotional_label = session_labels[trial_id]
+            label_array[session_trial] = emotional_label
 
         data_array = {
             key: np.expand_dims(value, axis=-3) for key, value in data_array.items()
@@ -174,6 +207,7 @@ class SeedIV(EEGDataset):
         )
 
         return data_array, label_array
+
 
     def __get_trials__(self, sessions, subject_ids):
         labels_file_path = self.root / Path("ReadMe.txt")
@@ -186,48 +220,45 @@ class SeedIV(EEGDataset):
         data_array, label_array = {}, {}
 
         for session in sessions:
-            path_to_mat = self.root / Path(str(session))  # eeg_raw_data
-            mat_data = scipy.io.loadmat(path_to_mat)  # Get Matlab File
-            mat_data_values = list(mat_data.values())[
-                              3:]  # Matlab file contains some not necessary info so let's remove it
-            for trial in range(1, num_trials + 1):
-                eeg_data = mat_data_values[
-                    trial - 1
-                    ]  # each matlab file contains 24 trials. Here we take one trial
-                info = mne.create_info(
-                    ch_names=channels, sfreq=sampling_rate, ch_types="eeg"
-                )
-                raw_data = mne.io.RawArray(
-                    eeg_data, info, verbose=False
-                )  # convert numpy ndarray to mne object
+            session_name = "".join(session.split(self.unique_identifier)[1])
+            trial_id = int("".join(session.split(self.unique_identifier)[0][:len(self.unique_identifier)]))            
+            eeg_data = self.read_files[session] # each matlab file contains 24 trials. Here we take one trial
+            info = mne.create_info(
+                ch_names=channels, sfreq=sampling_rate, ch_types="eeg"
+            )
+            raw_data = mne.io.RawArray(
+                eeg_data, info, verbose=False
+            )  # convert numpy ndarray to mne object
 
-                if self.transform:  # apply transformations
-                    raw_data = self.transform(raw_data)
+            if self.transform:  # apply transformations
+                raw_data = self.transform(raw_data)
 
-                session_trial = session + "/" + str(trial)
-                data_array[session_trial] = raw_data.get_data()
+            session_trial = session_name + "/" + str(trial_id)
+            data_array[session_trial] = raw_data.get_data()
 
-                with open(labels_file_path, "r") as file:
-                    labels_file_content = file.read()
+            with open(labels_file_path, "r") as file:
+                labels_file_content = file.read()
 
-                # Extract label from file and add to label_array
-                session_id = session[: session.index("/")]
-                session_start_idx = labels_file_content.index(
-                    f"session{session_id}_label"
-                )
-                session_end_idx = labels_file_content.index(";", session_start_idx)
-                session_labels = labels_file_content[session_start_idx:session_end_idx]
-                session_labels = eval(session_labels[session_labels.index("["):])
+            # Extract label from file and add to label_array
+            session_id = session[: session.index("/")]
+            # since we are using just first session :  session1_label = [1,2,3,0,2,0,0,1,0,1,2,1,1,1,2,3,2,2,3,3,0,3,0,3];
+            session_id = 1
+            session_start_idx = labels_file_content.index(
+                f"session{session_id}_label"
+            )
+            session_end_idx = labels_file_content.index(";", session_start_idx)
+            session_labels = labels_file_content[session_start_idx:session_end_idx]
+            session_labels = eval(session_labels[session_labels.index("["):])
 
-                emotional_label = session_labels[trial - 1]
-                label_array[session_trial] = emotional_label
+            emotional_label = session_labels[trial_id]
+            label_array[session_trial] = emotional_label
 
         data_array = {
             key: np.expand_dims(value, axis=-3) for key, value in data_array.items()
         }
 
         return data_array, label_array
-
+    
 
 class MAHNOB(EEGDataset):
     @staticmethod
@@ -880,7 +911,7 @@ class AMIGOS(EEGDataset):
 
 class Seed(EEGDataset):
     @staticmethod
-    def _create_user_mat_mapping(data_path: Path) -> Dict[int, List[str]]:
+    def _create_user_mat_mapping(data_path: Path, unique_identifier: str) -> Dict[int, List[str]]:
         """This method creates mapping between users and user_recordings
         Args:
             data_path(Path): path to SEED dataset
@@ -903,20 +934,20 @@ class Seed(EEGDataset):
                 )  # file name starts with user_id
                 session_file_name = str(path) + "/" + mat_file_name
                 for i in range(15):
-                    curr_session_trial_name = str(i) + '_' + session_file_name
+                    curr_session_trial_name = str(i) + unique_identifier + session_file_name
                     user_session_info[subject_id].append(curr_session_trial_name)
 
         return user_session_info
     
-    def read_mat_file(mapping_list):
+    def read_mat_file(mapping_list, unique_identifier):
         user_ids = mapping_list.keys()
         already_read_sessions = {}
         ids_and_read_data = {}
         for user in user_ids:
             trial_names = mapping_list[user] # "0_../Desktop/seed_data_cp/Preprocessed_EEG/1_20131027.mat"
             for trial_name in trial_names:
-                session_name = "".join(["..",trial_name.split("..")[1]])
-                trial_id = int("".join(trial_name.split("..")[0][:-1]))
+                session_name = "".join(trial_name.split(unique_identifier)[1])
+                trial_id = int("".join(trial_name.split(unique_identifier)[0][:len(unique_identifier)]))
                 if session_name in already_read_sessions:
                     session = already_read_sessions[session_name]
                     eg_data = session[trial_id]
@@ -944,8 +975,9 @@ class Seed(EEGDataset):
 
         self.root = Path(root)
         self.transform = transform
-        self.mapping_list = Seed._create_user_mat_mapping(self.root)
-        self.read_files = Seed.read_mat_file(self.mapping_list)
+        self.unique_identifier = "<EOF>"
+        self.mapping_list = Seed._create_user_mat_mapping(self.root, self.unique_identifier)
+        self.read_files = Seed.read_mat_file(self.mapping_list, self.unique_identifier)
         self.label_type = label_type
         self._num_trials = 15
         self._sampling_rate = 1000
@@ -978,8 +1010,8 @@ class Seed(EEGDataset):
         data_array, label_array = {}, {}
 
         for session in sessions:
-            session_name = "".join(["..",session.split("..")[1]])
-            trial_id = int("".join(session.split("..")[0][:-1]))
+            session_name = "".join(session.split(self.unique_identifier)[1])
+            trial_id = int("".join(session.split(self.unique_identifier)[0][:len(self.unique_identifier)]))            
             eeg_data = self.read_files[session] # each matlab file contains 15 trials. Here we take one trial
             info = mne.create_info(
                 ch_names=channels, sfreq=sampling_rate, ch_types="eeg"
@@ -1017,8 +1049,8 @@ class Seed(EEGDataset):
         data_array, label_array = {}, {}
 
         for session in sessions:
-            session_name = "".join(["..",session.split("..")[1]])
-            trial_id = int("".join(session.split("..")[0][:-1]))
+            session_name = "".join(session.split(self.unique_identifier)[1])
+            trial_id = int("".join(session.split(self.unique_identifier)[0][:len(self.unique_identifier)]))            
             eeg_data = self.read_files[session] # each matlab file contains 15 trials. Here we take one trial
             info = mne.create_info(
                 ch_names=channels, sfreq=sampling_rate, ch_types="eeg"
