@@ -6,6 +6,7 @@ import torch
 from torch import nn
 from tqdm import tqdm
 
+import copy
 import config
 import eegain
 import json
@@ -164,7 +165,7 @@ def run_loso(
     logger.log_summary(overal_log_file="overal_log", log_dir="logs/")
 
 
-def main_loto(dataset, model, classes, **kwargs):
+def main_loto(dataset, model, empty_model, classes, **kwargs):
     subject_video_mapping = dataset.mapping_list
     logger = EmotionLogger(log_dir=kwargs["log_dir"], class_names=classes)
 
@@ -180,6 +181,7 @@ def main_loto(dataset, model, classes, **kwargs):
                 is_random=True
                 scheduler=None
             else:
+                model = copy.deepcopy(empty_model)
                 model = model.to(device)
                 optimizer = torch.optim.Adam(model.parameters(), lr=kwargs["lr"], weight_decay=kwargs["weight_decay"])
                 scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=100, eta_min=0)
@@ -239,17 +241,18 @@ def loso_loop(model, loader, logger, **kwargs):
 
 
 
-def main_loso(dataset, model, classes, **kwargs):
+def main_loso(dataset, model, empty_model, classes, **kwargs):
     eegloader = EEGDataloader(dataset, batch_size=32).loso()
 
     logger = EmotionLogger(log_dir=kwargs["log_dir"], class_names=classes)
     for loader in eegloader:
         if kwargs["model_name"]=="RANDOM":
             model = RandomModel(loader["train"])
+        model = copy.deepcopy(empty_model)
         loso_loop(model, loader, logger, **kwargs)
     logger.log_summary(overal_log_file=kwargs["overal_log_file"], log_dir=kwargs["log_dir"])
 
-def main_loso_fixed(dataset, model, classes, **kwargs):
+def main_loso_fixed(dataset, model, empty_model, classes, **kwargs):
     dataset_name = dataset.__class__.__name__
     test_subjects_json_path = 'test_subjects.json'
 

@@ -1,4 +1,5 @@
 import os
+import copy
 
 os.environ["LOG_LEVEL"] = "DEBUG"
 
@@ -116,18 +117,20 @@ def main(**kwargs):
     if kwargs["model_name"]=="RANDOM":
         print("initializing random model")
         model = None
+        empty_model = None
     # -------------- Model --------------
     else:
         model = globals()[kwargs['model_name']](input_size=[1, kwargs["channels"], kwargs["window"]*kwargs["s_rate"]], **kwargs)
+        empty_model = copy.deepcopy(model)
     if kwargs["split_type"] == "LOSO":
         classes = [i for i in range(kwargs["num_classes"])]
-        main_loso(dataset, model, classes, **kwargs)
+        main_loso(dataset, model, empty_model, classes, **kwargs)
     elif kwargs["split_type"] == "LOSO_Fixed":
         classes = [i for i in range(kwargs["num_classes"])]
-        main_loso_fixed(dataset, model, classes, **kwargs)
+        main_loso_fixed(dataset, model, empty_model, classes, **kwargs)
     else:
         classes = [i for i in range(kwargs["num_classes"])]
-        main_loto(dataset, model, classes, **kwargs)
+        main_loto(dataset, model, empty_model, classes, **kwargs)
 
 if __name__ == "__main__":
     main()
