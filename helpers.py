@@ -250,7 +250,8 @@ def main_loso(dataset, model, empty_model, classes, **kwargs):
     for loader in eegloader:
         if kwargs["model_name"]=="RANDOM":
             model = RandomModel(loader["train"])
-        model = copy.deepcopy(empty_model)
+        else:
+            model = copy.deepcopy(empty_model)
         loso_loop(model, loader, logger, **kwargs)
     logger.log_summary(overal_log_file=kwargs["overal_log_file"], log_dir=kwargs["log_dir"])
 
