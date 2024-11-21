@@ -173,6 +173,7 @@ class EmotionLogger:
                 "loss",
                 loss, i, data_part
             )
+        # Save the predictions to a file
         if test_flag == True:
             with open(prediction_file, 'a', newline='') as f:
                 writer = csv.writer(f)
