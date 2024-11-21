@@ -14,7 +14,8 @@ overal_log
 dataset/
 log_*.txt
 run_*.sh
-install.sh
 run_cmd.txt
 predictions/
 predictions_logger/
+install.sh
+install.log

@@ -4,9 +4,9 @@ Collecting pip
   Obtaining dependency information for pip from http://pypi-cache/packages/ef/7d/500c9ad20238fcfcb4cb9243eede163594d7020ce87bd9610c9e02771876/pip-24.3.1-py3-none-any.whl.metadata
   Downloading http://pypi-cache/packages/ef/7d/500c9ad20238fcfcb4cb9243eede163594d7020ce87bd9610c9e02771876/pip-24.3.1-py3-none-any.whl.metadata (3.7 kB)
 Downloading http://pypi-cache/packages/ef/7d/500c9ad20238fcfcb4cb9243eede163594d7020ce87bd9610c9e02771876/pip-24.3.1-py3-none-any.whl (1.8 MB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.8/1.8 MB 456.2 MB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.8/1.8 MB 499.7 MB/s eta 0:00:00
 Downloading http://pypi-cache/packages/ef/7d/500c9ad20238fcfcb4cb9243eede163594d7020ce87bd9610c9e02771876/pip-24.3.1-py3-none-any.whl (1.8 MB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.8/1.8 MB 494.2 MB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.8/1.8 MB 514.6 MB/s eta 0:00:00
 Installing collected packages: pip
   Attempting uninstall: pip
     Found existing installation: pip 23.0.1
@@ -117,7 +117,7 @@ Collecting threadpoolctl>=3.1.0 (from scikit-learn->-r requirements.txt (line 9)
 Collecting absl-py>=0.4 (from tensorboard->-r requirements.txt (line 11))
   Downloading http://pypi-cache/packages/a2/ad/e0d3c824784ff121c03cc031f944bc7e139a8f1870ffd2845cc2dd76f6c4/absl_py-2.1.0-py3-none-any.whl.metadata (2.3 kB)
 Collecting grpcio>=1.48.2 (from tensorboard->-r requirements.txt (line 11))
-  Downloading http://pypi-cache/packages/64/19/a16762a70eeb8ddfe43283ce434d1499c1c409ceec0c646f783883084478/grpcio-1.67.1-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (3.9 kB)
+  Downloading http://pypi-cache/packages/d0/64/3a90fac70af2279477483d189007e244fec90ef0ba372043f21f8a6f5b80/grpcio-1.68.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (3.9 kB)
 Collecting markdown>=2.6.8 (from tensorboard->-r requirements.txt (line 11))
   Downloading http://pypi-cache/packages/3f/08/83871f3c50fc983b88547c196d11cf8c3340e37c32d2e9d6152abe2c61f7/Markdown-3.7-py3-none-any.whl.metadata (7.0 kB)
 Collecting protobuf!=4.24.0,>=3.19.6 (from tensorboard->-r requirements.txt (line 11))
@@ -254,20 +254,20 @@ Requirement already satisfied: executing in /opt/conda/lib/python3.10/site-packa
 Requirement already satisfied: asttokens in /opt/conda/lib/python3.10/site-packages (from stack-data->ipython->myst-nb<3,>=1->jupyter-book->-r requirements.txt (line 2)) (2.0.5)
 Requirement already satisfied: pure-eval in /opt/conda/lib/python3.10/site-packages (from stack-data->ipython->myst-nb<3,>=1->jupyter-book->-r requirements.txt (line 2)) (0.2.2)
 Downloading http://pypi-cache/packages/56/0b/39cff9014ba41c527e09920b69abf5753b14e5a71c7eeab6600181381c7c/mne-1.4.2-py3-none-any.whl (7.7 MB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 7.7/7.7 MB 935.9 MB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 7.7/7.7 MB 450.3 MB/s eta 0:00:00
 Downloading http://pypi-cache/packages/f7/ec/67fbef5d497f86283db54c22eec6f6140243aae73265799baaaa19cd17fb/ghp_import-2.1.0-py3-none-any.whl (11 kB)
 Downloading http://pypi-cache/packages/2b/3d/3b0360dade8df5d5f7a30f230f1316ded7e029d7f60a6e38b3765be47603/jupyter_book-1.0.3-py3-none-any.whl (44 kB)
 Downloading http://pypi-cache/packages/8d/9d/d06860390f9d154fa884f1740a5456378fb153ff57443c91a4a32bab7092/matplotlib-3.9.2-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (8.3 MB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 8.3/8.3 MB 1.0 GB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 8.3/8.3 MB 408.4 MB/s eta 0:00:00
 Downloading http://pypi-cache/packages/44/50/7db2cd5e6373ae796f0ddad3675268c8d59fb6076e66f0c339d61cea886b/pandas-2.2.3-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (13.1 MB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 13.1/13.1 MB 1.0 GB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 13.1/13.1 MB 482.9 MB/s eta 0:00:00
 Downloading http://pypi-cache/packages/16/8f/496e10d51edd6671ebe0432e33ff800aa86775d2d147ce7d43389324a525/pre_commit-4.0.1-py2.py3-none-any.whl (218 kB)
 Downloading http://pypi-cache/packages/6b/77/7440a06a8ead44c7757a64362dd22df5760f9b12dc5f11b6188cd2fc27a0/pytest-8.3.3-py3-none-any.whl (342 kB)
 Downloading http://pypi-cache/packages/4c/1e/a7c7357e704459c7d56a18df4a0bf08669442d1f8878cc0864beccd6306a/scikit_learn-1.5.2-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (13.3 MB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 13.3/13.3 MB 929.1 MB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 13.3/13.3 MB 1.1 GB/s eta 0:00:00
 Downloading http://pypi-cache/packages/83/11/00d3c3dfc25ad54e731d91449895a79e4bf2384dc3ac01809010ba88f6d5/seaborn-0.13.2-py3-none-any.whl (294 kB)
 Downloading http://pypi-cache/packages/b1/de/021c1d407befb505791764ad2cbd56ceaaa53a746baed01d2e2143f05f18/tensorboard-2.18.0-py3-none-any.whl (5.5 MB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 5.5/5.5 MB 1.0 GB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 5.5/5.5 MB 420.7 MB/s eta 0:00:00
 Downloading http://pypi-cache/packages/c0/da/977ded879c29cbd04de313843e76868e6e13408a94ed6b987245dc7c8506/openpyxl-3.1.5-py2.py3-none-any.whl (250 kB)
 Downloading http://pypi-cache/packages/a2/ad/e0d3c824784ff121c03cc031f944bc7e139a8f1870ffd2845cc2dd76f6c4/absl_py-2.1.0-py3-none-any.whl (133 kB)
 Downloading http://pypi-cache/packages/c5/55/51844dd50c4fc7a33b653bfaba4c2456f06955289ca770a5dbd5fd267374/cfgv-3.4.0-py2.py3-none-any.whl (7.2 kB)
@@ -275,14 +275,14 @@ Downloading http://pypi-cache/packages/00/2e/d53fa4befbf2cfa713304affc7ca780ce4f
 Downloading http://pypi-cache/packages/a9/57/86c500d63b3e26e5b73a28b8291a67c5608d4aa87ebd17bd15bb33c178bc/contourpy-1.3.1-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (324 kB)
 Downloading http://pypi-cache/packages/e7/05/c19819d5e3d95294a6f5947fb9b9629efb316b96de511b418c53d245aae6/cycler-0.12.1-py3-none-any.whl (8.3 kB)
 Downloading http://pypi-cache/packages/c4/03/8136887d1b0b7a9831c7e8e2598c0e5851e31cc2231295769350349a236b/fonttools-4.55.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (4.6 MB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.6/4.6 MB 967.7 MB/s eta 0:00:00
-Downloading http://pypi-cache/packages/64/19/a16762a70eeb8ddfe43283ce434d1499c1c409ceec0c646f783883084478/grpcio-1.67.1-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (5.9 MB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 5.9/5.9 MB 944.3 MB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.6/4.6 MB 504.3 MB/s eta 0:00:00
+Downloading http://pypi-cache/packages/d0/64/3a90fac70af2279477483d189007e244fec90ef0ba372043f21f8a6f5b80/grpcio-1.68.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (5.9 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 5.9/5.9 MB 281.3 kB/s eta 0:00:00
 Downloading http://pypi-cache/packages/e0/86/c4395700f3c5475424fb5c41e20c16be28d10c904aee4d005ba3217fc8e7/identify-2.6.2-py2.py3-none-any.whl (98 kB)
 Downloading http://pypi-cache/packages/91/29/df4b9b42f2be0b623cbd5e2140cafcaa2bef0759a00b7b70104dcfe2fb51/joblib-1.4.2-py3-none-any.whl (301 kB)
 Downloading http://pypi-cache/packages/69/4a/4f9dbeb84e8850557c02365a0eee0649abe5eb1d84af92a25731c6c0f922/jsonschema-4.23.0-py3-none-any.whl (88 kB)
 Downloading http://pypi-cache/packages/55/91/0a57ce324caf2ff5403edab71c508dd8f648094b18cfbb4c8cc0fde4a6ac/kiwisolver-1.4.7-cp310-cp310-manylinux_2_12_x86_64.manylinux2010_x86_64.whl (1.6 MB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.6/1.6 MB 1.4 GB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.6/1.6 MB 722.7 MB/s eta 0:00:00
 Downloading http://pypi-cache/packages/04/1e/b832de447dee8b582cac175871d2f6c3d5077cc56d5575cadba1fd1cccfa/linkify_it_py-2.0.3-py3-none-any.whl (19 kB)
 Downloading http://pypi-cache/packages/3f/08/83871f3c50fc983b88547c196d11cf8c3340e37c32d2e9d6152abe2c61f7/Markdown-3.7-py3-none-any.whl (106 kB)
 Downloading http://pypi-cache/packages/04/45/cf78b2f09c46b36f486b75c34a8b48580e53b543bd9a467b3c7eb9054b70/myst_nb-1.1.2-py3-none-any.whl (80 kB)
@@ -294,23 +294,23 @@ Downloading http://pypi-cache/packages/5d/ae/3257b09328c0b4e59535e497b0c7537d495
 Downloading http://pypi-cache/packages/be/ec/2eb3cd785efd67806c46c13a17339708ddc346cbb684eade7a6e6f79536a/pyparsing-3.2.0-py3-none-any.whl (106 kB)
 Downloading http://pypi-cache/packages/ec/57/56b9bcc3c9c6a792fcbaf139543cee77261f3651ca9da0c93f5c1221264b/python_dateutil-2.9.0.post0-py2.py3-none-any.whl (229 kB)
 Downloading http://pypi-cache/packages/47/78/b0c2c23880dd1e99e938ad49ccfb011ae353758a2dc5ed7ee59baff684c3/scipy-1.14.1-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (41.2 MB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 41.2/41.2 MB 900.8 MB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 41.2/41.2 MB 453.5 MB/s eta 0:00:00
 Downloading http://pypi-cache/packages/0d/ef/153f6803c5d5f8917dbb7f7fcf6d34a871ede3296fa89c2c703f5f8a6c8e/sphinx-7.4.7-py3-none-any.whl (3.4 MB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.4/3.4 MB 1.2 GB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.4/3.4 MB 563.4 MB/s eta 0:00:00
 Downloading http://pypi-cache/packages/2b/80/90574e2e82c955b9c6f6b77f7badb2cf2ef4ef77599e4343cced2d098681/sphinx_book_theme-1.1.3-py3-none-any.whl (430 kB)
 Downloading http://pypi-cache/packages/c6/43/65c0acbd8cc6f50195a3a1fc195c404988b15c67090e73c7a41a9f57d6bd/sphinx_design-0.6.1-py3-none-any.whl (2.2 MB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.2/2.2 MB 1.4 GB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.2/2.2 MB 588.9 MB/s eta 0:00:00
 Downloading http://pypi-cache/packages/5f/9a/cb412957424012869b43a5aa3d95ccebcac737dafc5a545ce15bb8037f6e/sphinx_external_toc-1.0.1-py3-none-any.whl (26 kB)
 Downloading http://pypi-cache/packages/70/1f/1d4ecaf58b17fe61497644655f40b04d84a88348e41a6f0c6392394d95e4/sphinx_jupyterbook_latex-1.0.0-py3-none-any.whl (13 kB)
 Downloading http://pypi-cache/packages/ec/9f/902f2030674cd9473fdbe5a2c2dec2618c27ec853484c35f82cf8df40ece/sphinx_multitoc_numbering-0.1.3-py3-none-any.whl (4.6 kB)
 Downloading http://pypi-cache/packages/ca/7c/a53bdb465fd364bc3d255d96d5d70e6ba5183cfb4e45b8aa91c59b099124/sphinx_thebe-0.3.1-py3-none-any.whl (9.0 kB)
 Downloading http://pypi-cache/packages/8e/49/c23f9493c0a5d5881fb7ed3002e87708454fef860aa96a48e755d27bf6f0/sphinxcontrib_bibtex-2.6.3-py3-none-any.whl (40 kB)
 Downloading http://pypi-cache/packages/73/c6/825dab04195756cf8ff2e12698f22513b3db2f64925bdd41671bfb33aaa5/tensorboard_data_server-0.7.2-py3-none-manylinux_2_31_x86_64.whl (6.6 MB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 6.6/6.6 MB 977.4 MB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 6.6/6.6 MB 496.1 MB/s eta 0:00:00
 Downloading http://pypi-cache/packages/4b/2c/ffbf7a134b9ab11a67b0cf0726453cedd9c5043a4fe7a35d1cefa9a1bcfb/threadpoolctl-3.5.0-py3-none-any.whl (18 kB)
 Downloading http://pypi-cache/packages/a6/ab/7e5f53c3b9d14972843a647d8d7a853969a58aecc7559cb3267302c94774/tzdata-2024.2-py2.py3-none-any.whl (346 kB)
 Downloading http://pypi-cache/packages/ae/92/78324ff89391e00c8f4cf6b8526c41c6ef36b4ea2d2c132250b1a6fc2b8d/virtualenv-20.27.1-py3-none-any.whl (3.1 MB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.1/3.1 MB 1.0 GB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.1/3.1 MB 566.0 MB/s eta 0:00:00
 Downloading http://pypi-cache/packages/b9/f8/feced7779d755758a52d1f6635d990b8d98dc0a29fa568bbe0625f18fdf3/filelock-3.16.1-py3-none-any.whl (16 kB)
 Downloading http://pypi-cache/packages/52/24/ab44c871b0f07f491e5d2ad12c9bd7358e527510618cb1b803a88e986db1/werkzeug-3.1.3-py3-none-any.whl (224 kB)
 Downloading http://pypi-cache/packages/c1/8b/5fe2cc11fee489817272089c4203e679c63b570a5aaeb18d852ae3cbba6a/et_xmlfile-2.0.0-py3-none-any.whl (18 kB)
@@ -320,10 +320,10 @@ Downloading http://pypi-cache/packages/9e/48/1ea60e74949eecb12cdd6ac43987f9fd331
 Downloading http://pypi-cache/packages/e9/18/267ce39f29d26cdc7177231428ba823fe5ca94db8c56d1bed69033b364c8/sphinx_togglebutton-0.3.2-py3-none-any.whl (8.2 kB)
 Downloading http://pypi-cache/packages/32/34/d4e1c02d3bee589efb5dfa17f88ea08bdb3e3eac12bc475462aec52ed223/alabaster-0.7.16-py3-none-any.whl (13 kB)
 Downloading http://pypi-cache/packages/ed/20/bc79bc575ba2e2a7f70e8a1155618bb1301eaa5132a8271373a6903f73f8/babel-2.16.0-py3-none-any.whl (9.6 MB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 9.6/9.6 MB 978.0 MB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 9.6/9.6 MB 481.8 MB/s eta 0:00:00
 Downloading http://pypi-cache/packages/91/a1/cf2472db20f7ce4a6be1253a81cfdf85ad9c7885ffbed7047fb72c24cf87/distlib-0.3.9-py2.py3-none-any.whl (468 kB)
 Downloading http://pypi-cache/packages/26/87/f238c0670b94533ac0353a4e2a1a771a0cc73277b88bff23d3ae35a256c1/docutils-0.20.1-py3-none-any.whl (572 kB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 572.7/572.7 kB 1.3 GB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 572.7/572.7 kB 1.1 GB/s eta 0:00:00
 Downloading http://pypi-cache/packages/ff/62/85c4c919272577931d407be5ba5d71c20f0b616d31a0befe0ae45bb79abd/imagesize-1.4.1-py2.py3-none-any.whl (8.8 kB)
 Downloading http://pypi-cache/packages/d1/0f/8910b19ac0670a0f80ce1008e5e751c4a57e14d2c4c13a482aa6079fa9d6/jsonschema_specifications-2024.10.1-py3-none-any.whl (18 kB)
 Downloading http://pypi-cache/packages/64/6b/67b87da9d36bff9df7d0efbd1a325fa372a43be7158effaf43ed7b22341d/jupyter_cache-1.0.1-py3-none-any.whl (33 kB)
@@ -333,12 +333,12 @@ Downloading http://pypi-cache/packages/66/e8/00517a23d3eeaed0513e718fbc94aab26ea
 Downloading http://pypi-cache/packages/a9/82/0340caa499416c78e5d8f5f05947ae4bc3cba53c9f038ab6e9ed964e22f1/nbformat-5.10.4-py3-none-any.whl (78 kB)
 Downloading http://pypi-cache/packages/3c/a6/bc1012356d8ece4d66dd75c4b9fc6c1f6650ddd5991e421177d9f8f671be/platformdirs-4.3.6-py3-none-any.whl (18 kB)
 Downloading http://pypi-cache/packages/ad/5f/40d8e90f985a05133a8895fc454c6127ecec3de8b095dd35bba91382f803/pybtex-0.24.0-py2.py3-none-any.whl (561 kB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 561.4/561.4 kB 1.1 GB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 561.4/561.4 kB 981.7 MB/s eta 0:00:00
 Downloading http://pypi-cache/packages/11/b1/ce1f4596211efb5410e178a803f08e59b20bedb66837dcf41e21c54f9ec1/pybtex_docutils-1.0.3-py3-none-any.whl (6.4 kB)
 Downloading http://pypi-cache/packages/ba/92/38f384061e1361fac7092c35e932c0e08026fb9080bf3fbf05f4c3bb6bda/pydata_sphinx_theme-0.16.0-py3-none-any.whl (6.7 MB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 6.7/6.7 MB 1.1 GB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 6.7/6.7 MB 473.3 MB/s eta 0:00:00
 Downloading http://pypi-cache/packages/f7/3f/01c8b82017c199075f8f788d0d906b9ffbbc5a47dc9918a945e13d5a2bda/pygments-2.18.0-py3-none-any.whl (1.2 MB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.2/1.2 MB 1.5 GB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.2/1.2 MB 861.9 MB/s eta 0:00:00
 Downloading http://pypi-cache/packages/b7/59/2056f61236782a2c86b33906c025d4f4a0b17be0161b63b70fd9e8775d36/referencing-0.35.1-py3-none-any.whl (26 kB)
 Downloading http://pypi-cache/packages/f9/9b/335f9764261e915ed497fcdeb11df5dfd6f7bf257d4a6a2a686d80da4d54/requests-2.32.3-py3-none-any.whl (64 kB)
 Downloading http://pypi-cache/packages/d4/31/2dd40abc26fc0fc037b86006583276dc375d38ac821d4ca2394274e8045b/rpds_py-0.21.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (360 kB)
@@ -354,25 +354,25 @@ Downloading http://pypi-cache/packages/27/83/859ecdd180cacc13b1f7e857abf8582a645
 Downloading http://pypi-cache/packages/37/87/1f677586e8ac487e29672e4b17455758fce261de06a0d086167bb760361a/uc_micro_py-1.0.3-py3-none-any.whl (6.2 kB)
 Downloading http://pypi-cache/packages/e6/75/49e5bfe642f71f272236b5b2d2691cf915a7283cc0ceda56357b61daa538/comm-0.2.2-py3-none-any.whl (7.2 kB)
 Downloading http://pypi-cache/packages/11/b3/4119fa89b66bcc64a3b186ea52ee7c22bccc5d1765ee890887678b0e3e76/debugpy-1.8.8-cp310-cp310-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl (3.6 MB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.6/3.6 MB 1.0 GB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.6/3.6 MB 554.8 MB/s eta 0:00:00
 Downloading http://pypi-cache/packages/6d/ca/086311cdfc017ec964b2436fe0c98c1f4efcb7e4c328956a22456e497655/fastjsonschema-2.20.0-py3-none-any.whl (23 kB)
 Downloading http://pypi-cache/packages/11/85/b0394e0b6fcccd2c1eeefc230978a6f8cb0c5df1e4cd3e7625735a0d7d1e/jupyter_client-8.6.3-py3-none-any.whl (106 kB)
 Downloading http://pypi-cache/packages/c9/fb/108ecd1fe961941959ad0ee4e12ee7b8b1477247f30b1fdfd83ceaf017f0/jupyter_core-5.7.2-py3-none-any.whl (28 kB)
 Downloading http://pypi-cache/packages/b0/bf/ea8887e9f31a8f93ca306699d11909c6140151393a4216f0d9f85a004077/latexcodec-3.0.0-py3-none-any.whl (18 kB)
 Downloading http://pypi-cache/packages/b3/38/89ba8ad64ae25be8de66a6d463314cf1eb366222074cfda9ee839c56a4b4/mdurl-0.1.2-py3-none-any.whl (10.0 kB)
 Downloading http://pypi-cache/packages/16/29/ca99b4598a9dc7e468b5417eda91f372b595be1e3eec9b7cbe8e5d3584e8/pyzmq-26.2.0-cp310-cp310-manylinux_2_28_x86_64.whl (868 kB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 868.8/868.8 kB 1.3 GB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 868.8/868.8 kB 1.1 GB/s eta 0:00:00
 Downloading http://pypi-cache/packages/07/15/68ef91de5b8b7f80fb2d2b3b31ed42180c6227fe0a701aed9d01d34f98ec/SQLAlchemy-2.0.36-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (3.1 MB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.1/3.1 MB 1.3 GB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.1/3.1 MB 1.1 GB/s eta 0:00:00
 Downloading http://pypi-cache/packages/26/9f/ad63fc0248c5379346306f8668cda6e2e2e9c95e01216d2b8ffd9ff037d0/typing_extensions-4.12.2-py3-none-any.whl (37 kB)
 Downloading http://pypi-cache/packages/22/d4/54f9d12668b58336bd30defe0307e6c61589a3e687b05c366f804b7faaf0/tornado-6.4.1-cp38-abi3-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl (436 kB)
 Downloading http://pypi-cache/packages/b7/1a/7e4798e9339adc931158c9d69ecc34f5e6791489d469f5e50ec15e35f458/zipp-3.21.0-py3-none-any.whl (9.6 kB)
 Downloading http://pypi-cache/packages/8d/3f/95338030883d8c8b91223b4e21744b04d11b161a3ef117295d8241f50ab4/accessible_pygments-0.0.5-py3-none-any.whl (1.4 MB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.4/1.4 MB 1.3 GB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.4/1.4 MB 739.3 MB/s eta 0:00:00
 Downloading http://pypi-cache/packages/a0/c4/c2971a3ba4c6103a3d10c4b0f24f461ddc027f0f09763220cf35ca1401b3/nest_asyncio-1.6.0-py3-none-any.whl (5.2 kB)
 Downloading http://pypi-cache/packages/40/44/4a5f08c96eb108af5cb50b41f76142f0afa346dfa99d5296fe7202a11854/tabulate-0.9.0-py3-none-any.whl (35 kB)
 Downloading http://pypi-cache/packages/cf/69/79e4d63b9387b48939096e25115b8af7cd8a90397a304f92436bcb21f5b2/greenlet-3.1.1-cp310-cp310-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl (599 kB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 599.5/599.5 kB 1.2 GB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 599.5/599.5 kB 1.1 GB/s eta 0:00:00
 Installing collected packages: snowballstemmer, fastjsonschema, distlib, zipp, werkzeug, uc-micro-py, tzdata, typing-extensions, tornado, threadpoolctl, tensorboard-data-server, tabulate, sphinxcontrib-serializinghtml, sphinxcontrib-qthelp, sphinxcontrib-jsmath, sphinxcontrib-htmlhelp, sphinxcontrib-devhelp, sphinxcontrib-applehelp, scipy, rpds-py, requests, pyzmq, python-dateutil, pyparsing, Pygments, protobuf, pluggy, platformdirs, nodeenv, nest-asyncio, mdurl, markdown, latexcodec, kiwisolver, joblib, iniconfig, imagesize, identify, grpcio, greenlet, fonttools, filelock, et-xmlfile, docutils, debugpy, cycler, contourpy, comm, click, cfgv, babel, alabaster, absl-py, virtualenv, tensorboard, sqlalchemy, sphinx, scikit-learn, referencing, pytest, pybtex, pooch, pandas, openpyxl, matplotlib, markdown-it-py, linkify-it-py, jupyter-core, importlib_metadata, ghp-import, accessible-pygments, sphinx_togglebutton, sphinx-thebe, sphinx-multitoc-numbering, sphinx-jupyterbook-latex, sphinx-external-toc, sphinx-design, sphinx-copybutton, sphinx-comments, seaborn, pydata-sphinx-theme, pybtex-docutils, pre-commit, mne, mdit-py-plugins, jupyter-client, jsonschema-specifications, sphinxcontrib-bibtex, sphinx-book-theme, myst-parser, jsonschema, ipykernel, nbformat, nbclient, jupyter-cache, myst-nb, jupyter-book
   Attempting uninstall: typing-extensions
     Found existing installation: typing_extensions 4.5.0
@@ -397,5 +397,5 @@ Installing collected packages: snowballstemmer, fastjsonschema, distlib, zipp, w
 ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
 triton 2.0.0 requires cmake, which is not installed.
 triton 2.0.0 requires lit, which is not installed.
-Successfully installed Pygments-2.18.0 absl-py-2.1.0 accessible-pygments-0.0.5 alabaster-0.7.16 babel-2.16.0 cfgv-3.4.0 click-8.1.7 comm-0.2.2 contourpy-1.3.1 cycler-0.12.1 debugpy-1.8.8 distlib-0.3.9 docutils-0.20.1 et-xmlfile-2.0.0 fastjsonschema-2.20.0 filelock-3.16.1 fonttools-4.55.0 ghp-import-2.1.0 greenlet-3.1.1 grpcio-1.67.1 identify-2.6.2 imagesize-1.4.1 importlib_metadata-8.5.0 iniconfig-2.0.0 ipykernel-6.29.5 joblib-1.4.2 jsonschema-4.23.0 jsonschema-specifications-2024.10.1 jupyter-book-1.0.3 jupyter-cache-1.0.1 jupyter-client-8.6.3 jupyter-core-5.7.2 kiwisolver-1.4.7 latexcodec-3.0.0 linkify-it-py-2.0.3 markdown-3.7 markdown-it-py-3.0.0 matplotlib-3.9.2 mdit-py-plugins-0.4.2 mdurl-0.1.2 mne-1.4.2 myst-nb-1.1.2 myst-parser-2.0.0 nbclient-0.10.0 nbformat-5.10.4 nest-asyncio-1.6.0 nodeenv-1.9.1 openpyxl-3.1.5 pandas-2.2.3 platformdirs-4.3.6 pluggy-1.5.0 pooch-1.8.2 pre-commit-4.0.1 protobuf-5.28.3 pybtex-0.24.0 pybtex-docutils-1.0.3 pydata-sphinx-theme-0.16.0 pyparsing-3.2.0 pytest-8.3.3 python-dateutil-2.9.0.post0 pyzmq-26.2.0 referencing-0.35.1 requests-2.32.3 rpds-py-0.21.0 scikit-learn-1.5.2 scipy-1.14.1 seaborn-0.13.2 snowballstemmer-2.2.0 sphinx-7.4.7 sphinx-book-theme-1.1.3 sphinx-comments-0.0.3 sphinx-copybutton-0.5.2 sphinx-design-0.6.1 sphinx-external-toc-1.0.1 sphinx-jupyterbook-latex-1.0.0 sphinx-multitoc-numbering-0.1.3 sphinx-thebe-0.3.1 sphinx_togglebutton-0.3.2 sphinxcontrib-applehelp-2.0.0 sphinxcontrib-bibtex-2.6.3 sphinxcontrib-devhelp-2.0.0 sphinxcontrib-htmlhelp-2.1.0 sphinxcontrib-jsmath-1.0.1 sphinxcontrib-qthelp-2.0.0 sphinxcontrib-serializinghtml-2.0.0 sqlalchemy-2.0.36 tabulate-0.9.0 tensorboard-2.18.0 tensorboard-data-server-0.7.2 threadpoolctl-3.5.0 tornado-6.4.1 typing-extensions-4.12.2 tzdata-2024.2 uc-micro-py-1.0.3 virtualenv-20.27.1 werkzeug-3.1.3 zipp-3.21.0
+Successfully installed Pygments-2.18.0 absl-py-2.1.0 accessible-pygments-0.0.5 alabaster-0.7.16 babel-2.16.0 cfgv-3.4.0 click-8.1.7 comm-0.2.2 contourpy-1.3.1 cycler-0.12.1 debugpy-1.8.8 distlib-0.3.9 docutils-0.20.1 et-xmlfile-2.0.0 fastjsonschema-2.20.0 filelock-3.16.1 fonttools-4.55.0 ghp-import-2.1.0 greenlet-3.1.1 grpcio-1.68.0 identify-2.6.2 imagesize-1.4.1 importlib_metadata-8.5.0 iniconfig-2.0.0 ipykernel-6.29.5 joblib-1.4.2 jsonschema-4.23.0 jsonschema-specifications-2024.10.1 jupyter-book-1.0.3 jupyter-cache-1.0.1 jupyter-client-8.6.3 jupyter-core-5.7.2 kiwisolver-1.4.7 latexcodec-3.0.0 linkify-it-py-2.0.3 markdown-3.7 markdown-it-py-3.0.0 matplotlib-3.9.2 mdit-py-plugins-0.4.2 mdurl-0.1.2 mne-1.4.2 myst-nb-1.1.2 myst-parser-2.0.0 nbclient-0.10.0 nbformat-5.10.4 nest-asyncio-1.6.0 nodeenv-1.9.1 openpyxl-3.1.5 pandas-2.2.3 platformdirs-4.3.6 pluggy-1.5.0 pooch-1.8.2 pre-commit-4.0.1 protobuf-5.28.3 pybtex-0.24.0 pybtex-docutils-1.0.3 pydata-sphinx-theme-0.16.0 pyparsing-3.2.0 pytest-8.3.3 python-dateutil-2.9.0.post0 pyzmq-26.2.0 referencing-0.35.1 requests-2.32.3 rpds-py-0.21.0 scikit-learn-1.5.2 scipy-1.14.1 seaborn-0.13.2 snowballstemmer-2.2.0 sphinx-7.4.7 sphinx-book-theme-1.1.3 sphinx-comments-0.0.3 sphinx-copybutton-0.5.2 sphinx-design-0.6.1 sphinx-external-toc-1.0.1 sphinx-jupyterbook-latex-1.0.0 sphinx-multitoc-numbering-0.1.3 sphinx-thebe-0.3.1 sphinx_togglebutton-0.3.2 sphinxcontrib-applehelp-2.0.0 sphinxcontrib-bibtex-2.6.3 sphinxcontrib-devhelp-2.0.0 sphinxcontrib-htmlhelp-2.1.0 sphinxcontrib-jsmath-1.0.1 sphinxcontrib-qthelp-2.0.0 sphinxcontrib-serializinghtml-2.0.0 sqlalchemy-2.0.36 tabulate-0.9.0 tensorboard-2.18.0 tensorboard-data-server-0.7.2 threadpoolctl-3.5.0 tornado-6.4.1 typing-extensions-4.12.2 tzdata-2024.2 uc-micro-py-1.0.3 virtualenv-20.27.1 werkzeug-3.1.3 zipp-3.21.0
 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable.It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
