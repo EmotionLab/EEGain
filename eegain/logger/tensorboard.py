@@ -175,11 +175,24 @@ class EmotionLogger:
             )
         # Save the predictions to a file
         if test_flag == True:
+            # for logging predictions
+            # with open(prediction_file, 'a', newline='') as f:
+            #     writer = csv.writer(f)
+
+            #     for act, pred, vid in zip(test_actual, test_pred, videos):
+            #         writer.writerow([i, data_part, subject_id, vid, act, pred])
+            
+            #for logging metrics
             with open(prediction_file, 'a', newline='') as f:
                 writer = csv.writer(f)
 
-                for act, pred, vid in zip(test_actual, test_pred, videos):
-                    writer.writerow([i, data_part, subject_id, vid, act, pred])
+                acc = accuracy_score(test_actual, test_pred)
+                f1 = f1_score(test_actual, test_pred, average='binary' if self.num_class <= 2 else 'micro')
+                f1_weighted = f1_score(test_actual, test_pred, average='weighted')
+                recall = recall_score(test_actual, test_pred, average='binary' if self.num_class <= 2 else 'micro')
+                precision = precision_score(test_actual, test_pred, average='binary' if self.num_class <= 2 else 'micro')
+                
+                writer.writerow([i, data_part, subject_id, acc, f1, f1_weighted, recall, precision])
         
         
     def log_each_user_metrics(self, metric_names: list[str]):

@@ -189,11 +189,18 @@ def run_loso(
         with open(prediction_file, 'w', newline='') as f:
             writer = csv.writer(f)
             writer.writerow(['Epoch', 'Data Part', 'Subject id', 'Video id', 'Actual', 'Predicted'])
-
-        prediction_file_log = os.path.join(prediction_dir, f"LOG_predictions_loso_{test_subject_ids[0]}.csv")
-        with open(prediction_file_log, 'w', newline='') as f:
+            
+        # logging actual and predicted values for each epoch in tensorboard.py
+        # prediction_file_log = os.path.join(prediction_dir, f"LOG_predictions_loso_{test_subject_ids[0]}.csv")
+        # with open(prediction_file_log, 'w', newline='') as f:
+        #     writer = csv.writer(f)
+        #     writer.writerow(['Epoch', 'Data Part', 'Subject id', 'Video id', 'Actual', 'Predicted'])
+        
+        # loggin metrics for each epoch in tensorboard.py
+        metric_file_log = os.path.join(prediction_dir, f"METRICS_loso_{test_subject_ids[0]}.csv")
+        with open(metric_file_log, 'w', newline='') as f:
             writer = csv.writer(f)
-            writer.writerow(['Epoch', 'Data Part', 'Subject id', 'Video id', 'Actual', 'Predicted'])
+            writer.writerow(['Epoch', 'Data Part', 'Subject id', 'Accuracy', 'F1', 'F1-weighted', 'Precision', 'Recall'])
         
     for i in range(epoch):
         print(f"\nEpoch {i}/{epoch}")
@@ -213,9 +220,13 @@ def run_loso(
             )
             train_pred, train_actual, train_loss = test_pred, test_actual, test_loss
 
-        
-        logger.log(test_subject_ids[0], train_pred, train_actual, i, "train", prediction_file_log, False, train_videos, train_loss)
-        logger.log(test_subject_ids[0], test_pred, test_actual, i, "val", prediction_file_log, True, test_videos, test_loss)
+        # for logging predictions in tensorboard.py
+        #logger.log(test_subject_ids[0], train_pred, train_actual, i, "train", prediction_file_log, False, train_videos, train_loss)
+        #logger.log(test_subject_ids[0], test_pred, test_actual, i, "val", prediction_file_log, True, test_videos, test_loss)
+
+        # for logging metrics in tensorboard.py
+        logger.log(test_subject_ids[0], train_pred, train_actual, i, "train", metric_file_log, False, train_videos, train_loss)
+        logger.log(test_subject_ids[0], test_pred, test_actual, i, "val", metric_file_log, True, test_videos, test_loss)
         
         ## [NEW CODE BLOCK]
         # if you want to log predictions, this code block will write the predictions to the file
