@@ -126,29 +126,34 @@ class EmotionLogger:
             videos,
             loss=None,
     ):
-
+        accuracy = accuracy_score(test_actual, test_pred)
         self.log_metric(
             subject_id, "accuracy",
-            accuracy_score(test_actual, test_pred), i, data_part
+            accuracy, i, data_part
         )
+        f1 = f1_score(test_actual, test_pred, average='binary' if self.num_class <= 2 else 'micro')
         self.log_metric(
                 subject_id, "f1",
-                f1_score(test_actual, test_pred, average='binary' if self.num_class <= 2 else 'micro'), i, data_part
+                f1, i, data_part
             )
+        f1_wtd = f1_score(test_actual, test_pred, average='weighted')
         self.log_metric(
             subject_id, "f1_weighted",
-            f1_score(test_actual, test_pred, average='weighted'), i, data_part
+            f1_wtd, i, data_part
         )
+        recall = recall_score(test_actual, test_pred, average='binary' if self.num_class <= 2 else 'micro')
         self.log_metric(
             subject_id, "recall",
-            recall_score(test_actual, test_pred, average='binary' if self.num_class <= 2 else 'micro'), i, data_part
+            recall, i, data_part
         )
+        precision = precision_score(test_actual, test_pred, average='binary' if self.num_class <= 2 else 'micro')
         self.log_metric(
             subject_id,
             "precision",
-            precision_score(test_actual, test_pred, average='binary' if self.num_class <= 2 else 'micro'), i,
+            precision, i,
             data_part
         )
+        
         self.log_metric(
             subject_id, "kappa",
             cohen_kappa_score(test_actual, test_pred), i, data_part
@@ -175,24 +180,10 @@ class EmotionLogger:
             )
         # Save the predictions to a file
         if test_flag == True:
-            # for logging predictions
-            # with open(prediction_file, 'a', newline='') as f:
-            #     writer = csv.writer(f)
-
-            #     for act, pred, vid in zip(test_actual, test_pred, videos):
-            #         writer.writerow([i, data_part, subject_id, vid, act, pred])
-            
             #for logging metrics
             with open(prediction_file, 'a', newline='') as f:
                 writer = csv.writer(f)
-
-                acc = accuracy_score(test_actual, test_pred)
-                f1 = f1_score(test_actual, test_pred, average='binary' if self.num_class <= 2 else 'micro')
-                f1_weighted = f1_score(test_actual, test_pred, average='weighted')
-                recall = recall_score(test_actual, test_pred, average='binary' if self.num_class <= 2 else 'micro')
-                precision = precision_score(test_actual, test_pred, average='binary' if self.num_class <= 2 else 'micro')
-                
-                writer.writerow([i, data_part, subject_id, acc, f1, f1_weighted, recall, precision])
+                writer.writerow([i, data_part, subject_id, accuracy, f1, f1_wtd, recall, precision])
         
         
     def log_each_user_metrics(self, metric_names: list[str]):
@@ -226,8 +217,13 @@ class EmotionLogger:
                 for _, metrics in metrics_for_each_subject.items():
                     metric_average.append(metrics[metric_name][-1])
 
+                print(f"{metric_name}={metric_average}")
+                print(f"{metric_name}_sum={sum(metric_average)}")
+                print(f"{metric_name}_length={len(metric_average)}")
+                print("--------------------------------------------------------------")
                 metric_std = np.std(metric_average)
                 metric_average = sum(metric_average) / len(metric_average)
+                
 
                 self.writer.add_scalar(f"Overall/{metric_name}", metric_average)
                 file.write(f"{metric_name}={metric_average}\n")
