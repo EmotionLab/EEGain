@@ -19,7 +19,7 @@ from dataclasses import asdict
 from sklearn.metrics import *
 from helpers import main_loso, main_loto, main_loso_fixed
 from config import *
-
+import pdb
 
 MAHNOB_transform = [
             eegain.transforms.Crop(t_min=30, t_max=-30),
@@ -91,13 +91,14 @@ Seed_transform =  [
         eegain.transforms.NotchFilter(freq=50),
         eegain.transforms.Resample(s_rate=128),
     ]
-
+## DEBUG THIS PORTION
 def generate_options():
     def decorator(func):
-        config_instances = [TransformConfig, MAHNOBConfig, TrainingConfig, EEGNetConfig, TSceptionConfig, DeepConvNetConfig, ShallowConvNetConfig]
+        config_instances = [TransformConfig, DREAMERConfig, TrainingConfig, EEGNetConfig, TSceptionConfig, DeepConvNetConfig, ShallowConvNetConfig]
         for config_instance in config_instances:
             for field, value in asdict(config_instance()).items():
                 option = click.option(f"--{field}", default=value, required=False, type=type(value))
+                
                 func = option(func)
         return func
     return decorator
@@ -130,6 +131,7 @@ def main(**kwargs):
     else:
         model = globals()[kwargs['model_name']](input_size=[1, kwargs["channels"], kwargs["window"]*kwargs["s_rate"]], **kwargs)
         empty_model = copy.deepcopy(model)
+        pdb.set_trace()
     if kwargs["split_type"] == "LOSO":
         classes = [i for i in range(kwargs["num_classes"])]
         main_loso(dataset, model, empty_model, classes, **kwargs)
