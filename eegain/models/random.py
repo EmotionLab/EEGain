@@ -35,6 +35,7 @@ from config import *
 #         class_list = list(range(self.num_classes))
 #         return torch.tensor(np.random.choice(class_list, size=x.shape[0], p=self.weights))
 
+# Random model that always predicts the most occuring class in the dataset
 class RandomModel:
     def __init__(self, train_dataloader):
         labels = []
