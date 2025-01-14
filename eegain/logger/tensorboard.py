@@ -121,9 +121,6 @@ class EmotionLogger:
             test_actual: torch.Tensor,
             i: int,
             data_part: str,
-            prediction_file,
-            test_flag,
-            videos,
             loss=None,
     ):
         accuracy = accuracy_score(test_actual, test_pred)
@@ -178,12 +175,6 @@ class EmotionLogger:
                 "loss",
                 loss, i, data_part
             )
-        # Save the predictions to a file
-        if test_flag == True:
-            #for logging metrics
-            with open(prediction_file, 'a', newline='') as f:
-                writer = csv.writer(f)
-                writer.writerow([i, data_part, subject_id, accuracy, f1, f1_wtd, recall, precision])
         
         
     def log_each_user_metrics(self, metric_names: list[str]):
@@ -217,13 +208,8 @@ class EmotionLogger:
                 for _, metrics in metrics_for_each_subject.items():
                     metric_average.append(metrics[metric_name][-1])
 
-                print(f"{metric_name}={metric_average}")
-                print(f"{metric_name}_sum={sum(metric_average)}")
-                print(f"{metric_name}_length={len(metric_average)}")
-                print("--------------------------------------------------------------")
                 metric_std = np.std(metric_average)
                 metric_average = sum(metric_average) / len(metric_average)
-                
 
                 self.writer.add_scalar(f"Overall/{metric_name}", metric_average)
                 file.write(f"{metric_name}={metric_average}\n")

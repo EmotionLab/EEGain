@@ -91,9 +91,7 @@ def train_one_epoch(model, loader, optimizer, loss_fn):
         running_loss += loss.item() * batch_size
         epoch_loss = running_loss / dataset_size
         pbar.set_postfix(loss=f"{epoch_loss:0.4f}")
-        # if i % 10 == 0:  # Print every 10 batches
-        #     print(f"Batch {i} - Pred: {pred}, Actual: {y_batch}")
-        #print(f"Train Batch {i}: Size {batch_size}, Pred {len(pred.tolist())}, Actual {len(y_batch.tolist())}")
+    
     return all_preds, all_actuals, epoch_loss
 
 
@@ -112,18 +110,16 @@ def run_loto(
         split_type="LOTO",
         **kwargs       # new params
 ):
-    ## [NEW CODE BLOCK]
-    # if you want to log predictions, this code block will create the directory and file
+    # [NEW] Code to log predictions
     if kwargs["log_predictions"] == True:
-        # Ensure the directory exists
+        
         prediction_dir = kwargs["log_predictions_dir"]
-        if not os.path.exists(prediction_dir):
-            os.makedirs(prediction_dir)
     
-        prediction_file = os.path.join(prediction_dir, f"predictions_loto_{test_ids[0]}.csv")
-        with open(prediction_file, 'w', newline='') as f:
-            writer = csv.writer(f)
-            writer.writerow(['Epoch', 'Data Part', 'Video id', 'Subject id', 'Actual', 'Predicted'])
+        prediction_file = os.path.join(prediction_dir, f"predictions_LOTO_{test_ids[0]}.csv")
+        if os.path.exists(prediction_file) == False:
+            with open(prediction_file, 'w', newline='') as f:
+                writer = csv.writer(f)
+                writer.writerow(['Epoch', 'Data Part', 'Video id', 'Subject id', 'Actual', 'Predicted'])
     
     for i in range(epoch):
         print(f"\nEpoch {i}/{epoch}")
@@ -145,13 +141,12 @@ def run_loto(
             logger.log(test_ids[0], train_pred, train_actual, i, "train", train_loss)
             logger.log(test_ids[0], test_pred, test_actual, i, "val", test_loss)
     
-        ## [NEW CODE BLOCK]
-        # if you want to log predictions, this code block will write the predictions to the file
+        # [NEW]
         if kwargs["log_predictions"] == True:
             with open(prediction_file, 'a', newline='') as f:
                 writer = csv.writer(f)
 
-                for act, pred, subject_id in zip(test_actual, test_pred, subject_id):
+                for act, pred in zip(test_actual, test_pred):
                     writer.writerow([i, 'val', test_ids[0], subject_id, act, pred])
         
     if split_type == "LOTO":
@@ -177,30 +172,13 @@ def run_loso(
 ):
         
     print(f"test subject ids {test_subject_ids}")
-    ## [NEW CODE BLOCK]
-    # if you want to log predictions, this code block will create the directory and file
+    # [NEW]
     if kwargs["log_predictions"] == True:
-        # Ensure the directory exists
         prediction_dir = kwargs["log_predictions_dir"]
-        if not os.path.exists(prediction_dir):
-            os.makedirs(prediction_dir)
-    
-        prediction_file = os.path.join(prediction_dir, f"predictions_loso_{test_subject_ids[0]}.csv")
+        prediction_file = os.path.join(prediction_dir, f"predictions_LOSO_{test_subject_ids[0]}.csv")
         with open(prediction_file, 'w', newline='') as f:
             writer = csv.writer(f)
             writer.writerow(['Epoch', 'Data Part', 'Subject id', 'Video id', 'Actual', 'Predicted'])
-            
-        # logging actual and predicted values for each epoch in tensorboard.py
-        # prediction_file_log = os.path.join(prediction_dir, f"LOG_predictions_loso_{test_subject_ids[0]}.csv")
-        # with open(prediction_file_log, 'w', newline='') as f:
-        #     writer = csv.writer(f)
-        #     writer.writerow(['Epoch', 'Data Part', 'Subject id', 'Video id', 'Actual', 'Predicted'])
-        
-        # loggin metrics for each epoch in tensorboard.py
-        metric_file_log = os.path.join(prediction_dir, f"METRICS_loso_{test_subject_ids[0]}.csv")
-        with open(metric_file_log, 'w', newline='') as f:
-            writer = csv.writer(f)
-            writer.writerow(['Epoch', 'Data Part', 'Subject id', 'Accuracy', 'F1', 'F1-weighted', 'Precision', 'Recall'])
         
     for i in range(epoch):
         print(f"\nEpoch {i}/{epoch}")
@@ -220,15 +198,11 @@ def run_loso(
             )
             train_pred, train_actual, train_loss = test_pred, test_actual, test_loss
 
-        # for logging predictions in tensorboard.py
-        #logger.log(test_subject_ids[0], train_pred, train_actual, i, "train", prediction_file_log, False, train_videos, train_loss)
-        #logger.log(test_subject_ids[0], test_pred, test_actual, i, "val", prediction_file_log, True, test_videos, test_loss)
-
-        # for logging metrics in tensorboard.py
-        logger.log(test_subject_ids[0], train_pred, train_actual, i, "train", metric_file_log, False, train_videos, train_loss)
-        logger.log(test_subject_ids[0], test_pred, test_actual, i, "val", metric_file_log, True, test_videos, test_loss)
+        # in the end of epoch it logs metrics for this specific epoch. test_subject_ids is test_session_ids
+        logger.log(test_subject_ids[0], train_pred, train_actual, i, "train", train_loss)
+        logger.log(test_subject_ids[0], test_pred, test_actual, i, "val", test_loss)
         
-        ## [NEW CODE BLOCK]
+        ## [NEW]
         # if you want to log predictions, this code block will write the predictions to the file
         if kwargs["log_predictions"] == True:
             with open(prediction_file, 'a', newline='') as f:
@@ -277,7 +251,6 @@ def main_loto(dataset, model, empty_model, classes, **kwargs):
                 logger=logger,
                 random_baseline=is_random,
                 subject_id=loader["subject_id"],    # new params
-                split_type="LOTO",
                 **kwargs,                           # new params   
             )
             all_test_preds_for_subject.append(test_pred)

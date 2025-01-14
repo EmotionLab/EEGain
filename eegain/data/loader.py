@@ -30,8 +30,8 @@ class EEGDataloader:
             logger.debug(f"subject_id is: {subject_id}, train sessions are: {train_sessions}")
             test_data = self.dataset.__get_trials__(test_sessions, subject_id)
             train_data = self.dataset.__get_trials__(train_sessions, subject_id)
-            train_data, train_label = EEGDataloader._concat_data(train_data, loader_type="LOTO")
-            test_data, test_label = EEGDataloader._concat_data(test_data, loader_type="LOTO")
+            train_data, train_label, _ = EEGDataloader._concat_data(train_data, loader_type="LOTO")
+            test_data, test_label, _ = EEGDataloader._concat_data(test_data, loader_type="LOTO")
 
             if len(train_data.shape) != 4:  # DREAMER has already shape that is needed and it doesn't need normalization
                 train_data, test_data = EEGDataloader.normalize(train_data, test_data)
@@ -43,6 +43,7 @@ class EEGDataloader:
                 "test": test_dataloader,
                 "test_session_indexes": test_sessions,
                 "train_session_indexes": train_sessions,
+                "subject_id": subject_id,
             }
 
     @staticmethod

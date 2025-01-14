@@ -17,5 +17,7 @@ run_*.sh
 run_cmd.txt
 predictions/
 predictions_logger/
+training_logger/
+training_logger_*/
 install.sh
 install.log

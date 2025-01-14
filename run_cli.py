@@ -19,7 +19,6 @@ from dataclasses import asdict
 from sklearn.metrics import *
 from helpers import main_loso, main_loto, main_loso_fixed
 from config import *
-import pdb
 
 MAHNOB_transform = [
             eegain.transforms.Crop(t_min=30, t_max=-30),
@@ -91,7 +90,7 @@ Seed_transform =  [
         eegain.transforms.NotchFilter(freq=50),
         eegain.transforms.Resample(s_rate=128),
     ]
-## DEBUG THIS PORTION
+
 def generate_options():
     def decorator(func):
         config_instances = [TransformConfig, DREAMERConfig, TrainingConfig, EEGNetConfig, TSceptionConfig, DeepConvNetConfig, ShallowConvNetConfig]
@@ -103,7 +102,6 @@ def generate_options():
         return func
     return decorator
 
-
 @click.command()
 @click.option("--model_name", required=True, type=str, help="name of the config")
 @click.option("--data_name", required=True, type=str, help="name of the config")
@@ -111,15 +109,17 @@ def generate_options():
 @click.option("--log_predictions", type=bool, help="log predictions to a directory")
 @click.option("--log_predictions_dir", type=str, help="directory to save logged predictions")
 @generate_options()
+
 def main(**kwargs):
     transform = globals().get(kwargs["data_name"] + "_transform")
     transform.append(eegain.transforms.Segment(duration=kwargs["window"], overlap=0))
     transform = eegain.transforms.Construct(transform)
     dataset = globals()[kwargs['data_name']](transform=transform, root=kwargs["data_path"], **kwargs)
     
-    # Log predictions if the flag is set to True
+    # [NEW] Log predictions if the flag is set to True and create the directory if it does not exist
     if kwargs["log_predictions"]:
-        # os.makedirs(kwargs["log_predictions_dir"], exist_ok=True)
+        if not os.path.exists(kwargs["log_predictions_dir"]):
+            os.makedirs(kwargs["log_predictions_dir"])
         print(f"[INFO] Logging predictions to directory: {kwargs['log_predictions_dir']}")
 
     # -------------- Model --------------
@@ -131,7 +131,7 @@ def main(**kwargs):
     else:
         model = globals()[kwargs['model_name']](input_size=[1, kwargs["channels"], kwargs["window"]*kwargs["s_rate"]], **kwargs)
         empty_model = copy.deepcopy(model)
-        pdb.set_trace()
+        
     if kwargs["split_type"] == "LOSO":
         classes = [i for i in range(kwargs["num_classes"])]
         main_loso(dataset, model, empty_model, classes, **kwargs)
