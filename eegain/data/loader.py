@@ -89,7 +89,7 @@ class EEGDataloader:
         return x, y,video_ids
 
     def _get_dataloader(
-        self, data: torch.Tensor, label: torch.Tensor, shuffle: bool = False #changed to False
+        self, data: torch.Tensor, label: torch.Tensor, shuffle: bool = True #changed to False
     ) -> DataLoader:
         """
         Returns a DataLoader object that can be used for iterating through batches of data and labels.
@@ -164,8 +164,8 @@ class EEGDataloader:
             train_data, test_data = EEGDataloader.normalize(train_data, test_data)
             print(f"Number of train samples: {len(train_label)}, Number of test samples: {len(test_label)}")
 
-            train_dataloader = self._get_dataloader(train_data, train_label, shuffle=False) #changed to False
-            test_dataloader = self._get_dataloader(test_data, test_label, shuffle=False) #changed to False
+            train_dataloader = self._get_dataloader(train_data, train_label) #changed to False
+            test_dataloader = self._get_dataloader(test_data, test_label) #changed to False
             yield {
                 "train": train_dataloader,
                 "test": test_dataloader,
