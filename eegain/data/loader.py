@@ -37,7 +37,7 @@ class EEGDataloader:
                 train_data, test_data = EEGDataloader.normalize(train_data, test_data)
 
             train_dataloader = self._get_dataloader(train_data, train_label)
-            test_dataloader = self._get_dataloader(test_data, test_label)
+            test_dataloader = self._get_dataloader(test_data, test_label, shuffle=False) #changed to False
             yield {
                 "train": train_dataloader,
                 "test": test_dataloader,
@@ -164,8 +164,8 @@ class EEGDataloader:
             train_data, test_data = EEGDataloader.normalize(train_data, test_data)
             print(f"Number of train samples: {len(train_label)}, Number of test samples: {len(test_label)}")
 
-            train_dataloader = self._get_dataloader(train_data, train_label) #changed to False
-            test_dataloader = self._get_dataloader(test_data, test_label) #changed to False
+            train_dataloader = self._get_dataloader(train_data, train_label)
+            test_dataloader = self._get_dataloader(test_data, test_label, shuffle = False) #changed to False
             yield {
                 "train": train_dataloader,
                 "test": test_dataloader,
@@ -191,7 +191,7 @@ class EEGDataloader:
         train_data, test_data = EEGDataloader.normalize(train_data, test_data)
 
         train_dataloader = self._get_dataloader(train_data, train_label)
-        test_dataloader = self._get_dataloader(test_data, test_label)
+        test_dataloader = self._get_dataloader(test_data, test_label, shuffle=False) #changed to False
         return {
             "train": train_dataloader,
             "test": test_dataloader,
