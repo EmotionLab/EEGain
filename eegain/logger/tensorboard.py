@@ -128,7 +128,7 @@ class EmotionLogger:
             subject_id, "accuracy",
             accuracy, i, data_part
         )
-        f1 = f1_score(test_actual, test_pred, average='binary' if self.num_class <= 2 else 'micro')
+        f1 = f1_score(test_actual, test_pred, average='binary' if self.num_class <= 2 else 'macro')
         self.log_metric(
                 subject_id, "f1",
                 f1, i, data_part
@@ -138,12 +138,12 @@ class EmotionLogger:
             subject_id, "f1_weighted",
             f1_wtd, i, data_part
         )
-        recall = recall_score(test_actual, test_pred, average='binary' if self.num_class <= 2 else 'micro')
+        recall = recall_score(test_actual, test_pred, average='binary' if self.num_class <= 2 else 'macro')
         self.log_metric(
             subject_id, "recall",
             recall, i, data_part
         )
-        precision = precision_score(test_actual, test_pred, average='binary' if self.num_class <= 2 else 'micro')
+        precision = precision_score(test_actual, test_pred, average='binary' if self.num_class <= 2 else 'macro')
         self.log_metric(
             subject_id,
             "precision",
@@ -200,7 +200,7 @@ class EmotionLogger:
 
         with open(kwargs["overal_log_file"], 'a') as file:
             file.write("=" * 100 + "\n")
-            file.write(f"log_dir={kwargs['log_dir']}\n")
+            #file.write(f"log_dir={kwargs['log_dir']}\n")
             file.write(" ".join([f"{k}={v}" for k, v in kwargs.items()]) + "\n")
 
             for metric_name in metric_names:
