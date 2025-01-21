@@ -1,6 +1,6 @@
 <p align="center">
     <!-- <h1>EEGain</h1> -->
-    <img src="book/images/gain_logo.png" alt="Logo" width="400" />
+    <img src="book/images/eegain_logo.png" alt="Logo" width="500" />
 </p>
 
 <!-- <p align="center" style="font-weight: bold; font-size: 22px;">
