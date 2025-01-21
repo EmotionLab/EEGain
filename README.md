@@ -1,6 +1,10 @@
 <p align="center">
     <!-- <h1>EEGain</h1> -->
     <img src="book/images/eegain_logo.png" alt="Logo" width="500" />
+     <br />
+  <br />
+  <a href=""><img alt="MIT License" src="https://img.shields.io/badge/license-MIT-blue.svg" /></a>
+  <a><img alt="Latest Release" src="https://img.shields.io/badge/version-1.0.0-orange" /></a>
 </p>
 
 <!-- <p align="center" style="font-weight: bold; font-size: 22px;">
