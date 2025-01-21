@@ -1,16 +1,25 @@
 <p align="center">
     <!-- <h1>EEGain</h1> -->
     <img src="book/images/eegain_logo.png" alt="Logo" width="500" />
-     <br />
-  <br />
-  <a href=""><img alt="MIT License" src="https://img.shields.io/badge/license-MIT-blue.svg" /></a>
-  <a><img alt="Latest Release" src="https://img.shields.io/badge/version-1.0.0-orange" /></a>
+    <br/>
+    <br/>
+    <a href=""><img alt="MIT License" src="https://img.shields.io/badge/license-MIT-blue.svg" /></a>
+    <a><img alt="Latest Release" src="https://img.shields.io/badge/version-1.0.0-orange" /></a>
 </p>
 
-<!-- <p align="center" style="font-weight: bold; font-size: 22px;">
-    Run experiments for EEG-based emotion recognition for the most popular 
-    datasets and models with just one command.
-</p> -->
+---
+
+<p align="center" style="font-weight:bold; font-size: 16px;">
+    A joint venture by:-
+    <br/>
+    <br/>
+    <img src="book/images/dfki_logo.png" alt="DFKI" width="100" style="margin-right: 10px;">
+    <img src="book/images/inria_logo.png" alt="Inria" width="95">
+    <img src="book/images/eu.png" alt="EU" width="80" style="margin-left: 10px;">
+</p>
+
+---
+
 ## Run experiments for EEG-based emotion recognition for most popular datasets and models with just one command
 
 ### **Description**
