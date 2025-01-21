@@ -1,6 +1,12 @@
-# **EEGain**
-
-## Run experiments for EEG-based emotion recognition for most popular datasets and models with just one command
+<div style="text-align: center; font-size: 18px; font-weight: bold;">
+    <!-- <h1>EEGain</h1> -->
+    <img src="book/images/gain_logo.png" alt="Logo" width="200" />
+    <h1></h1>
+</div>
+<div style="text-align: center; font-size: 16px; font-weight: bold;">
+    <h2>Run experiments for EEG-based emotion recognition for most popular 
+    datasets and models with just one command</h2>
+</div>
 
 ### **Description**
 EEG-based emotion recognition has become increasingly popular direction in recent years. Although lots of researchers are working on this task, running experiments is still very difficult. The main challenges are related to dataset and model. Running experiment on new dataset means that researcher should implement it with pytorch or tensorflow, get detailed information how dataset is recorded and saved and many more. Running experiment on new model is also tricky, researcher should implement it from scratch with pytorch or tensorflow. This process on one hand takes too much time and can cause lots of bugs and effort, on the other hand it is not helpful for researcher for further research. To solve this problem, make process easier and get more researchers in this field, we created EEGain, is a novel framework for EEG-based emotion recognition to run experiments on different datasets and models easily, with one command. You can implement your custom models and datasets too. 
@@ -36,6 +42,8 @@ Then you can run it with this command:
 --num_classes=2 \
 --channels=32 \
 --split_type="LOTO"
+--log_predictions=True \
+--log_predictions_dir=".../..." \
 ```
 Here you can change some important arguments. For example, to change dataset here you need to change just 4 arguments - data_name, data_path, num_classes and channels. 
 You can see results on tensorboard. 
@@ -104,6 +112,10 @@ You can add your custom dataset as well.
 - LOTO: Leave one trial out. Use this split for the person-dependent task.
 - LOSO: Leave one subject out. Use this split for the person-independent task.
 - LOSO_Fixed: Creates a fixed 75/25 train-test split that is mandatory for the person-independent task.
+
+```--log_predictions``` - Specifies whether the user wants to log the predictions from the chosen model and dataset combination. Set this argument to True if you want to log the predicitions, otherwise leave it out or manually set to False.
+
+```--log_predictions_dir``` - Specifies the directory where the logged predicitions will be stored in CSV format.
 
 
 ### **Key Arguments to Modify**
