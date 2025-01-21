@@ -13,9 +13,9 @@
     A joint venture by:-
     <br/>
     <br/>
-    <img src="book/images/dfki_logo.png" alt="DFKI" width="100" style="margin-right: 10px;">
+    <img src="book/images/dfki_logo.png" alt="DFKI" width="100" style="margin-right: 40px;">
     <img src="book/images/inria_logo.png" alt="Inria" width="95">
-    <img src="book/images/eu.png" alt="EU" width="80" style="margin-left: 10px;">
+    <img src="book/images/eu.png" alt="EU" width="80" style="margin-left: 40px;">
 </p>
 
 ---
