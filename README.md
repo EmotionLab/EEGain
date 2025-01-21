@@ -65,7 +65,7 @@ You can adapt arguments within the sh file according to your specific intentions
 - EEGNet
 - DeepconvNet
 - ShallowConvNet
-- RANDOM ( for testing random baseline)
+- RANDOM ( for testing random baseline using most occuring class as the output)
 
 You can add your custom model as well.
 
