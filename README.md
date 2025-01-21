@@ -1,12 +1,13 @@
-<div style="text-align: center; font-size: 18px; font-weight: bold;">
+<p align="center">
     <!-- <h1>EEGain</h1> -->
-    <img src="book/images/gain_logo.png" alt="Logo" width="200" />
-    <h1></h1>
-</div>
-<div style="text-align: center; font-size: 16px; font-weight: bold;">
-    <h2>Run experiments for EEG-based emotion recognition for most popular 
-    datasets and models with just one command</h2>
-</div>
+    <img src="book/images/gain_logo.png" alt="Logo" width="400" />
+</p>
+
+<!-- <p align="center" style="font-weight: bold; font-size: 22px;">
+    Run experiments for EEG-based emotion recognition for the most popular 
+    datasets and models with just one command.
+</p> -->
+## Run experiments for EEG-based emotion recognition for most popular datasets and models with just one command
 
 ### **Description**
 EEG-based emotion recognition has become increasingly popular direction in recent years. Although lots of researchers are working on this task, running experiments is still very difficult. The main challenges are related to dataset and model. Running experiment on new dataset means that researcher should implement it with pytorch or tensorflow, get detailed information how dataset is recorded and saved and many more. Running experiment on new model is also tricky, researcher should implement it from scratch with pytorch or tensorflow. This process on one hand takes too much time and can cause lots of bugs and effort, on the other hand it is not helpful for researcher for further research. To solve this problem, make process easier and get more researchers in this field, we created EEGain, is a novel framework for EEG-based emotion recognition to run experiments on different datasets and models easily, with one command. You can implement your custom models and datasets too. 
