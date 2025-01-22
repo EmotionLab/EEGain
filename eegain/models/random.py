@@ -9,7 +9,7 @@ from tqdm import tqdm
 
 import eegain
 from eegain.data import EEGDataloader
-from eegain.data.datasets_org import *
+from eegain.data.datasets import *
 from eegain.logger import EmotionLogger
 from eegain.models import *
 from config import *

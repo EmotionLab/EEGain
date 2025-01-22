@@ -93,6 +93,7 @@ Seed_transform =  [
 
 def generate_options():
     def decorator(func):
+        # Replace the dataset config with the dataset specific config if your choosing
         config_instances = [TransformConfig, DREAMERConfig, TrainingConfig, EEGNetConfig, TSceptionConfig, DeepConvNetConfig, ShallowConvNetConfig]
         for config_instance in config_instances:
             for field, value in asdict(config_instance()).items():
