@@ -62,7 +62,7 @@ Then you can run it with this command:
 Here you can change some important arguments. For example, to change dataset here you need to change just 4 arguments - data_name, data_path, num_classes and channels. 
 You can see results on tensorboard. 
 
-**NOTE:** Remember to change the config file according to your chosen dataset in ```run_clip.py``` under the function ```generate_options()```.
+**NOTE:** Remember to change the config file according to your chosen dataset in ```run_cli.py``` under the function ```generate_options()```.
 
 ### **How to run**
    1. clone the repo

@@ -114,8 +114,12 @@ def run_loto(
     if kwargs["log_predictions"] == True:
         
         prediction_dir = kwargs["log_predictions_dir"]
-    
-        prediction_file = os.path.join(prediction_dir, f"predictions_LOTO_{test_ids[0]}.csv")
+        #for SEED dataset, the video id is in the form of 'video_id<EOF>path'
+        testID = test_ids[0]
+        if isinstance(testID, str) and '<EOF>' in testID:
+            testID = testID.split('<EOF>')[0]
+            
+        prediction_file = os.path.join(prediction_dir, f"predictions_LOTO_{testID}.csv")
         if os.path.exists(prediction_file) == False:
             with open(prediction_file, 'w', newline='') as f:
                 writer = csv.writer(f)
@@ -138,8 +142,8 @@ def run_loto(
             train_pred, train_actual, train_loss = test_pred, test_actual, test_loss
         if split_type != "LOTO":
             # in the end of epoch it logs metrics for this specific epoch. test_ids is test_session_ids
-            logger.log(test_ids[0], train_pred, train_actual, i, "train", train_loss)
-            logger.log(test_ids[0], test_pred, test_actual, i, "val", test_loss)
+            logger.log(testID, train_pred, train_actual, i, "train", train_loss)
+            logger.log(testID, test_pred, test_actual, i, "val", test_loss)
     
         # [NEW]
         if kwargs["log_predictions"] == True:
@@ -147,7 +151,7 @@ def run_loto(
                 writer = csv.writer(f)
 
                 for act, pred in zip(test_actual, test_pred):
-                    writer.writerow([i, 'val', test_ids[0], subject_id, act, pred])
+                    writer.writerow([i, 'val', testID, subject_id, act, pred])
         
     if split_type == "LOTO":
         return train_pred, train_actual, test_pred, test_actual
@@ -209,6 +213,10 @@ def run_loso(
                 writer = csv.writer(f)
 
                 for act, pred, vid in zip(test_actual, test_pred, test_videos):
+                    #for SEED dataset, the video id is in the form of 'video_id<EOF>path'
+                    if isinstance(vid, str) and '<EOF>' in vid:
+                        vid = vid.split('<EOF>')[0]
+                        
                     writer.writerow([i, 'val', test_subject_ids[0], vid, act, pred])
 
     logger.log_summary(overal_log_file="overal_log", log_dir="logs/")

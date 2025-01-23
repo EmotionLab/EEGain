@@ -94,7 +94,7 @@ Seed_transform =  [
 def generate_options():
     def decorator(func):
         # Replace the dataset config with the dataset specific config if your choosing
-        config_instances = [TransformConfig, DREAMERConfig, TrainingConfig, EEGNetConfig, TSceptionConfig, DeepConvNetConfig, ShallowConvNetConfig]
+        config_instances = [TransformConfig, SeedConfig, TrainingConfig, EEGNetConfig, TSceptionConfig, DeepConvNetConfig, ShallowConvNetConfig]
         for config_instance in config_instances:
             for field, value in asdict(config_instance()).items():
                 option = click.option(f"--{field}", default=value, required=False, type=type(value))
@@ -121,7 +121,7 @@ def main(**kwargs):
     if kwargs["log_predictions"]:
         if not os.path.exists(kwargs["log_predictions_dir"]):
             os.makedirs(kwargs["log_predictions_dir"])
-        print(f"[INFO] Logging predictions to directory: {kwargs['log_predictions_dir']}")
+        print(f"[INFO] Logger: Logging predictions to directory: {kwargs['log_predictions_dir']}")
 
     # -------------- Model --------------
     if kwargs["model_name"]=="RANDOM":
