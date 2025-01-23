@@ -21,4 +21,4 @@ training_logger/
 training_logger_*/
 install.sh
 install.log
-dreamer_results/
+*_results/
