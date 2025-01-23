@@ -137,7 +137,7 @@ You can add your custom dataset as well.
 ### **Key Arguments to Modify**
 
 **SeedIV Setup:**
-- Data Path: Ensure your directory structure follows "your_path_to/eeg_raw_data", containing three session folders. Each session folder must include .mat files.<br/>
+- Data Path: Ensure your directory structure follows "your_path_to/eeg_raw_data", containing three session folders. Each session folder must include .mat files. The "eeg_raw_data" folder should also contain "Channel Order.xlsx" and "ReadMe.txt" files.<br/>
 - Data Name: SeedIV<br/>
 - Channels: 62<br/>
 - Number of Classes: 4
