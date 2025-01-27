@@ -22,3 +22,4 @@ training_logger_*/
 install.sh
 install.log
 *_results/
+overall_metrics.log
