@@ -110,16 +110,16 @@ def run_loto(
         split_type="LOTO",
         **kwargs       # new params
 ):
-    # [NEW] Code to log predictions
+    # Code to log predictions
     if kwargs["log_predictions"] == True:
         
         prediction_dir = kwargs["log_predictions_dir"]
-        #for SEED dataset, the video id is in the form of 'video_id<EOF>path'
+        # for SEED dataset, the video id is in the form of 'video_id<EOF>path'
         testID = test_ids[0]
         if isinstance(testID, str) and '<EOF>' in testID:
             testID = testID.split('<EOF>')[0]
             
-        prediction_file = os.path.join(prediction_dir, f"predictions_LOTO_{testID}.csv")
+        prediction_file = os.path.join(prediction_dir, f"predictions_LOTO_VideoID{testID}.csv")
         if os.path.exists(prediction_file) == False:
             with open(prediction_file, 'w', newline='') as f:
                 writer = csv.writer(f)
@@ -145,7 +145,7 @@ def run_loto(
             logger.log(testID, train_pred, train_actual, i, "train", train_loss)
             logger.log(testID, test_pred, test_actual, i, "val", test_loss)
     
-        # [NEW]
+        # if you want to log predictions, this code block will write the predictions to the file
         if kwargs["log_predictions"] == True:
             with open(prediction_file, 'a', newline='') as f:
                 writer = csv.writer(f)
@@ -176,10 +176,11 @@ def run_loso(
 ):
         
     print(f"test subject ids {test_subject_ids}")
-    # [NEW]
+    
+    # Code to log predictions
     if kwargs["log_predictions"] == True:
         prediction_dir = kwargs["log_predictions_dir"]
-        prediction_file = os.path.join(prediction_dir, f"predictions_LOSO_{test_subject_ids[0]}.csv")
+        prediction_file = os.path.join(prediction_dir, f"predictions_LOSO_SubjectID{test_subject_ids[0]}.csv")
         with open(prediction_file, 'w', newline='') as f:
             writer = csv.writer(f)
             writer.writerow(['Epoch', 'Data Part', 'Subject id', 'Video id', 'Actual', 'Predicted'])
@@ -206,14 +207,13 @@ def run_loso(
         logger.log(test_subject_ids[0], train_pred, train_actual, i, "train", train_loss)
         logger.log(test_subject_ids[0], test_pred, test_actual, i, "val", test_loss)
         
-        ## [NEW]
         # if you want to log predictions, this code block will write the predictions to the file
         if kwargs["log_predictions"] == True:
             with open(prediction_file, 'a', newline='') as f:
                 writer = csv.writer(f)
 
                 for act, pred, vid in zip(test_actual, test_pred, test_videos):
-                    #for SEED dataset, the video id is in the form of 'video_id<EOF>path'
+                    # for SEED dataset, the video id is in the form of 'video_id<EOF>path'
                     if isinstance(vid, str) and '<EOF>' in vid:
                         vid = vid.split('<EOF>')[0]
                         

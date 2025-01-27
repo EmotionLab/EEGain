@@ -128,7 +128,7 @@ You can add your custom dataset as well.
 - LOSO: Leave one subject out. Use this split for the person-independent task.
 - LOSO_Fixed: Creates a fixed 75/25 train-test split that is mandatory for the person-independent task.
 
-```--log_predictions``` - Specifies whether the user wants to log the predictions from the chosen model and dataset combination. Set this argument to True if you want to log the predicitions, otherwise leave it out or manually set to False.
+```--log_predictions``` - Specifies whether the user wants to log the predictions from the chosen model and dataset combination for the Test sets. Set this argument to True if you want to log the predicitions, otherwise leave it out or manually set to False.
 
 ```--log_predictions_dir``` - Specifies the directory where the logged predicitions will be stored in CSV format.
 

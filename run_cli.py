@@ -117,7 +117,7 @@ def main(**kwargs):
     transform = eegain.transforms.Construct(transform)
     dataset = globals()[kwargs['data_name']](transform=transform, root=kwargs["data_path"], **kwargs)
     
-    # [NEW] Log predictions if the flag is set to True and create the directory if it does not exist
+    # Log predictions if the flag is set to True and create the directory if it does not exist
     if kwargs["log_predictions"]:
         if not os.path.exists(kwargs["log_predictions_dir"]):
             os.makedirs(kwargs["log_predictions_dir"])
