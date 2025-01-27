@@ -1,28 +1,27 @@
 <p align="center">
-    <!-- <h1>EEGain</h1> -->
     <img src="book/images/eegain_logo.png" alt="Logo" width="500" />
     <br/>
     <br/>
-    <a href=""><img alt="MIT License" src="https://img.shields.io/badge/license-MIT-blue.svg" /></a>
+    <a href="LICENSE"><img alt="CC BY 4.0 License" src="https://img.shields.io/badge/license-CC BY 4.0-blue.svg" /></a>
     <a><img alt="Latest Release" src="https://img.shields.io/badge/version-1.0.0-orange" /></a>
+    <a href=""><img alt="Paper" src="https://img.shields.io/badge/Paper-Link-green" /></a>
 </p>
 
 ---
-
+<!-- Logos of collaborating institutes to be added -->
 <p align="center" style="font-weight:bold; font-size: 16px;">
     A joint venture by:-
     <br/>
     <br/>
-    <img src="book/images/dfki_logo.png" alt="DFKI" width="100" style="margin-right: 40px;">
-    <img src="book/images/inria_logo.png" alt="Inria" width="95">
-    <img src="book/images/eu.png" alt="EU" width="80" style="margin-left: 40px;">
+    <!-- <img src="book/images/dfki_logo.png" alt="DFKI" width="100" style="margin-right: 40px;">
+    <img src="book/images/inria_logo.png" alt="Inria" width="95"> -->
 </p>
 
 ---
 
 ## Run experiments for EEG-based emotion recognition for most popular datasets and models with just one command
 
-### **Description**
+### **1. Description**
 EEG-based emotion recognition has become increasingly popular direction in recent years. Although lots of researchers are working on this task, running experiments is still very difficult. The main challenges are related to dataset and model. Running experiment on new dataset means that researcher should implement it with pytorch or tensorflow, get detailed information how dataset is recorded and saved and many more. Running experiment on new model is also tricky, researcher should implement it from scratch with pytorch or tensorflow. This process on one hand takes too much time and can cause lots of bugs and effort, on the other hand it is not helpful for researcher for further research. To solve this problem, make process easier and get more researchers in this field, we created EEGain, is a novel framework for EEG-based emotion recognition to run experiments on different datasets and models easily, with one command. You can implement your custom models and datasets too. 
 
 Models that are implemented in EEGain for now - EEGNet, TSception, DeepConvNet and ShallowConvNet.
@@ -31,7 +30,7 @@ Datasets that are implemented in EEGain for now - DEAP, MAHNOB, AMIGOS, DREAMER,
 
 Some other models and datasets are comming. 
 
-### **QuickStart**
+### **2. QuickStart**
 You can simply run the code in Google Colab. First you need to clone repo with this command:
 ```
 !git clone https://github.com/EmotionLab/EEGain.git
@@ -64,7 +63,7 @@ You can see results on tensorboard.
 
 **NOTE:** Remember to change the config file according to your chosen dataset in ```run_cli.py``` under the function ```generate_options()```.
 
-### **How to run**
+### **3. How to run**
    1. clone the repo
    2. Enter in EEGain folder. run <code>pip install .</code>
    3. Change run_cli.sh based on dataset/splitting/model requirements
@@ -134,7 +133,7 @@ You can add your custom dataset as well.
 ```--log_predictions_dir``` - Specifies the directory where the logged predicitions will be stored in CSV format.
 
 
-### **Key Arguments to Modify**
+### **4. Key Arguments to Modify**
 
 **SeedIV Setup:**
 - Data Path: Ensure your directory structure follows "your_path_to/eeg_raw_data", containing three session folders. Each session folder must include .mat files. The "eeg_raw_data" folder should also contain "Channel Order.xlsx" and "ReadMe.txt" files.<br/>
@@ -175,7 +174,7 @@ You can add your custom dataset as well.
 
 **[Struture of the framework](https://miro.com/app/board/uXjVMEB2nB0=/?share_link_id=710707650624)** 
 
-### **Processing Time for Different Datasets on Various Models**:
+### **5. Processing Time for Different Datasets on Various Models**:
 
 When running different models (such as **DeepConvNet**, **ShallowConvNet**, **EEGnet**, and **Tsception**) on a subject-dependent scenario, the time it takes to process the data can vary a little, but it primarily depends on the specific dataset being used.
 
@@ -190,3 +189,8 @@ Our tests were conducted on Google Colab, utilizing a V100 GPU, with a batch siz
 **AMIGOS** Dataset: Around 5 to 6 hours.
 
 estimated time for LOTO_Fixed approach is approximately 20 minutes for each dataset independently 
+
+### **6. License**:
+This code repository is licensed under the [CC BY 4.0 License](LICENSE).
+
+### **7. Citation**:
