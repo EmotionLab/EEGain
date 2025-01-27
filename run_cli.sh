@@ -20,3 +20,5 @@ python run_cli.py \
 --channels=32 \
 --log_dir="logs/" \
 --overal_log_file="log_file_name.txt" \
+--log_predictions=True \
+--log_predictions_dir="path_to_store_predictions" \
