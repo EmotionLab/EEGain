@@ -1,5 +1,5 @@
 import os
-
+import csv
 os.environ["LOG_LEVEL"] = "DEBUG"
 
 import torch
@@ -41,7 +41,9 @@ def test_one_epoch(model, loader, loss_fn):
             running_loss += loss.item() * batch_size
             epoch_loss = running_loss / dataset_size
             pbar.set_postfix(loss=f"{epoch_loss:0.4f}")
-
+            # if i % 10 == 0:  # Print every 10 batches
+            #     print(f"Batch {i} - Pred: {pred}, Actual: {y_batch}")
+            print(f"TEST Batch {i}: Size {batch_size}, Pred {len(pred.tolist())}, Actual {len(y_batch.tolist())}")
     return all_preds, all_actuals, epoch_loss
 
 def test_one_epoch_random(model, loader, loss_fn):
@@ -89,7 +91,7 @@ def train_one_epoch(model, loader, optimizer, loss_fn):
         running_loss += loss.item() * batch_size
         epoch_loss = running_loss / dataset_size
         pbar.set_postfix(loss=f"{epoch_loss:0.4f}")
-
+    
     return all_preds, all_actuals, epoch_loss
 
 
@@ -104,8 +106,25 @@ def run_loto(
         epoch,
         logger,
         random_baseline,
+        subject_id,     # new params
         split_type="LOTO",
+        **kwargs       # new params
 ):
+    # [NEW] Code to log predictions
+    if kwargs["log_predictions"] == True:
+        
+        prediction_dir = kwargs["log_predictions_dir"]
+        #for SEED dataset, the video id is in the form of 'video_id<EOF>path'
+        testID = test_ids[0]
+        if isinstance(testID, str) and '<EOF>' in testID:
+            testID = testID.split('<EOF>')[0]
+            
+        prediction_file = os.path.join(prediction_dir, f"predictions_LOTO_{testID}.csv")
+        if os.path.exists(prediction_file) == False:
+            with open(prediction_file, 'w', newline='') as f:
+                writer = csv.writer(f)
+                writer.writerow(['Epoch', 'Data Part', 'Video id', 'Subject id', 'Actual', 'Predicted'])
+    
     for i in range(epoch):
         print(f"\nEpoch {i}/{epoch}")
         if not random_baseline:
@@ -123,8 +142,17 @@ def run_loto(
             train_pred, train_actual, train_loss = test_pred, test_actual, test_loss
         if split_type != "LOTO":
             # in the end of epoch it logs metrics for this specific epoch. test_ids is test_session_ids
-            logger.log(test_ids[0], train_pred, train_actual, i, "train", train_loss)
-            logger.log(test_ids[0], test_pred, test_actual, i, "val", test_loss)
+            logger.log(testID, train_pred, train_actual, i, "train", train_loss)
+            logger.log(testID, test_pred, test_actual, i, "val", test_loss)
+    
+        # [NEW]
+        if kwargs["log_predictions"] == True:
+            with open(prediction_file, 'a', newline='') as f:
+                writer = csv.writer(f)
+
+                for act, pred in zip(test_actual, test_pred):
+                    writer.writerow([i, 'val', testID, subject_id, act, pred])
+        
     if split_type == "LOTO":
         return train_pred, train_actual, test_pred, test_actual
 
@@ -141,26 +169,55 @@ def run_loso(
         loss_fn,
         epoch,
         logger,
-        random_baseline
+        random_baseline,
+        train_videos,   # new params
+        test_videos,    # new params
+        **kwargs        # new params
 ):
+        
+    print(f"test subject ids {test_subject_ids}")
+    # [NEW]
+    if kwargs["log_predictions"] == True:
+        prediction_dir = kwargs["log_predictions_dir"]
+        prediction_file = os.path.join(prediction_dir, f"predictions_LOSO_{test_subject_ids[0]}.csv")
+        with open(prediction_file, 'w', newline='') as f:
+            writer = csv.writer(f)
+            writer.writerow(['Epoch', 'Data Part', 'Subject id', 'Video id', 'Actual', 'Predicted'])
+        
     for i in range(epoch):
         print(f"\nEpoch {i}/{epoch}")
         if not random_baseline:
             train_pred, train_actual, train_loss = train_one_epoch(
                 model, train_dataloader, optimizer, loss_fn
             )
+            
             test_pred, test_actual, test_loss = test_one_epoch(
-            model, test_dataloader, loss_fn
+                model, test_dataloader, loss_fn
             )
+            print(f" len of test_pred is {len(test_pred)}")
             scheduler.step()
         else:
             test_pred, test_actual, test_loss = test_one_epoch_random(
-            model, test_dataloader, loss_fn
+                model, test_dataloader, loss_fn
             )
             train_pred, train_actual, train_loss = test_pred, test_actual, test_loss
 
+        # in the end of epoch it logs metrics for this specific epoch. test_subject_ids is test_session_ids
         logger.log(test_subject_ids[0], train_pred, train_actual, i, "train", train_loss)
         logger.log(test_subject_ids[0], test_pred, test_actual, i, "val", test_loss)
+        
+        ## [NEW]
+        # if you want to log predictions, this code block will write the predictions to the file
+        if kwargs["log_predictions"] == True:
+            with open(prediction_file, 'a', newline='') as f:
+                writer = csv.writer(f)
+
+                for act, pred, vid in zip(test_actual, test_pred, test_videos):
+                    #for SEED dataset, the video id is in the form of 'video_id<EOF>path'
+                    if isinstance(vid, str) and '<EOF>' in vid:
+                        vid = vid.split('<EOF>')[0]
+                        
+                    writer.writerow([i, 'val', test_subject_ids[0], vid, act, pred])
 
     logger.log_summary(overal_log_file="overal_log", log_dir="logs/")
 
@@ -201,7 +258,8 @@ def main_loto(dataset, model, empty_model, classes, **kwargs):
                 epoch=num_epoch,
                 logger=logger,
                 random_baseline=is_random,
-                split_type="LOTO"  # for loto
+                subject_id=loader["subject_id"],    # new params
+                **kwargs,                           # new params   
             )
             all_test_preds_for_subject.append(test_pred)
             all_test_actuals_for_subject.append(test_actual)
@@ -238,7 +296,10 @@ def loso_loop(model, loader, logger, **kwargs):
         loss_fn=loss_fn,
         epoch=kwargs["num_epochs"],
         logger=logger,
-        random_baseline=is_random
+        random_baseline=is_random,
+        train_videos = loader["train_videos"],  # new params
+        test_videos = loader["test_videos"],    # new params
+        **kwargs
     )
 
 

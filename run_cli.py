@@ -20,7 +20,6 @@ from sklearn.metrics import *
 from helpers import main_loso, main_loto, main_loso_fixed
 from config import *
 
-
 MAHNOB_transform = [
             eegain.transforms.Crop(t_min=30, t_max=-30),
             eegain.transforms.DropChannels(
@@ -94,24 +93,35 @@ Seed_transform =  [
 
 def generate_options():
     def decorator(func):
-        config_instances = [TransformConfig, MAHNOBConfig, TrainingConfig, EEGNetConfig, TSceptionConfig, DeepConvNetConfig, ShallowConvNetConfig]
+        # Replace the dataset config with the dataset specific config if your choosing
+        config_instances = [TransformConfig, SeedConfig, TrainingConfig, EEGNetConfig, TSceptionConfig, DeepConvNetConfig, ShallowConvNetConfig]
         for config_instance in config_instances:
             for field, value in asdict(config_instance()).items():
                 option = click.option(f"--{field}", default=value, required=False, type=type(value))
+                
                 func = option(func)
         return func
     return decorator
 
-
 @click.command()
 @click.option("--model_name", required=True, type=str, help="name of the config")
 @click.option("--data_name", required=True, type=str, help="name of the config")
+# new options for logging predictions
+@click.option("--log_predictions", type=bool, help="log predictions to a directory")
+@click.option("--log_predictions_dir", type=str, help="directory to save logged predictions")
 @generate_options()
+
 def main(**kwargs):
     transform = globals().get(kwargs["data_name"] + "_transform")
     transform.append(eegain.transforms.Segment(duration=kwargs["window"], overlap=0))
     transform = eegain.transforms.Construct(transform)
     dataset = globals()[kwargs['data_name']](transform=transform, root=kwargs["data_path"], **kwargs)
+    
+    # [NEW] Log predictions if the flag is set to True and create the directory if it does not exist
+    if kwargs["log_predictions"]:
+        if not os.path.exists(kwargs["log_predictions_dir"]):
+            os.makedirs(kwargs["log_predictions_dir"])
+        print(f"[INFO] Logger: Logging predictions to directory: {kwargs['log_predictions_dir']}")
 
     # -------------- Model --------------
     if kwargs["model_name"]=="RANDOM":
@@ -122,6 +132,7 @@ def main(**kwargs):
     else:
         model = globals()[kwargs['model_name']](input_size=[1, kwargs["channels"], kwargs["window"]*kwargs["s_rate"]], **kwargs)
         empty_model = copy.deepcopy(model)
+        
     if kwargs["split_type"] == "LOSO":
         classes = [i for i in range(kwargs["num_classes"])]
         main_loso(dataset, model, empty_model, classes, **kwargs)

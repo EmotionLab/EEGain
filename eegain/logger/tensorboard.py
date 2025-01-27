@@ -8,6 +8,8 @@ import torch
 from sklearn.metrics import *
 from torch.utils.tensorboard import SummaryWriter
 
+import csv
+
 logger = logging.getLogger("Tensorboard")
 
 
@@ -121,29 +123,34 @@ class EmotionLogger:
             data_part: str,
             loss=None,
     ):
-
+        accuracy = accuracy_score(test_actual, test_pred)
         self.log_metric(
             subject_id, "accuracy",
-            accuracy_score(test_actual, test_pred), i, data_part
+            accuracy, i, data_part
         )
+        f1 = f1_score(test_actual, test_pred, average='binary' if self.num_class <= 2 else 'macro')
         self.log_metric(
                 subject_id, "f1",
-                f1_score(test_actual, test_pred, average='binary' if self.num_class <= 2 else 'micro'), i, data_part
+                f1, i, data_part
             )
+        f1_wtd = f1_score(test_actual, test_pred, average='weighted')
         self.log_metric(
             subject_id, "f1_weighted",
-            f1_score(test_actual, test_pred, average='weighted'), i, data_part
+            f1_wtd, i, data_part
         )
+        recall = recall_score(test_actual, test_pred, average='binary' if self.num_class <= 2 else 'macro')
         self.log_metric(
             subject_id, "recall",
-            recall_score(test_actual, test_pred, average='binary' if self.num_class <= 2 else 'micro'), i, data_part
+            recall, i, data_part
         )
+        precision = precision_score(test_actual, test_pred, average='binary' if self.num_class <= 2 else 'macro')
         self.log_metric(
             subject_id,
             "precision",
-            precision_score(test_actual, test_pred, average='binary' if self.num_class <= 2 else 'micro'), i,
+            precision, i,
             data_part
         )
+        
         self.log_metric(
             subject_id, "kappa",
             cohen_kappa_score(test_actual, test_pred), i, data_part
@@ -168,7 +175,8 @@ class EmotionLogger:
                 "loss",
                 loss, i, data_part
             )
-
+        
+        
     def log_each_user_metrics(self, metric_names: list[str]):
         metrics_for_each_subject = {}
         for subject_id, subject_logger in self.subject_loggers.items():
@@ -192,7 +200,7 @@ class EmotionLogger:
 
         with open(kwargs["overal_log_file"], 'a') as file:
             file.write("=" * 100 + "\n")
-            file.write(f"log_dir={kwargs['log_dir']}\n")
+            #file.write(f"log_dir={kwargs['log_dir']}\n")
             file.write(" ".join([f"{k}={v}" for k, v in kwargs.items()]) + "\n")
 
             for metric_name in metric_names:

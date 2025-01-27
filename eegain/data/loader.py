@@ -30,19 +30,20 @@ class EEGDataloader:
             logger.debug(f"subject_id is: {subject_id}, train sessions are: {train_sessions}")
             test_data = self.dataset.__get_trials__(test_sessions, subject_id)
             train_data = self.dataset.__get_trials__(train_sessions, subject_id)
-            train_data, train_label = EEGDataloader._concat_data(train_data, loader_type="LOTO")
-            test_data, test_label = EEGDataloader._concat_data(test_data, loader_type="LOTO")
+            train_data, train_label, _ = EEGDataloader._concat_data(train_data, loader_type="LOTO")
+            test_data, test_label, _ = EEGDataloader._concat_data(test_data, loader_type="LOTO")
 
             if len(train_data.shape) != 4:  # DREAMER has already shape that is needed and it doesn't need normalization
                 train_data, test_data = EEGDataloader.normalize(train_data, test_data)
 
             train_dataloader = self._get_dataloader(train_data, train_label)
-            test_dataloader = self._get_dataloader(test_data, test_label)
+            test_dataloader = self._get_dataloader(test_data, test_label, shuffle=False) #changed to False
             yield {
                 "train": train_dataloader,
                 "test": test_dataloader,
                 "test_session_indexes": test_sessions,
                 "train_session_indexes": train_sessions,
+                "subject_id": subject_id,
             }
 
     @staticmethod
@@ -68,6 +69,7 @@ class EEGDataloader:
 
         # TODO: refactor
         y = []
+        video_ids = []
         if loader_type == "LOTO":
             for i in data[1].items():
                 k = i[0]
@@ -76,15 +78,18 @@ class EEGDataloader:
             y = torch.tensor(y) 
         else:
             for i in data:
+                #i is each subject
                 for k, v in i[1].items():
+                    #k - clip index
                     y.extend(list(np.repeat(v, i[0][k].shape[0])))
+                    video_ids.extend(list(np.repeat(k, i[0][k].shape[0])))
             y = torch.tensor(y)
 
 
-        return x, y
+        return x, y,video_ids
 
     def _get_dataloader(
-        self, data: torch.Tensor, label: torch.Tensor, shuffle: bool = True
+        self, data: torch.Tensor, label: torch.Tensor, shuffle: bool = True #changed to False
     ) -> DataLoader:
         """
         Returns a DataLoader object that can be used for iterating through batches of data and labels.
@@ -144,26 +149,30 @@ class EEGDataloader:
 
         for test_subject_ids in test_ids_combination:
             train_subject_ids = set(subject_ids) - set(test_subject_ids)
-
+            
             logger.debug(f"Preparing: train subjects: {train_subject_ids}")
             train_data = [self.dataset.__get_subject__(i) for i in train_subject_ids]
-            train_data, train_label = EEGDataloader._concat_data(train_data)
+            #print(train_data)
+            train_data, train_label, train_videos = EEGDataloader._concat_data(train_data)
             logger.debug(f"train data shape {train_data.shape}")
 
             logger.debug(f"Preparing: test subjects: {test_subject_ids}")
             test_data = [self.dataset.__get_subject__(i) for i in test_subject_ids]
-            test_data, test_label = EEGDataloader._concat_data(test_data)
+            test_data, test_label, test_videos = EEGDataloader._concat_data(test_data)
             logger.debug(f"test data shape {test_data.shape}")
 
             train_data, test_data = EEGDataloader.normalize(train_data, test_data)
+            print(f"Number of train samples: {len(train_label)}, Number of test samples: {len(test_label)}")
 
             train_dataloader = self._get_dataloader(train_data, train_label)
-            test_dataloader = self._get_dataloader(test_data, test_label)
+            test_dataloader = self._get_dataloader(test_data, test_label, shuffle = False) #changed to False
             yield {
                 "train": train_dataloader,
                 "test": test_dataloader,
                 "test_subject_indexes": test_subject_ids,
                 "train_subject_indexes": train_subject_ids,
+                "train_videos": train_videos,
+                "test_videos":test_videos,
             }
 
     def loso_fixed(self, train_subject_ids, test_subject_ids) -> Dict[str, Any]:
@@ -182,11 +191,10 @@ class EEGDataloader:
         train_data, test_data = EEGDataloader.normalize(train_data, test_data)
 
         train_dataloader = self._get_dataloader(train_data, train_label)
-        test_dataloader = self._get_dataloader(test_data, test_label)
+        test_dataloader = self._get_dataloader(test_data, test_label, shuffle=False) #changed to False
         return {
             "train": train_dataloader,
             "test": test_dataloader,
             "test_subject_indexes": test_subject_ids,
             "train_subject_indexes": train_subject_ids,
         }
-

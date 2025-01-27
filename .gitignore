@@ -11,3 +11,4 @@ dist/
 logs/
 log.log
 overal_log
+dataset/
