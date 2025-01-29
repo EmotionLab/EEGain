@@ -10,8 +10,8 @@
 ---
 <!-- Logos of collaborating institutes to be added -->
 <p align="center">
-    A joint venture by:-
-    <br/><br/>
+    <h4 align="center">A joint venture by:-</h4>
+    <br/>
     <img src="book/images/dfki_logo.png" alt="DFKI" height="50">
     &nbsp;&nbsp;&nbsp;&nbsp;
     <img src="book/images/micm_logo.png" alt="MICM" height="50">
