@@ -13,8 +13,10 @@
     A joint venture by:-
     <br/>
     <br/>
-    <!-- <img src="book/images/dfki_logo.png" alt="DFKI" width="100" style="margin-right: 40px;">
-    <img src="book/images/inria_logo.png" alt="Inria" width="95"> -->
+    <img src="book/images/dfki_logo.png" alt="DFKI" height="50" style="margin-right: 20px">
+    <img src="book/images/micm_logo.png" alt="MICM" height="50">
+    <img src="book/images/inria_logo.png" alt="Inria" height="50"
+    style="margin-left: 20px">
 </p>
 
 ---
