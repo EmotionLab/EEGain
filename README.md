@@ -9,14 +9,14 @@
 
 ---
 <!-- Logos of collaborating institutes to be added -->
-<p align="center" style="font-weight:bold; font-size: 16px;">
+<p align="center">
     A joint venture by:-
-    <br/>
-    <br/>
-    <img src="book/images/dfki_logo.png" alt="DFKI" height="50" style="margin-right: 20px">
+    <br/><br/>
+    <img src="book/images/dfki_logo.png" alt="DFKI" height="50">
+    &nbsp;&nbsp;&nbsp;&nbsp;
     <img src="book/images/micm_logo.png" alt="MICM" height="50">
-    <img src="book/images/inria_logo.png" alt="Inria" height="50"
-    style="margin-left: 20px">
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <img src="book/images/inria_logo.png" alt="Inria" height="50">
 </p>
 
 ---
