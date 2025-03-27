@@ -14,7 +14,7 @@ from eegain.logger import EmotionLogger
 from eegain.models import *
 from config import *
 
-
+# Random model that always predicts a random class based on the distribution of the classes in the training set
 # class RandomModel:
 #     def __init__(self, train_dataloader):
 #         labels = []

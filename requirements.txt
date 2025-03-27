@@ -12,3 +12,4 @@ tensorboard
 torch
 tqdm
 openpyxl
+colorama

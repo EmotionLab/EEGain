@@ -17,7 +17,7 @@ setup(
     description="EEG emotion recognition package for standardization",
     long_description=README,
     long_description_content_type="text/markdown",
-    url="https://github.com/RRaphaell/EEGain",
+    url="https://github.com/EmotionLab/EEGain",
     author="GAIN Team",
     packages=find_packages(),
     author_email="",

@@ -30,7 +30,7 @@ Models that are implemented in EEGain for now - EEGNet, TSception, DeepConvNet a
 
 Datasets that are implemented in EEGain for now - DEAP, MAHNOB, AMIGOS, DREAMER, Seed and SeedIV.
 
-Some other models and datasets are comming. 
+Some other models and datasets are coming. 
 
 ### **2. QuickStart**
 You can simply run the code in Google Colab. First you need to clone repo with this command:
@@ -46,7 +46,7 @@ Then you can run it with this command:
 --log_dir="logs/" \
 --overal_log_file="logs_mahnob_loto.txt" \
 --label_type="V" \
---num_epochs=2 \
+--num_epochs=100 \
 --batch_size=32 \
 --lr=0.001 \
 --sampling_r=128 \
@@ -81,7 +81,9 @@ You can adapt arguments within the sh file according to your specific intentions
 - EEGNet
 - DeepconvNet
 - ShallowConvNet
-- RANDOM ( for testing random baseline using most occuring class as the output)
+- RANDOM (for testing random baseline using most occuring class as the output)
+
+**NOTE:** The default RANDOM model always predicts the most occurring class in the training set, so it is not recommended to use it for F1-score calculations. For F1-score calculations, please use the other provided Random Model, that predicts a random class based on class distribution, in `EEGain/eegain/models/random.py`
 
 You can add your custom model as well.
 
@@ -156,7 +158,7 @@ You can add your custom dataset as well.
 - Number of Classes: 2
 
 **DEAP Setup:** <br/>
-- Data Path: Structure your directory as "your_path_to/data_preprocessed_python", which should contain .mat files. <br/>
+- Data Path: Structure your directory as "your_path_to/data_preprocessed_python", which should contain .dat files. <br/>
 - Data Name: DEAP <br/>
 - Channels: 32 <br/>
 - Number of Classes: 2

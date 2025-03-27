@@ -19,6 +19,7 @@ from dataclasses import asdict
 from sklearn.metrics import *
 from helpers import main_loso, main_loto, main_loso_fixed
 from config import *
+from colorama import Fore, Style
 
 MAHNOB_transform = [
             eegain.transforms.Crop(t_min=30, t_max=-30),
@@ -126,6 +127,9 @@ def main(**kwargs):
     # -------------- Model --------------
     if kwargs["model_name"]=="RANDOM":
         print("initializing random model")
+        print(Fore.RED +"[NOTE] The default Random Model always predicts the most occurring class in the training set, so it is not recommended to use it for F1-score calculations.")
+        print("For F1-score calculations, please use the other provided Random Model, that predicts a random class based on class distribution, in EEGain/eegain/models/random.py"+ Style.RESET_ALL)
+
         model = None
         empty_model = None
     # -------------- Model --------------
