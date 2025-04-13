@@ -51,6 +51,7 @@ Then you can run it with this command:
 --lr=0.001 \
 --sampling_r=128 \
 --window=4 \
+--overlap=0 \
 --weight_decay=0 \
 --label_smoothing=0.01 \
 --dropout_rate=0.5 \
