@@ -10,6 +10,7 @@ python run_cli.py \
 --num_classes=3 \
 --sampling_r=128 \
 --window=4 \
+--overlap=0 \
 --label_type="V" \
 --num_epochs=200 \
 --batch_size=16 \

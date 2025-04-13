@@ -24,7 +24,7 @@
 ## Run experiments for EEG-based emotion recognition for most popular datasets and models with just one command
 
 ### **1. Description**
-EEG-based emotion recognition has become increasingly popular direction in recent years. Although lots of researchers are working on this task, running experiments is still very difficult. The main challenges are related to dataset and model. Running experiment on new dataset means that researcher should implement it with pytorch or tensorflow, get detailed information how dataset is recorded and saved and many more. Running experiment on new model is also tricky, researcher should implement it from scratch with pytorch or tensorflow. This process on one hand takes too much time and can cause lots of bugs and effort, on the other hand it is not helpful for researcher for further research. To solve this problem, make process easier and get more researchers in this field, we created EEGain, is a novel framework for EEG-based emotion recognition to run experiments on different datasets and models easily, with one command. You can implement your custom models and datasets too. 
+EEG-based emotion recognition has become increasingly popular direction in recent years. Although lots of researchers are working on this task, running experiments is still very difficult. The main challenges are related to datasets and models. Running experiments on new datasets means that the researcher would need to implement it with pytorch or tensorflow, get detailed information how dataset is recorded and saved, and much more. Running experiments on new models is also tricky where the researcher would need to implement it from scratch with pytorch or tensorflow. This process, on one hand, takes too much time and can cause lots of bugs and effort. On the other hand it is not helpful for the researcher for furthering their research. To solve this problem, to make the process easier and get more researchers in this field, we created **EEGain**. It is a novel framework for EEG-based emotion recognition to run experiments on different datasets and models easily, with one command. You can implement your custom models and datasets too. 
 
 Models that are implemented in EEGain for now - EEGNet, TSception, DeepConvNet and ShallowConvNet.
 
@@ -117,6 +117,8 @@ You can add your custom dataset as well.
 
 ```--window``` - Specifies the length of the EEG segments (in seconds).
 
+```--overlap``` - Specifies the overlap between the EEG segments (in seconds).
+
 ```--weight_decay``` - Specifies the weight decay ratio for regularization.
 
 ```--label_smoothing``` - Smoothing factor applied to the labels to make them less extreme.
@@ -156,6 +158,7 @@ You can add your custom dataset as well.
 - Data Name: MAHNOB <br/>
 - Channels: 32 <br/>
 - Number of Classes: 2
+- Set `self.inception_window = [0.25, 0.125, 0.0625]` for TSception model
 
 **DEAP Setup:** <br/>
 - Data Path: Structure your directory as "your_path_to/data_preprocessed_python", which should contain .dat files. <br/>

@@ -30,41 +30,51 @@ class ShallowConvNet(nn.Module):
             nn.BatchNorm2d(out_f),
         )
 
-    def calculate_out_size(self, n_chan, n_time):
-        """
-        Calculate the output based on input size.
-        model is from nn.Module and inputSize is a array.
-        """
-
-        data = torch.rand(1, 1, n_chan, n_time)
-        block_one = self.firstLayer
-        avg = self.avgpool
-        dp = self.dp
-        out = torch.log(block_one(data).pow(2))
-        out = avg(out)
-        out = dp(out)
-        out = out.view(out.size()[0], -1)
-        return out.size()
-
     def __init__(self, channels, num_classes, dropout_rate, **kwargs):
         super(ShallowConvNet, self).__init__()
         n_time = kwargs["sampling_r"]*kwargs["window"]
-        kernel_size = (1, 25)
+        
+        # [NEW] Scale kernel size and avgpool size based on sampling rate
+        sampling_rate = kwargs.get("sampling_r", 128)  # Default to 128Hz
+        scaling_factor = sampling_rate / 128  # Calculate scaling factor
+        
+        # [NEW] Scale kernel size and pooling size
+        kernel_size_base = 25
+        pool_size_base = 75
+        pool_stride_base = 15
+        
+        kernel_size_scaled = int(kernel_size_base * scaling_factor)
+        pool_size_scaled = int(pool_size_base * scaling_factor)
+        pool_stride_scaled = int(pool_stride_base * scaling_factor)
+        
+        kernel_size = (1, kernel_size_scaled)
         n_filt_first_layer = 40
 
+        print(f"[NEW] Using kernel size {kernel_size} (scaling_factor={scaling_factor})")
+        print(f"[NEW] Using pool size {pool_size_scaled} with stride {pool_stride_scaled}")
+        
         self.firstLayer = ShallowConvNet.first_block(
             n_filt_first_layer, kernel_size, channels
         )
-        self.avgpool = nn.AvgPool2d((1, 75), stride=(1, 15))
+        self.avgpool = nn.AvgPool2d((1, pool_size_scaled), stride=(1, pool_stride_scaled))
         self.dp = nn.Dropout(p=dropout_rate)
-        self.fSize = self.calculate_out_size(channels, n_time)
-        self.lastLayer = nn.Linear(self.fSize[-1], num_classes)
+        self.num_classes = num_classes
+        
+        # [NEW] Set last layer to None, will create dynamically in forward pass
+        self.lastLayer = None
 
     def forward(self, x):
         x = self.firstLayer(x)
         x = torch.log(self.avgpool(x.pow(2)))
         x = self.dp(x)
         x = x.view(x.size()[0], -1)
+        
+        # [NEW] Create last layer dynamically based on actual feature size
+        if self.lastLayer is None:
+            in_features = x.size(1)
+            device = x.device
+            print(f"[NEW] Creating last layer with in_features={in_features}, device={device}")
+            self.lastLayer = nn.Linear(in_features, self.num_classes).to(device)
+            
         x = self.lastLayer(x)
-
         return x

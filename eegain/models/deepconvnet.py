@@ -67,10 +67,17 @@ class DeepConvNet(nn.Module):
     def __init__(self, channels, num_classes, dropout_rate, **kwargs):
         super(DeepConvNet, self).__init__()
         n_time = kwargs["sampling_r"]*kwargs["window"]
-        # Please note that the kernel size in the original paper is (1, 10),
-        # we found when the segment length is shorter than 4s (1s, 2s, 3s) larger kernel size will  cause network error.
-        # Besides using (1, 5) when EEG segment is 4s gives slightly higher ACC and F1 with a smaller model size.
-        kernel_size = (1, 5)
+        
+        # [NEW] Scale kernel size based on sampling rate
+        sampling_rate = kwargs.get("sampling_r", 128)  # Default to 128Hz
+        scaling_factor = sampling_rate / 128  # Calculate scaling factor
+        
+        # [NEW] Base kernel size of 5 at 128Hz, scale accordingly
+        kernel_size_base = 5
+        kernel_size_scaled = int(kernel_size_base * scaling_factor)
+        kernel_size = (1, kernel_size_scaled)
+        print(f"[NEW] Using kernel size {kernel_size} (scaling_factor={scaling_factor})")
+        
         n_filt_first_layer = 25
         n_filt_later_layer = [25, 50, 100, 200]
 
@@ -83,16 +90,25 @@ class DeepConvNet(nn.Module):
         )
 
         self.allButLastLayers = nn.Sequential(first_layer, middle_layers)
-
-        self.fSize = DeepConvNet.calculate_out_size(
-            self.allButLastLayers, channels, n_time
-        )
-        self.lastLayer = DeepConvNet.last_block(
-            n_filt_later_layer[-1], num_classes, (1, self.fSize[1])
-        )
+        
+        # [NEW] Set up to create lastLayer dynamically in first forward pass
+        self.n_filt_later_layer = n_filt_later_layer
+        self.num_classes = num_classes
+        self.lastLayer = None
 
     def forward(self, x):
         x = self.allButLastLayers(x)
+        
+        # [NEW] Create last layer dynamically based on actual feature size
+        if self.lastLayer is None:
+            feature_size = x.size()
+            print(f"[NEW] Feature size before last layer: {feature_size}")
+            # Ensure kernel size doesn't exceed feature map size
+            kernel_size = (1, feature_size[3])
+            self.lastLayer = DeepConvNet.last_block(
+                self.n_filt_later_layer[-1], self.num_classes, kernel_size
+            ).to(x.device)
+            
         x = self.lastLayer(x)
         x = torch.squeeze(x, 3)
         x = torch.squeeze(x, 2)

@@ -228,8 +228,8 @@ def main_loto(dataset, model, empty_model, classes, **kwargs):
 
     for subject_id, session_ids in subject_video_mapping.items():
         n_fold=len(session_ids)
-        n_fold=10
-        eegloader = EEGDataloader(dataset, batch_size=32).loto(subject_id, session_ids,
+        # n_fold=10 (for 10-fold cross validation to replicate the TSception paper) 
+        eegloader = EEGDataloader(dataset, batch_size=kwargs["batch_size"]).loto(subject_id, session_ids,
                                                                n_fold=n_fold)  # pass n_fold=len(session_ids) for LOTO
         num_epoch = kwargs["num_epochs"]
         all_train_preds_for_subject, all_train_actuals_for_subject, all_test_preds_for_subject, all_test_actuals_for_subject = [], [], [], []
@@ -305,7 +305,7 @@ def loso_loop(model, loader, logger, **kwargs):
 
 
 def main_loso(dataset, model, empty_model, classes, **kwargs):
-    eegloader = EEGDataloader(dataset, batch_size=32).loso()
+    eegloader = EEGDataloader(dataset, batch_size=kwargs["batch_size"]).loso()
 
     logger = EmotionLogger(log_dir=kwargs["log_dir"], class_names=classes)
     for loader in eegloader:
@@ -326,7 +326,7 @@ def main_loso_fixed(dataset, model, empty_model, classes, **kwargs):
     train_set = train_test_split_json[dataset_name]['train']
     test_set = train_test_split_json[dataset_name]['test']
 
-    eegloader = EEGDataloader(dataset, batch_size=32).loso_fixed(train_set, test_set)
+    eegloader = EEGDataloader(dataset, batch_size=kwargs["batch_size"]).loso_fixed(train_set, test_set)
 
     logger = EmotionLogger(log_dir=kwargs["log_dir"], class_names=classes)
     if kwargs["model_name"]=="RANDOM":

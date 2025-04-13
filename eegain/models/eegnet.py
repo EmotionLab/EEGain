@@ -23,9 +23,9 @@ class EEGNet(nn.Module):
             nn.Conv2d(
                 1,
                 self.F1,
-                (1, self.kernelLength),
+                (1, self.kernelLength1),
                 stride=1,
-                padding=(0, self.kernelLength // 2),
+                padding=(0, self.kernelLength1 // 2),
                 bias=False,
             ),
             nn.BatchNorm2d(self.F1, momentum=0.01, affine=True, eps=1e-3),
@@ -42,7 +42,7 @@ class EEGNet(nn.Module):
             ),
             nn.BatchNorm2d(self.F1 * self.D, momentum=0.01, affine=True, eps=1e-3),
             nn.ELU(),
-            nn.AvgPool2d((1, 4), stride=4),
+            nn.AvgPool2d((1, self.pool_size1), stride=self.pool_size1), # [NEW] Using scaled pool size
             nn.Dropout(p=dropout_rate),
         )
 
@@ -68,7 +68,7 @@ class EEGNet(nn.Module):
             ),
             nn.BatchNorm2d(self.F2, momentum=0.01, affine=True, eps=1e-3),
             nn.ELU(),
-            nn.AvgPool2d((1, 8), stride=8),
+            nn.AvgPool2d((1, self.pool_size2), stride=self.pool_size2), # [NEW] Using scaled pool size
             nn.Dropout(p=dropout_rate),
         )
         return nn.Sequential(block1, block2)
@@ -96,7 +96,7 @@ class EEGNet(nn.Module):
         num_classes,
         channels,
         dropout_rate,
-        kernel_length=64,
+        kernel_length1=64,
         kernel_length2=16,
         f1=8,
         d=2,
@@ -111,19 +111,33 @@ class EEGNet(nn.Module):
         self.samples = samples
         self.n_classes = num_classes
         self.channels = channels
-        self.kernelLength = kernel_length
-        self.kernelLength2 = kernel_length2
+        
+        # [NEW] Scale kernel length and pooling sizes based on sampling rate
+        sampling_rate = kwargs.get("sampling_r", 128)  # Default to 128Hz
+        scaling_factor = sampling_rate / 128  # Calculate scaling factor
+        
+        self.kernelLength1 = int(kernel_length1 * scaling_factor)
+        self.kernelLength2 = int(kernel_length2 * scaling_factor)
+        self.pool_size1 = int(4 * scaling_factor)  # [NEW] Scale pool size 1
+        self.pool_size2 = int(8 * scaling_factor)  # [NEW] Scale pool size 2
         self.dropoutRate = dropout_rate
 
         self.blocks = self.initial_block(dropout_rate)
-        self.blockOutputSize = EEGNet.calculate_out_size(self.blocks, channels, samples)
-        self.classifierBlock = EEGNet.classifier_block(
-            self.F2 * self.blockOutputSize[1], num_classes
-        )
-
+        
+        # [NEW] Set classifier to None and create it dynamically in the first forward pass
+        self.classifierBlock = None
+    
     def forward(self, x):
         x = self.blocks(x)
         x = x.view(x.size()[0], -1)  # Flatten
+        
+        # [NEW] Create the classifier on the first forward pass with correct size
+        # and move to the same device as the input tensor
+        if self.classifierBlock is None:
+            input_size = x.size(1)
+            device = x.device
+            print(f"[NEW] Creating classifier with input_size={input_size} on device {device}")
+            self.classifierBlock = EEGNet.classifier_block(input_size, self.n_classes).to(device)
+            
         x = self.classifierBlock(x)
-
         return x

@@ -114,7 +114,7 @@ def generate_options():
 
 def main(**kwargs):
     transform = globals().get(kwargs["data_name"] + "_transform")
-    transform.append(eegain.transforms.Segment(duration=kwargs["window"], overlap=0))
+    transform.append(eegain.transforms.Segment(duration=kwargs["window"], overlap=kwargs["overlap"]))
     transform = eegain.transforms.Construct(transform)
     dataset = globals()[kwargs['data_name']](transform=transform, root=kwargs["data_path"], **kwargs)
     
