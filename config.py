@@ -5,6 +5,7 @@ from dataclasses import dataclass, field
 class TransformConfig:
     s_rate: int = 128
     window: int = 4
+    overlap: int = 0
 
 @dataclass
 class MAHNOBConfig:
