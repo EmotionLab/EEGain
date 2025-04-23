@@ -20,7 +20,7 @@ class Construct:
                                     'GSR1', 'GSR2', 'Erg1', 'Erg2', 'Resp', 'Temp', 'Status']),
             transforms.Filter(l_freq=0.3, h_freq=45),
             transforms.NotchFilter(freq=50),
-            transforms.Resample(s_rate=128)
+            transforms.Resample(sampling_r=128)
         ])
     """
 
@@ -53,14 +53,21 @@ class Crop:
 
     note:
         if t_max is negative it crops last part of the signal
+        if t_max is None, it keeps all data after t_min
     """
 
-    def __init__(self, t_min: float, t_max: float) -> None:
+    def __init__(self, t_min: float, t_max=None) -> None:
         self.t_min = t_min
         self.t_max = t_max
 
     def __call__(self, data) -> None:
-        t_max = self.t_max if self.t_max > 0 else data.tmax + self.t_max
+        if self.t_max is None:
+            # Use the entire signal duration if t_max is None
+            t_max = data.tmax
+        else:
+            # Original logic for non-None values
+            t_max = self.t_max if self.t_max > 0 else data.tmax + self.t_max
+            
         data.crop(tmin=self.t_min, tmax=t_max, verbose=False)
 
     def __repr__(self) -> str:
@@ -119,14 +126,14 @@ class Resample:
     Resample the signal based on target frequency
     """
 
-    def __init__(self, s_rate: float) -> None:
-        self.s_rate = s_rate
+    def __init__(self, sampling_r: float) -> None:
+        self.sampling_r = sampling_r
 
     def __call__(self, data) -> None:
-        data.resample(self.s_rate, verbose=False)
+        data.resample(self.sampling_r, verbose=False)
 
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}(s_rate={self.s_rate})"
+        return f"{self.__class__.__name__}(sampling_r={self.sampling_r})"
 
 
 class Segment:

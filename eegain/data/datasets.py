@@ -136,7 +136,6 @@ class SeedIV(EEGDataset):
 
         logger.info(f"Using Dataset: {self.__class__.__name__}")
         logger.info(f"Using label: {self.label_type}")
-        logger.info(f"Using threshold: {self.ground_truth_threshold}")
 
     def __get_subject_ids__(self) -> List[int]:
         """Method returns list of subject ids"""

@@ -3,6 +3,7 @@ from itertools import combinations
 from typing import Any, Dict, List, Tuple
 
 import numpy as np
+import copy
 import torch
 from torch.utils.data import DataLoader
 
@@ -19,7 +20,7 @@ class EEGDataloader:
         self.dataset = dataset
         self.batch_size = batch_size
 
-    def loto(self, subject_id, session_ids, n_fold):
+    def loto(self, subject_id, session_ids, n_fold, **kwargs):
         fold_size = len(session_ids) // n_fold
 
         folds = [session_ids[i:i + fold_size] for i in range(0, len(session_ids), fold_size)]
@@ -30,20 +31,31 @@ class EEGDataloader:
             logger.debug(f"subject_id is: {subject_id}, train sessions are: {train_sessions}")
             test_data = self.dataset.__get_trials__(test_sessions, subject_id)
             train_data = self.dataset.__get_trials__(train_sessions, subject_id)
-            train_data, train_label, _ = EEGDataloader._concat_data(train_data, loader_type="LOTO")
-            test_data, test_label, _ = EEGDataloader._concat_data(test_data, loader_type="LOTO")
+            train_data, train_label, train_videos = EEGDataloader._concat_data(train_data, loader_type="LOTO")
+            test_data, test_label, test_videos = EEGDataloader._concat_data(test_data, loader_type="LOTO")
 
             if len(train_data.shape) != 4:  # DREAMER has already shape that is needed and it doesn't need normalization
                 train_data, test_data = EEGDataloader.normalize(train_data, test_data)
+            
+            # Split training data into train and validation sets (80-20)
+            train_ratio = kwargs.get('train_val_split', 0.8)
+            train_data, train_label, val_data, val_label, train_videos, val_videos = self.split_train_val(
+                train_data, train_label, train_ratio=train_ratio, videos=train_videos)
 
             train_dataloader = self._get_dataloader(train_data, train_label)
-            test_dataloader = self._get_dataloader(test_data, test_label, shuffle=False) #changed to False
+            val_dataloader = self._get_dataloader(val_data, val_label, shuffle=False)
+            test_dataloader = self._get_dataloader(test_data, test_label, shuffle=False)
+            
             yield {
                 "train": train_dataloader,
+                "val": val_dataloader,
                 "test": test_dataloader,
                 "test_session_indexes": test_sessions,
                 "train_session_indexes": train_sessions,
                 "subject_id": subject_id,
+                "train_videos": train_videos,
+                "val_videos": val_videos,
+                "test_videos": test_videos,
             }
 
     @staticmethod
@@ -142,7 +154,7 @@ class EEGDataloader:
             test_data[:, :, channel, :] = (test_data[:, :, channel, :] - mean) / std
         return train_data, test_data
 
-    def loso(self, subject_out_num: int = 1) -> Dict[str, Any]:
+    def loso(self, subject_out_num: int = 1, **kwargs) -> Dict[str, Any]:
         logger.info(f"Splitting type: leave-one-subject-out")
         subject_ids = self.dataset.__get_subject_ids__()
         test_ids_combination = list(combinations(subject_ids, subject_out_num))
@@ -150,51 +162,131 @@ class EEGDataloader:
         for test_subject_ids in test_ids_combination:
             train_subject_ids = set(subject_ids) - set(test_subject_ids)
             
-            logger.debug(f"Preparing: train subjects: {train_subject_ids}")
+            # Get training and test data
             train_data = [self.dataset.__get_subject__(i) for i in train_subject_ids]
-            #print(train_data)
             train_data, train_label, train_videos = EEGDataloader._concat_data(train_data)
-            logger.debug(f"train data shape {train_data.shape}")
 
-            logger.debug(f"Preparing: test subjects: {test_subject_ids}")
             test_data = [self.dataset.__get_subject__(i) for i in test_subject_ids]
             test_data, test_label, test_videos = EEGDataloader._concat_data(test_data)
-            logger.debug(f"test data shape {test_data.shape}")
 
             train_data, test_data = EEGDataloader.normalize(train_data, test_data)
-            print(f"Number of train samples: {len(train_label)}, Number of test samples: {len(test_label)}")
-
+            
+            # Split training data into train and validation sets (80-20)
+            train_ratio = kwargs.get('train_val_split', 0.8)
+            train_data, train_label, val_data, val_label, train_videos, val_videos = self.split_train_val(
+                train_data, train_label, train_ratio=train_ratio, videos=train_videos)
+            
             train_dataloader = self._get_dataloader(train_data, train_label)
-            test_dataloader = self._get_dataloader(test_data, test_label, shuffle = False) #changed to False
+            val_dataloader = self._get_dataloader(val_data, val_label, shuffle=False)  
+            test_dataloader = self._get_dataloader(test_data, test_label, shuffle=False)
+            
             yield {
                 "train": train_dataloader,
+                "val": val_dataloader,
                 "test": test_dataloader,
                 "test_subject_indexes": test_subject_ids,
                 "train_subject_indexes": train_subject_ids,
                 "train_videos": train_videos,
-                "test_videos":test_videos,
+                "val_videos": val_videos,
+                "test_videos": test_videos,
             }
 
-    def loso_fixed(self, train_subject_ids, test_subject_ids) -> Dict[str, Any]:
+    def loso_fixed(self, train_subject_ids, test_subject_ids, **kwargs) -> Dict[str, Any]:
         logger.info(f"Splitting type: leave-n-subject-out-fixed")
 
         logger.debug(f"Preparing: train subjects: {train_subject_ids}")
         train_data = [self.dataset.__get_subject__(i) for i in train_subject_ids]
-        train_data, train_label = EEGDataloader._concat_data(train_data)
+        train_data, train_label, train_videos = EEGDataloader._concat_data(train_data)
         logger.debug(f"train data shape {train_data.shape}")
 
         logger.debug(f"Preparing: test subjects: {test_subject_ids}")
         test_data = [self.dataset.__get_subject__(i) for i in test_subject_ids]
-        test_data, test_label = EEGDataloader._concat_data(test_data)
+        test_data, test_label, test_videos = EEGDataloader._concat_data(test_data)
         logger.debug(f"test data shape {test_data.shape}")
 
         train_data, test_data = EEGDataloader.normalize(train_data, test_data)
+        
+        # Split training data into train and validation sets (80-20)
+        train_ratio = kwargs.get('train_val_split', 0.8)
+        train_data, train_label, val_data, val_label, train_videos, val_videos = self.split_train_val(
+            train_data, train_label, train_ratio=train_ratio, videos=train_videos)
 
         train_dataloader = self._get_dataloader(train_data, train_label)
-        test_dataloader = self._get_dataloader(test_data, test_label, shuffle=False) #changed to False
+        val_dataloader = self._get_dataloader(val_data, val_label, shuffle=False)
+        test_dataloader = self._get_dataloader(test_data, test_label, shuffle=False)
+        
         return {
             "train": train_dataloader,
+            "val": val_dataloader,
             "test": test_dataloader,
             "test_subject_indexes": test_subject_ids,
             "train_subject_indexes": train_subject_ids,
+            "train_videos": train_videos,
+            "val_videos": val_videos,
+            "test_videos": test_videos,
         }
+
+    def split_train_val(self, data, label, train_ratio=0.8, shuffle=True, videos=None):
+        """
+        Split training data into training and validation sets in a class-balanced way for N classes.
+    
+        Args:
+            data: Training data tensor
+            label: Training labels tensor
+            train_ratio: Ratio of data to use for training
+            shuffle: Whether to shuffle indices before splitting
+            videos: Optional video IDs corresponding to the data
+    
+        Returns:
+            train_data, train_label, val_data, val_label, train_videos, val_videos
+        """
+        # Convert tensor to numpy if needed
+        if isinstance(label, torch.Tensor):
+            label_np = label.cpu().numpy()
+        else:
+            label_np = label
+    
+        # Set fixed random seed for reproducibility
+        np.random.seed(0)
+    
+        # Get unique classes
+        unique_classes = np.unique(label_np)
+    
+        # Initialize empty arrays for train and validation indices
+        index_train = np.array([], dtype=int)
+        index_val = np.array([], dtype=int)
+    
+        # Process each class separately to maintain class balance
+        for class_label in unique_classes:
+            # Find indices for this class
+            class_indices = np.where(label_np == class_label)[0]
+        
+            # Copy indices
+            class_indices_copy = copy.deepcopy(class_indices)
+        
+            # Shuffle if requested
+            if shuffle:
+                np.random.shuffle(class_indices_copy)
+        
+            # Calculate split point
+            split_point = int(len(class_indices_copy) * train_ratio)
+        
+            # Add indices to train and validation sets
+            index_train = np.concatenate((index_train, class_indices_copy[:split_point]))
+            index_val = np.concatenate((index_val, class_indices_copy[split_point:]))
+    
+        # Extract data and labels for training and validation
+        train_data = data[index_train]
+        train_label = label[index_train]
+        val_data = data[index_val]
+        val_label = label[index_val]
+    
+        # Handle videos if provided
+        train_videos, val_videos = None, None
+        if videos is not None:
+            videos_list = videos if isinstance(videos, list) else videos.tolist() if hasattr(videos, 'tolist') else []
+            if videos_list:
+                train_videos = [videos_list[i] for i in index_train]
+                val_videos = [videos_list[i] for i in index_val]
+    
+        return train_data, train_label, val_data, val_label, train_videos, val_videos

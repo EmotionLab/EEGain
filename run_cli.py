@@ -20,6 +20,7 @@ from sklearn.metrics import *
 from helpers import main_loso, main_loto, main_loso_fixed
 from config import *
 from colorama import Fore, Style
+import functools
 
 MAHNOB_transform = [
             eegain.transforms.Crop(t_min=30, t_max=-30),
@@ -40,14 +41,16 @@ MAHNOB_transform = [
                     "Resp",
                     "Temp",
                     "Status",
+                    #"Oz", "Pz", "Fz", "Cz" # remove Oz, Pz, Fz, Cz channels to replicate the TSception paper
                 ]
             ),
             eegain.transforms.Filter(l_freq=0.3, h_freq=45),
             eegain.transforms.NotchFilter(freq=50),
-            eegain.transforms.Resample(s_rate=128),
+            eegain.transforms.Resample(sampling_r=128),
         ]
 
 DEAP_transform = [
+        #eegain.transforms.Crop(t_min=3, t_max=None), # crop the first 3 seconds to replicate the TSception paper
         eegain.transforms.DropChannels(
             [
                 "EXG1",
@@ -58,8 +61,10 @@ DEAP_transform = [
                 "Plet",
                 "Resp",
                 "Temp",
+                #"Oz", "Pz", "Fz", "Cz" # remove Oz, Pz, Fz, Cz channels to replicate the TSception paper
             ]
         ),
+        eegain.transforms.Resample(sampling_r=128)
     ]
 
 AMIGOS_transform = [
@@ -75,33 +80,69 @@ AMIGOS_transform = [
 DREAMER_transform = [
         eegain.transforms.Filter(l_freq=0.3, h_freq=45),
         eegain.transforms.NotchFilter(freq=50),
-        eegain.transforms.Resample(s_rate=128),
+        eegain.transforms.Resample(sampling_r=128),
     ]
 
 SeedIV_transform = [
         # eegain.transforms.DropChannels(channels_to_drop_seed_iv),
         eegain.transforms.Filter(l_freq=0.3, h_freq=45),
         eegain.transforms.NotchFilter(freq=50),
-        eegain.transforms.Resample(s_rate=128),
+        eegain.transforms.Resample(sampling_r=128),
     ]
 
 Seed_transform =  [
         # eegain.transforms.DropChannels(channels_to_drop_seed),
         eegain.transforms.Filter(l_freq=0.3, h_freq=45),
         eegain.transforms.NotchFilter(freq=50),
-        eegain.transforms.Resample(s_rate=128),
+        eegain.transforms.Resample(sampling_r=128),
     ]
 
 def generate_options():
     def decorator(func):
-        # Replace the dataset config with the dataset specific config if your choosing
-        config_instances = [TransformConfig, SeedConfig, TrainingConfig, EEGNetConfig, TSceptionConfig, DeepConvNetConfig, ShallowConvNetConfig]
-        for config_instance in config_instances:
-            for field, value in asdict(config_instance()).items():
-                option = click.option(f"--{field}", default=value, required=False, type=type(value))
-                
-                func = option(func)
-        return func
+        # First add required common options (like data_config)
+        func = click.option("--data_config", default="MAHNOBConfig", required=False, type=str, 
+                           help="Dataset config class name (e.g., DEAPConfig)")(func)
+        
+        # Get all dataset config classes
+        dataset_configs = [DEAPConfig, MAHNOBConfig, AMIGOSConfig, DREAMERConfig, SeedIVConfig, SeedConfig]
+        
+        # Get all other config classes
+        other_configs = [TransformConfig, TrainingConfig, EEGNetConfig, TSceptionConfig, DeepConvNetConfig, ShallowConvNetConfig]
+        
+        # Generate CLI options for all config values from all configs
+        all_configs = other_configs + dataset_configs
+        
+        # Track all fields we've seen to handle duplicates
+        seen_fields = set()
+        
+        # Add options for all config fields (both dataset and non-dataset)
+        for config_class in all_configs:
+            config_instance = config_class()
+            for field, value in asdict(config_instance).items():
+                if field not in seen_fields:
+                    seen_fields.add(field)
+                    option = click.option(f"--{field}", default=value, required=False, type=type(value))
+                    func = option(func)
+        
+        @functools.wraps(func)
+        def wrapper(**kwargs):
+            # Get the specified dataset config
+            config_class_name = kwargs.get("data_config")
+            config_class = globals().get(config_class_name)
+            
+            if config_class is None:
+                raise ValueError(f"Config class {config_class_name} not found")
+            
+            # Apply defaults from the selected dataset config
+            config_instance = config_class()
+            for field, value in asdict(config_instance).items():
+                # Update all values from the specific config class, unless explicitly provided in CLI
+                if not click.get_current_context().get_parameter_source(field) == click.core.ParameterSource.COMMANDLINE:
+                    kwargs[field] = value
+            
+            return func(**kwargs)
+        
+        return wrapper
     return decorator
 
 @click.command()
@@ -110,31 +151,46 @@ def generate_options():
 # new options for logging predictions
 @click.option("--log_predictions", type=bool, help="log predictions to a directory")
 @click.option("--log_predictions_dir", type=str, help="directory to save logged predictions")
+@click.option("--train_val_split", type=float, default=0.8, help="ratio of training data to use for training (rest for validation)")
 @generate_options()
 
 def main(**kwargs):
     transform = globals().get(kwargs["data_name"] + "_transform")
+    # Update sampling_r in any Resample transform to match CLI parameter
+    for i, t in enumerate(transform):
+        if isinstance(t, eegain.transforms.Resample):
+            if int(t.sampling_r) != int(kwargs['sampling_r']):
+                print(f"[INFO] Updating sampling rate from {t.sampling_r} to {kwargs['sampling_r']}")
+            # Create a new Resample transform with updated sampling_r
+            transform[i] = eegain.transforms.Resample(sampling_r=kwargs["sampling_r"])
+            
     transform.append(eegain.transforms.Segment(duration=kwargs["window"], overlap=kwargs["overlap"]))
     transform = eegain.transforms.Construct(transform)
+
     dataset = globals()[kwargs['data_name']](transform=transform, root=kwargs["data_path"], **kwargs)
     
-    # Log predictions if the flag is set to True and create the directory if it does not exist
+    # [NEW] Log predictions if the flag is set to True and create the directory if it does not exist
     if kwargs["log_predictions"]:
         if not os.path.exists(kwargs["log_predictions_dir"]):
             os.makedirs(kwargs["log_predictions_dir"])
         print(f"[INFO] Logger: Logging predictions to directory: {kwargs['log_predictions_dir']}")
 
     # -------------- Model --------------
-    if kwargs["model_name"]=="RANDOM":
-        print("initializing random model")
-        print(Fore.RED +"[NOTE] The default Random Model always predicts the most occurring class in the training set, so it is not recommended to use it for F1-score calculations.")
-        print("For F1-score calculations, please use the other provided Random Model, that predicts a random class based on class distribution, in EEGain/eegain/models/random.py"+ Style.RESET_ALL)
-
+    if kwargs["model_name"]=="RANDOM_most_occurring":
+        print("initializing random model with most occurring class")
+        print(Fore.RED + "[NOTE] You have selected Random Model that always predicts the most occurring class in the training and validation sets, so it is not recommended to use it for F1-score calculations.")
+        print(Fore.RED + "For F1-score calculations, please use the Random Model that predicts a random class based on class distribution (RANDOM_class_distribution)"+ Style.RESET_ALL)
+        model = None
+        empty_model = None
+    elif kwargs["model_name"]=="RANDOM_class_distribution":
+        print("initializing random model with class distribution")
+        print(Fore.RED + "[NOTE] You have selected Random Model that predicts a random class based on class distribution in the training and validation sets, so it is not recommended to use it for Accuracy calculations.")
+        print(Fore.RED + "For Accuracy calculations, please use the Random Model that always predicts the most occurring class (RANDOM_most_occurring)"+ Style.RESET_ALL)
         model = None
         empty_model = None
     # -------------- Model --------------
     else:
-        model = globals()[kwargs['model_name']](input_size=[1, kwargs["channels"], kwargs["window"]*kwargs["s_rate"]], **kwargs)
+        model = globals()[kwargs['model_name']](input_size=[1, kwargs["channels"], kwargs["window"]*kwargs["sampling_r"]], **kwargs)
         empty_model = copy.deepcopy(model)
         
     if kwargs["split_type"] == "LOSO":

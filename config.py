@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 
 @dataclass
 class TransformConfig:
-    s_rate: int = 128
+    sampling_r: int = 128
     window: int = 4
     overlap: int = 0
 
@@ -13,7 +13,7 @@ class MAHNOBConfig:
     label_type: str = "V"
     split_type: str = "LOSO"
     class_names: list[str] = field(default_factory=lambda: ["low", "high"])
-    ground_truth_threshold: float = 4.5  # inclusive
+    ground_truth_threshold: float = 4.5   # inclusive
     n_classes: int = 2
 
 @dataclass
@@ -22,7 +22,7 @@ class DEAPConfig:
     label_type: str = "V"
     split_type: str = "LOSO"
     class_names: list[str] = field(default_factory=lambda: ["low", "high"])
-    ground_truth_threshold: float = 4.5  # inclusive
+    ground_truth_threshold: float = 4.5   # inclusive
     n_classes: int = 2
     
 @dataclass

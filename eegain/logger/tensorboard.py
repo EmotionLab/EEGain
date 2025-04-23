@@ -185,9 +185,9 @@ class EmotionLogger:
         for metric_name in metric_names:
             x = metrics_for_each_subject.keys()
             y = [metrics_for_each_subject[i][metric_name][-1] for i in x]
-
+            
             plt.bar(x, y)
-            plt.xlabel("Metric")
+            plt.xlabel("Subject ID")
             plt.ylabel(metric_name)
 
             self.writer.add_figure(f"For each subject/{metric_name}", plt.gcf())

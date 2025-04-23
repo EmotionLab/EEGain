@@ -34,8 +34,12 @@ class TSception(nn.Module):
         )
         logger.info(f"Using model: \n{self.__class__.__name__}(\n--{log_info})")
 
-        #self.inception_window = [0.25, 0.125, 0.0625] # for MAHNOB dataset
-        self.inception_window = [0.5, 0.25, 0.125] # for DEAP and other datasets
+        if kwargs["data_name"] == "MAHNOB":
+            self.inception_window = [0.25, 0.125, 0.0625] # for MAHNOB dataset
+            print("[INFO] Using MAHNOB dataset, setting inception_window to [0.25, 0.125, 0.0625]")
+        else:
+            self.inception_window = [0.5, 0.25, 0.125] # for DEAP and other datasets
+            
         self.pool = 8
         # by setting the convolutional kernel being (1, length) and the strides being 1 we can use conv 2d to
         # achieve the 1d convolution operation
