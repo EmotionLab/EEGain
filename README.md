@@ -97,99 +97,100 @@ You can add your custom model as well.
     <th>Description</th>
   </tr>
   <tr>
-    <td><code style="white-space: nowrap;">--data_path</code></td>
+    <td><pre>--data_path</pre></td>
     <td>Specifies the directory where the data files are saved. You can check exact path for each dataset below in "Key Arguments to Modify" section.</td>
   </tr>
   <tr>
-    <td><code style="white-space: nowrap;">--data_config</code></td>
+    <td><pre>--data_config</pre></td>
     <td>Specifies the dataset config that you want to load with the default arguements present in the <code>config.py</code> file.</td>
   </tr>
   <tr>
-    <td><code style="white-space: nowrap;">--log_dir</code></td>
+    <td><pre>--log_dir</pre></td>
     <td>Specifies the directory where the log files will be saved.</td>
   </tr>
   <tr>
-    <td><code style="white-space: nowrap;">--overal_log_file</code></td>
+    <td><pre>--overal_log_file</pre></td>
     <td>Specifies the name of the log file that will be created.</td>
   </tr>
   <tr>
-    <td><code style="white-space: nowrap;">--label_type</code></td>
+    <td><pre>--label_type</pre></td>
     <td>
       Specifies whether data is separated into classes based on valence or arousal. This argument has no effect on the Seed and Seed IV dataset because these datasets have fixed splits based on categorical labels. You can choose the following options:<br><br>
-      - V: Valence<br>
-      - A: Arousal
+      - <code>V</code>: Valence<br>
+      - <code>A</code>: Arousal
     </td>
   </tr>
   <tr>
-    <td><code style="white-space: nowrap;">--num_epochs</code></td>
+    <td><pre>--num_epochs</pre></td>
     <td>Sets the number of epochs for training.</td>
   </tr>
   <tr>
-    <td><code style="white-space: nowrap;">--batch_size</code></td>
+    <td><pre>--batch_size</pre></td>
     <td>Specifies the batch size for training.</td>
   </tr>
   <tr>
-    <td><code style="white-space: nowrap;">--lr</code></td>
+    <td><pre>--lr</pre></td>
     <td>Specifies the learning rate for training.</td>
   </tr>
   <tr>
-    <td><code style="white-space: nowrap;">--sampling_r</code></td>
+    <td><pre>--sampling_r</pre></td>
     <td>Specifies the sampling rate of the EEG data.</td>
   </tr>
   <tr>
-    <td><code style="white-space: nowrap;">--window</code></td>
+    <td><pre>--window</pre></td>
     <td>Specifies the length of the EEG segments (in seconds).</td>
   </tr>
   <tr>
-    <td><code style="white-space: nowrap;">--overlap</code></td>
+    <td><pre>--overlap</pre></td>
     <td>Specifies the overlap between the EEG segments (in seconds).</td>
   </tr>
   <tr>
-    <td><code style="white-space: nowrap;">--weight_decay</code></td>
+    <td><pre>--weight_decay</pre></td>
     <td>Specifies the weight decay ratio for regularization.</td>
   </tr>
   <tr>
-    <td><code style="white-space: nowrap;">--label_smoothing</code></td>
+    <td><pre>--label_smoothing</pre></td>
     <td>Smoothing factor applied to the labels to make them less extreme.</td>
   </tr>
   <tr>
-    <td><code style="white-space: nowrap;">--dropout_rate</code></td>
+    <td><pre>--dropout_rate</pre></td>
     <td>Probability at which outputs of the layer are dropped out.</td>
   </tr>
   <tr>
-    <td><code style="white-space: nowrap;">--num_classes</code></td>
+    <td><pre>--num_classes</pre></td>
     <td>Specifies the number of classes of the classification problem. Set this argument 2 for AMIGOS, MAHNOB, DEAP and DREAMER; 3 for SEED and 4 for SEED IV.</td>
   </tr>
   <tr>
-    <td><code style="white-space: nowrap;">--channels</code></td>
+    <td><pre>--channels</pre></td>
     <td>Specifies the number of channels for the dataset. Set this argument to 14 for AMIGOS and DREAMER, 32 for MAHNOB and DEAP, and to 62 for SEED and SEED IV.</td>
   </tr>
   <tr>
-    <td><code style="white-space: nowrap;">--split_type</code></td>
+    <td><pre>--split_type</pre></td>
     <td>
       Specifies the type of train-test splitting. There are three different types of splitting:<br><br>
-      - LOTO: Leave one trial out. Use this split for the person-dependent task.<br>
-      - LOSO: Leave one subject out. Use this split for the person-independent task.<br>
-      - LOSO_Fixed: Creates a fixed 75/25 train-test split that is mandatory for the person-independent task.
+      - <code>LOTO</code>: Leave one trial out. Use this split for the person-dependent task.<br>
+      - <code>LOSO</code>: Leave one subject out. Use this split for the person-independent task.<br>
+      - <code>LOSO_Fixed</code>: Creates a fixed 75/25 train-test split that is mandatory for the person-independent task.
     </td>
   </tr>
   <tr>
-    <td><code style="white-space: nowrap;">--train_val_split</code></td>
+    <td><pre>--train_val_split</pre></td>
     <td>Specifies the training and validation split for the data (default value = 0.8).</td>
   </tr>
   <tr>
-    <td><code style="white-space: nowrap;">--random_seed</code></td>
+    <td><pre>--random_seed</pre></td>
     <td>Sets the random seed value to ensure reproducibility (default value = 2025).</td>
   </tr>
   <tr>
-    <td><code style="white-space: nowrap;">--log_predictions</code></td>
-    <td>Specifies whether the user wants to log the predictions from the chosen model and dataset combination for the Test sets. Set this argument to True if you want to log the predicitions, otherwise leave it out or manually set to False.</td>
+    <td><pre>--log_predictions</pre></td>
+    <td>Specifies whether the user wants to log the predictions from the chosen model and dataset combination for the Test sets. Set this argument to <code>True</code> if you want to log the predicitions, otherwise leave it out or manually set to <code>False</code>.</td>
   </tr>
   <tr>
-    <td><code style="white-space: nowrap;">--log_predictions_dir</code></td>
+    <td><pre>--log_predictions_dir</pre></td>
     <td>Specifies the directory where the logged predicitions will be stored in CSV format.</td>
   </tr>
 </table>
+
 
 ### **4. Key Arguments to Modify**
 
