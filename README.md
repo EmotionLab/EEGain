@@ -26,9 +26,21 @@
 ### **1. Description**
 EEG-based emotion recognition has become increasingly popular direction in recent years. Although lots of researchers are working on this task, running experiments is still very difficult. The main challenges are related to datasets and models. Running experiments on new datasets means that the researcher would need to implement it with pytorch or tensorflow, get detailed information how dataset is recorded and saved, and much more. Running experiments on new models is also tricky where the researcher would need to implement it from scratch with pytorch or tensorflow. This process, on one hand, takes too much time and can cause lots of bugs and effort. On the other hand it is not helpful for the researcher for furthering their research. To solve this problem, to make the process easier and get more researchers in this field, we created **EEGain**. It is a novel framework for EEG-based emotion recognition to run experiments on different datasets and models easily, with one command. You can implement your custom models and datasets too. 
 
-Models that are implemented in EEGain for now - EEGNet, TSception, DeepConvNet and ShallowConvNet.
+Models that are implemented in EEGain for now :-
 
-Datasets that are implemented in EEGain for now - DEAP, MAHNOB, AMIGOS, DREAMER, Seed and SeedIV.
+- [EEGNet](https://arxiv.org/abs/1611.08024)
+- [TSception](https://ieeexplore.ieee.org/document/9762054)
+- [DeepConvNet](https://www.researchgate.net/publication/318965745_Deep_learning_with_convolutional_neural_networks_for_EEG_decoding_and_visualization_Convolutional_Neural_Networks_in_EEG_Analysis)
+- [ShallowConvNet](https://www.researchgate.net/publication/318965745_Deep_learning_with_convolutional_neural_networks_for_EEG_decoding_and_visualization_Convolutional_Neural_Networks_in_EEG_Analysis)
+
+Datasets that are implemented in EEGain for now :-
+
+- [DEAP](https://www.eecs.qmul.ac.uk/mmv/datasets/deap/)
+- [MAHNOB](https://mahnob-db.eu/)
+- [AMIGOS](https://www.eecs.qmul.ac.uk/mmv/datasets/amigos/)
+- [DREAMER](https://ieeexplore.ieee.org/document/7887697)
+- [Seed](https://bcmi.sjtu.edu.cn/home/seed/seed.html)
+- [Seed-IV](https://bcmi.sjtu.edu.cn/home/seed/seed-iv.html)
 
 Some other models and datasets are coming. 
 
