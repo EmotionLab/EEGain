@@ -28,19 +28,19 @@ EEG-based emotion recognition has become increasingly popular direction in recen
 
 Models that are implemented in EEGain for now :-
 
-- [EEGNet](https://arxiv.org/abs/1611.08024)
-- [TSception](https://ieeexplore.ieee.org/document/9762054)
-- [DeepConvNet](https://www.researchgate.net/publication/318965745_Deep_learning_with_convolutional_neural_networks_for_EEG_decoding_and_visualization_Convolutional_Neural_Networks_in_EEG_Analysis)
-- [ShallowConvNet](https://www.researchgate.net/publication/318965745_Deep_learning_with_convolutional_neural_networks_for_EEG_decoding_and_visualization_Convolutional_Neural_Networks_in_EEG_Analysis)
+- <a href="https://arxiv.org/abs/1611.08024" target="_blank">EEGNet</a>
+- <a href="https://ieeexplore.ieee.org/document/9762054" target="_blank">TSception</a>
+- <a href="https://www.researchgate.net/publication/318965745_Deep_learning_with_convolutional_neural_networks_for_EEG_decoding_and_visualization_Convolutional_Neural_Networks_in_EEG_Analysis" target="_blank">DeepConvNet</a>
+- <a href="https://www.researchgate.net/publication/318965745_Deep_learning_with_convolutional_neural_networks_for_EEG_decoding_and_visualization_Convolutional_Neural_Networks_in_EEG_Analysis" target="_blank">ShallowConvNet</a>
 
 Datasets that are implemented in EEGain for now :-
 
-- [DEAP](https://www.eecs.qmul.ac.uk/mmv/datasets/deap/)
-- [MAHNOB](https://mahnob-db.eu/)
-- [AMIGOS](https://www.eecs.qmul.ac.uk/mmv/datasets/amigos/)
-- [DREAMER](https://ieeexplore.ieee.org/document/7887697)
-- [Seed](https://bcmi.sjtu.edu.cn/home/seed/seed.html)
-- [Seed-IV](https://bcmi.sjtu.edu.cn/home/seed/seed-iv.html)
+- <a href="https://www.eecs.qmul.ac.uk/mmv/datasets/deap/" target="_blank">DEAP</a>
+- <a href="https://mahnob-db.eu/" target="_blank">MAHNOB</a>
+- <a href="https://www.eecs.qmul.ac.uk/mmv/datasets/amigos/" target="_blank">AMIGOS</a>
+- <a href="https://ieeexplore.ieee.org/document/7887697" target="_blank">DREAMER</a>
+- <a href="https://bcmi.sjtu.edu.cn/home/seed/seed.html" target="_blank">Seed</a>
+- <a href="https://bcmi.sjtu.edu.cn/home/seed/seed-iv.html" target="_blank">Seed-IV</a>
 
 Some other models and datasets are coming. 
 
