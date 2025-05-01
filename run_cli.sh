@@ -23,6 +23,7 @@ python run_cli.py \
 --label_smoothing=0.01 \
 --dropout_rate=0.5 \
 --train_val_split=0.8 \
+--random_seed=2025 \
 --log_dir="logs/" \
 --overal_log_file="log_file_name.txt" \
 --log_predictions=True \

@@ -17,9 +17,20 @@ from eegain.models import DeepConvNet, EEGNet, ShallowConvNet, TSception, Random
 from collections import defaultdict
 from sklearn.metrics import *
 
+import numpy as np
+
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-
+def setup_seed(seed):
+    """
+    Set random seeds for reproducibility across all libraries
+    """
+    torch.manual_seed(seed)
+    torch.backends.cudnn.deterministic = True
+    np.random.seed(seed)
+    # torch.backends.cudnn.benchmark = False  # if benchmark=True, deterministic will be False
+    # torch.backends.cudnn.enabled = False
+    
 def test_one_epoch(model, loader, loss_fn, val=False):
     model.eval()
     all_preds, all_actuals = [], []

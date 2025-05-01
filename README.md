@@ -58,6 +58,7 @@ Then you can run it with this command:
 --label_smoothing=0.01 \
 --dropout_rate=0.5 \
 --train_val_split=0.8 \
+--random_seed=2025 \
 --log_dir="logs/" \
 --overal_log_file="log_file_name.txt" \
 --log_predictions=True \
@@ -140,6 +141,8 @@ You can add your custom dataset as well.
 - LOSO_Fixed: Creates a fixed 75/25 train-test split that is mandatory for the person-independent task.
 
 ```--train_val_split``` - Specifies the training and validation split for the data (default value = 0.8).
+
+```--random_seed``` - Sets the random seed value to ensure reproducibility (default value = 2025).
 
 ```--log_predictions``` - Specifies whether the user wants to log the predictions from the chosen model and dataset combination for the Test sets. Set this argument to True if you want to log the predicitions, otherwise leave it out or manually set to False.
 

@@ -246,9 +246,6 @@ class EEGDataloader:
         else:
             label_np = label
     
-        # Set fixed random seed for reproducibility
-        np.random.seed(0)
-    
         # Get unique classes
         unique_classes = np.unique(label_np)
     

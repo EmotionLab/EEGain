@@ -483,8 +483,11 @@ class DEAP(EEGDataset):
         ]
 
         self._sfreq = 128
+        # self.info = mne.create_info(
+        #     self._ch_names, self._sfreq, ch_types="misc", verbose=None
+        # )
         self.info = mne.create_info(
-            self._ch_names, self._sfreq, ch_types="misc", verbose=None
+            self._ch_names, self._sfreq, ch_types="eeg", verbose=None
         )
 
         logger.info(f"Using Dataset: {self.__class__.__name__}")
@@ -804,7 +807,7 @@ class AMIGOS(EEGDataset):
 
         self._sfreq = 128
         self.info = mne.create_info(
-            self._ch_names, self._sfreq, ch_types="misc", verbose=None
+            self._ch_names, self._sfreq, ch_types="eeg", verbose=None
         )
 
         logger.info(f"Using Dataset: {self.__class__.__name__}")

@@ -17,7 +17,7 @@ from collections import defaultdict
 from dataclasses import asdict
 
 from sklearn.metrics import *
-from helpers import main_loso, main_loto, main_loso_fixed
+from helpers import main_loso, main_loto, main_loso_fixed, setup_seed
 from config import *
 from colorama import Fore, Style
 import functools
@@ -50,7 +50,7 @@ MAHNOB_transform = [
         ]
 
 DEAP_transform = [
-        #eegain.transforms.Crop(t_min=3, t_max=None), # crop the first 3 seconds to replicate the TSception paper
+        eegain.transforms.Crop(t_min=3, t_max=None),
         eegain.transforms.DropChannels(
             [
                 "EXG1",
@@ -64,6 +64,7 @@ DEAP_transform = [
                 #"Oz", "Pz", "Fz", "Cz" # remove Oz, Pz, Fz, Cz channels to replicate the TSception paper
             ]
         ),
+        eegain.transforms.NotchFilter(freq=50),
         eegain.transforms.Resample(sampling_r=128)
     ]
 
@@ -75,6 +76,7 @@ AMIGOS_transform = [
             "GSR"
             ]
         ),
+        eegain.transforms.NotchFilter(freq=50),
     ]
 
 DREAMER_transform = [
@@ -146,15 +148,19 @@ def generate_options():
     return decorator
 
 @click.command()
-@click.option("--model_name", required=True, type=str, help="name of the config")
-@click.option("--data_name", required=True, type=str, help="name of the config")
+@click.option("--model_name", required=True, type=str, help="name of the model")
+@click.option("--data_name", required=True, type=str, help="name of the dataset")
 # new options for logging predictions
 @click.option("--log_predictions", type=bool, help="log predictions to a directory")
 @click.option("--log_predictions_dir", type=str, help="directory to save logged predictions")
 @click.option("--train_val_split", type=float, default=0.8, help="ratio of training data to use for training (rest for validation)")
+@click.option("--random_seed", type=int, default=2025, help="random seed for reproducibility")
 @generate_options()
 
 def main(**kwargs):
+    setup_seed(kwargs["random_seed"])
+    print(f"[INFO] Using random seed: {kwargs['random_seed']}")
+    # -------------- Data --------------
     transform = globals().get(kwargs["data_name"] + "_transform")
     # Update sampling_r in any Resample transform to match CLI parameter
     for i, t in enumerate(transform):
@@ -175,7 +181,7 @@ def main(**kwargs):
             os.makedirs(kwargs["log_predictions_dir"])
         print(f"[INFO] Logger: Logging predictions to directory: {kwargs['log_predictions_dir']}")
 
-    # -------------- Model --------------
+    # -------------- RANDOM Model --------------
     if kwargs["model_name"]=="RANDOM_most_occurring":
         print("initializing random model with most occurring class")
         print(Fore.RED + "[NOTE] You have selected Random Model that always predicts the most occurring class in the training and validation sets, so it is not recommended to use it for F1-score calculations.")
