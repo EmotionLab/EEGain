@@ -91,62 +91,30 @@ You can adapt arguments within the sh file according to your specific intentions
 
 You can add your custom model as well.
 
-```--data_name``` - Chooses a custom name or a name of predefined datasets. The predefined datasets are:
-- DEAP
-- MAHNOB
-- AMIGOS
-- DREAMER
-- Seed
-- SeedIV
+| **Argument**               | **Description** |
+|---------------------------|-----------------|
+| `--data_path`             | Specifies the directory where the data files are saved. You can check the exact path for each dataset below in the "Key Arguments to Modify" section. |
+| `--data_config`           | Specifies the dataset config that you want to load with the default arguments present in the `config.py` file. |
+| `--log_dir`               | Specifies the directory where the log files will be saved. |
+| `--overal_log_file`       | Specifies the name of the log file that will be created. |
+| `--label_type`            | Specifies whether data is separated into classes based on valence or arousal. This has no effect on the Seed and Seed IV dataset. Options: `V` (Valence), `A` (Arousal). |
+| `--num_epochs`            | Sets the number of epochs for training. |
+| `--batch_size`            | Specifies the batch size for training. |
+| `--lr`                    | Specifies the learning rate for training. |
+| `--sampling_r`            | Specifies the sampling rate of the EEG data. |
+| `--window`                | Specifies the length of the EEG segments (in seconds). |
+| `--overlap`               | Specifies the overlap between the EEG segments (in seconds). |
+| `--weight_decay`          | Specifies the weight decay ratio for regularization. |
+| `--label_smoothing`       | Smoothing factor applied to the labels to make them less extreme. |
+| `--dropout_rate`          | Probability at which outputs of the layer are dropped out. |
+| `--num_classes`           | Specifies the number of classes. Use 2 for AMIGOS, MAHNOB, DEAP, DREAMER; 3 for SEED; 4 for SEED IV. |
+| `--channels`              | Specifies the number of EEG channels. Use 14 for AMIGOS and DREAMER, 32 for MAHNOB and DEAP, and 62 for SEED and SEED IV. |
+| `--split_type`            | Specifies the type of train-test splitting. Options: `LOTO` (Leave One Trial Out — for person-dependent tasks), `LOSO` (Leave One Subject Out — for person-independent tasks), and `LOSO_Fixed` (Fixed 75/25 train-test split, mandatory for person-independent tasks). |
+| `--train_val_split`       | Specifies the training and validation split (default = 0.8). |
+| `--random_seed`           | Sets the random seed value for reproducibility (default = 2025). |
+| `--log_predictions`       | Whether to log the predictions for test sets. Set to `True` to enable logging. |
+| `--log_predictions_dir`   | Specifies the directory where the logged predictions will be stored in CSV format. |
 
-You can add your custom dataset as well.
-
-```--data_path``` - Specifies the directory where the data files are saved. You can check exact path for each dataset below in "Key Arguments to Modify" section.
-
-```--data_config``` - Specifies the dataset config that you want to load with the default arguements present in the `config.py` file.
-
-```--log_dir``` - Specifies the directory where the log files will be saved.
-
-```--overal_log_file``` - Specifies the name of the log file that will be created.
-
-```--label_type``` - Specifies whether data is separated into classes based on valence or arousal. This argument has no effect on the Seed and Seed IV dataset because these datasets have fixed splits based on categorical labels. You can choose the following options:
-- V: Valence
-- A: Arousal
-
-```--num_epochs``` - Sets the number of epochs for training.
-
-```--batch_size``` - Specifies the batch size for training.
-
-```--lr``` - Specifies the learning rate for training.
-
-```--sampling_r``` - Specifies the sampling rate of the EEG data.
-
-```--window``` - Specifies the length of the EEG segments (in seconds).
-
-```--overlap``` - Specifies the overlap between the EEG segments (in seconds).
-
-```--weight_decay``` - Specifies the weight decay ratio for regularization.
-
-```--label_smoothing``` - Smoothing factor applied to the labels to make them less extreme.
-
-```--dropout_rate``` - Probability at which outputs of the layer are dropped out.
-
-```--num_classes``` - Specifies the number of classes of the classification problem. Set this argument 2 for AMIGOS, MAHNOB, DEAP and DREAMER; 3 for SEED and 4 for SEED IV.
-
-```--channels``` - Specifies the number of channels for the dataset. Set this argument to 14 for AMIGOS and DREAMER, 32 for MAHNOB and DEAP, and to 62 for SEED and SEED IV.
-
-```--split_type``` - Specifies the type of train-test splitting. There are three different types of splitting:
-- LOTO: Leave one trial out. Use this split for the person-dependent task.
-- LOSO: Leave one subject out. Use this split for the person-independent task.
-- LOSO_Fixed: Creates a fixed 75/25 train-test split that is mandatory for the person-independent task.
-
-```--train_val_split``` - Specifies the training and validation split for the data (default value = 0.8).
-
-```--random_seed``` - Sets the random seed value to ensure reproducibility (default value = 2025).
-
-```--log_predictions``` - Specifies whether the user wants to log the predictions from the chosen model and dataset combination for the Test sets. Set this argument to True if you want to log the predicitions, otherwise leave it out or manually set to False.
-
-```--log_predictions_dir``` - Specifies the directory where the logged predicitions will be stored in CSV format.
 
 
 ### **4. Key Arguments to Modify**
