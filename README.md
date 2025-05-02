@@ -258,24 +258,102 @@ You can adapt arguments within the sh file according to your specific intentions
 - Channels: 14 <br/>
 - Number of Classes: 2 <br/>
 
+**[Struture of the framework](https://miro.com/app/board/uXjVMEB2nB0=/?share_link_id=710707650624)**
 
-**[Struture of the framework](https://miro.com/app/board/uXjVMEB2nB0=/?share_link_id=710707650624)** 
+### **6. Leave-one-subject-out Evaluation Results**
+The following table shows the **pre-processing** done on each dataset:
 
-### **5. Processing Time for Different Datasets on Various Models**:
+| Dataset     | Cropping                   | Channels Dropped                                                                                      | Band-pass Filter | Notch Filter | Ground Truth |
+|-------------|-----------------------------|--------------------------------------------------------------------------------------------------------|------------------|--------------|---------------|
+| MAHNOB-HCI  | 30 secs pre and post-baseline | EXG1, EXG2, EXG3, EXG4, EXG5, EXG6, EXG7, EXG8, GSR1, GSR2, Erg1, Erg2, Resp, Temp, Status              | [0.3Hz, 45Hz]     | 50Hz         | ≤ 4.5         |
+| DEAP        | 3 secs pre-baseline         | EXG1, EXG2, EXG3, EXG4, GSR1, Plet, Resp, Temp                                                         | -                | 50Hz         | ≤ 4.5         |
+| AMIGOS      | -                           | ECG_Right, ECG_Left, GSR                                                                              | -                | 50Hz         | ≤ 4.5         |
+| DREAMER     | -                           | -                                                                                                     | [0.3Hz, 45Hz]     | 50Hz         | ≤ 3           |
+| SEED        | -                           | -                                                                                                     | [0.3Hz, 45Hz]     | 50Hz         | -             |
+| SEED IV     | -                           | -                                                                                                     | [0.3Hz, 45Hz]     | 50Hz         | -             |
 
-When running different models (such as **DeepConvNet**, **ShallowConvNet**, **EEGnet**, and **Tsception**) on a subject-dependent scenario, the time it takes to process the data can vary a little, but it primarily depends on the specific dataset being used.
 
-Our tests were conducted on Google Colab, utilizing a V100 GPU, with a batch size of 32 and a total of 30 epochs for each run. The following is an estimate of the time required to complete the entire pipeline, using a Leave-One-Trial-Out (LOTO) split, for each dataset:
+All datasets were resampled using a sampling rate of 128Hz. Segments of the signal are created using a window size of 4 with an overlap of 0. All experiments were run for 200 epochs, with a batch size of 32. The learning rate used was 0.001 with no weight decay. For the Cross-entropy loss function, a label smoothing of 0.01 was used as we found that it slightly increased Accuracies (≈1%) for some models. For training the different methods, the data was split by subject into 80% training and 20% validation sets. In each fold of the LOSO loop, we select the model with the best accuracy on the validation set for evaluation on the test subject. To ensure reproducibility, we ran all our experiments using the random seed value of 2025
 
-**DREAMER** Dataset: Approximately 2 to 3 hours.
+#### Mahnob Dataset
 
-**DEAP** Dataset: About 2.5 to 3.5 hours.
+| Task    | Model            | Accuracy        | F1              | F1 Weighted     |
+| ------- | ---------------- | --------------- | --------------- | --------------- |
+| Arousal | TSception        | **0.54 ± 0.11** | **0.49 ± 0.24** | 0.51 ± 0.12     |
+|         | EEGNet           | 0.52 ± 0.11     | 0.43 ± 0.21     | 0.49 ± 0.12     |
+|         | DeepConvNet      | **0.54 ± 0.13** | 0.44 ± 0.27     | 0.49 ± 0.16     |
+|         | ShallowConvNet   | 0.52 ± 0.11     | 0.44 ± 0.21     | 0.49 ± 0.12     |
+|         | Trivial Baseline | 0.34 ± 0.11     | 0.48 ± 0.11     | **0.52 ± 0.04** |
+| Valence | TSception        | 0.53 ± 0.07     | 0.52 ± 0.16     | 0.50 ± 0.08     |
+|         | EEGNet           | 0.56 ± 0.08     | **0.58 ± 0.15** | 0.53 ± 0.10     |
+|         | DeepConvNet      | 0.56 ± 0.08     | 0.56 ± 0.18     | 0.53 ± 0.11     |
+|         | ShallowConvNet   | **0.57 ± 0.08** | 0.57 ± 0.18     | **0.54 ± 0.10** |
+|         | Trivial Baseline | 0.55 ± 0.10     | 0.53 ± 0.06     | 0.50 ± 0.03     |
 
-**MAHNOB** Dataset: Roughly 2 to 3 hours.
+#### Deap Dataset
 
-**AMIGOS** Dataset: Around 5 to 6 hours.
+| Task    | Model            | Accuracy        | F1              | F1 Weighted     |
+| ------- | ---------------- | --------------- | --------------- | --------------- |
+| Arousal | TSception        | 0.54 ± 0.09     | 0.56 ± 0.20     | **0.53 ± 0.10** |
+|         | EEGNet           | 0.53 ± 0.13     | 0.53 ± 0.21     | 0.50 ± 0.13     |
+|         | DeepConvNet      | 0.57 ± 0.14     | 0.52 ± 0.31     | 0.49 ± 0.16     |
+|         | ShallowConvNet   | 0.56 ± 0.13     | 0.57 ± 0.26     | 0.49 ± 0.13     |
+|         | Trivial Baseline | **0.59 ± 0.15** | **0.58 ± 0.08** | **0.53 ± 0.04** |
+| Valence | TSception        | 0.51 ± 0.08     | 0.55 ± 0.16     | 0.47 ± 0.08     |
+|         | EEGNet           | 0.53 ± 0.10     | 0.56 ± 0.21     | 0.45 ± 0.12     |
+|         | DeepConvNet      | 0.51 ± 0.11     | 0.47 ± 0.28     | 0.41 ± 0.13     |
+|         | ShallowConvNet   | 0.53 ± 0.08     | **0.61 ± 0.18** | 0.45 ± 0.12     |
+|         | Trivial Baseline | **0.57 ± 0.09** | 0.56 ± 0.05     | **0.51 ± 0.03** |
 
-estimated time for LOSO_Fixed approach is approximately 20 minutes for each dataset independently 
+#### Amigos Dataset
+
+| Task    | Model            | Accuracy        | F1              | F1 Weighted     |
+| ------- | ---------------- | --------------- | --------------- | --------------- |
+| Arousal | TSception        | 0.58 ± 0.18     | 0.64 ± 0.24     | 0.57 ± 0.20     |
+|         | EEGNet           | 0.60 ± 0.23     | 0.69 ± 0.24     | 0.56 ± 0.25     |
+|         | DeepConvNet      | 0.56 ± 0.21     | 0.65 ± 0.24     | 0.55 ± 0.22     |
+|         | ShallowConvNet   | 0.59 ± 0.23     | **0.70 ± 0.23** | 0.55 ± 0.25     |
+|         | Trivial Baseline | **0.66 ± 0.26** | 0.62 ± 0.19     | **0.59 ± 0.11** |
+| Valence | TSception        | 0.53 ± 0.10     | 0.56 ± 0.18     | 0.51 ± 0.13     |
+|         | EEGNet           | 0.55 ± 0.11     | 0.59 ± 0.19     | 0.50 ± 0.14     |
+|         | DeepConvNet      | 0.55 ± 0.11     | 0.56 ± 0.18     | **0.52 ± 0.13** |
+|         | ShallowConvNet   | 0.55 ± 0.13     | **0.60 ± 0.20** | 0.51 ± 0.15     |
+|         | Trivial Baseline | **0.56 ± 0.14** | 0.55 ± 0.07     | 0.51 ± 0.05     |
+
+#### Dreamer Dataset
+
+| Task    | Model            | Accuracy        | F1              | F1 Weighted     |
+| ------- | ---------------- | --------------- | --------------- | --------------- |
+| Arousal | TSception        | 0.47 ± 0.07     | 0.43 ± 0.14     | 0.46 ± 0.08     |
+|         | EEGNet           | 0.46 ± 0.09     | **0.47 ± 0.19** | 0.42 ± 0.13     |
+|         | DeepConvNet      | 0.48 ± 0.11     | 0.41 ± 0.18     | 0.45 ± 0.12     |
+|         | ShallowConvNet   | 0.48 ± 0.08     | 0.41 ± 0.18     | 0.45 ± 0.10     |
+|         | Trivial Baseline | **0.52 ± 0.15** | 0.46 ± 0.07     | **0.51 ± 0.02** |
+| Valence | TSception        | **0.60 ± 0.06** | **0.42 ± 0.15** | **0.57 ± 0.07** |
+|         | EEGNet           | **0.60 ± 0.08** | 0.26 ± 0.20     | 0.53 ± 0.11     |
+|         | DeepConvNet      | **0.60 ± 0.09** | 0.38 ± 0.20     | 0.56 ± 0.10     |
+|         | ShallowConvNet   | **0.60 ± 0.08** | 0.35 ± 0.19     | 0.56 ± 0.10     |
+|         | Trivial Baseline | 0.59 ± 0.09     | 0.40 ± 0.04     | 0.51 ± 0.03     |
+
+#### SEED Dataset
+
+| Task        | Model            | Accuracy        | F1              | F1 Weighted     |
+| ----------- | ---------------- | --------------- | --------------- | --------------- |
+| Categorical | TSception        | 0.48 ± 0.07     | 0.46 ± 0.08     | 0.46 ± 0.08     |
+|             | EEGNet           | 0.46 ± 0.06     | 0.44 ± 0.06     | 0.44 ± 0.06     |
+|             | DeepConvNet      | **0.55 ± 0.08** | **0.52 ± 0.10** | **0.52 ± 0.10** |
+|             | ShallowConvNet   | 0.49 ± 0.06     | 0.47 ± 0.07     | 0.47 ± 0.07     |
+|             | Trivial Baseline | 0.34 ± 0.00     | 0.34 ± 0.02     | 0.34 ± 0.02     |
+
+#### SEED IV Dataset
+
+| Task        | Model            | Accuracy        | F1              | F1 Weighted     |
+| ----------- | ---------------- | --------------- | --------------- | --------------- |
+| Categorical | TSception        | 0.40 ± 0.08     | 0.33 ± 0.10     | 0.35 ± 0.10     |
+|             | EEGNet           | 0.32 ± 0.03     | 0.20 ± 0.06     | 0.22 ± 0.05     |
+|             | DeepConvNet      | **0.45 ± 0.09** | **0.42 ± 0.11** | **0.42 ± 0.11** |
+|             | ShallowConvNet   | 0.37 ± 0.06     | 0.32 ± 0.06     | 0.33 ± 0.07     |
+|             | Trivial Baseline | 0.31 ± 0.00     | 0.24 ± 0.03     | 0.24 ± 0.03     |
 
 ### **6. License**:
 This code repository is licensed under the [CC BY 4.0 License](LICENSE).
