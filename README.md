@@ -221,18 +221,6 @@ You can adapt arguments within the sh file according to your specific intentions
 
 ### **4. Key Arguments to Modify**
 
-**SeedIV Setup:**
-- Data Path: Ensure your directory structure follows "your_path_to/eeg_raw_data", containing three session folders. Each session folder must include .mat files. The "eeg_raw_data" folder should also contain "Channel Order.xlsx" and "ReadMe.txt" files.<br/>
-- Data Name: SeedIV<br/>
-- Channels: 62<br/>
-- Number of Classes: 4
-
-**Seed Setup:**
-- Data Path: Use the structure "your_path_to/Preprocessed_EEG", which should contain .mat files, a channel-order.xlsx file, and a label.mat file.<br/>
-- Data Name: Seed<br/>
-- Channels: 62<br/>
-- Number of Classes: 3
-
 **MAHNOB Setup**: <br/>
 - Data Path: Follow "your_path_to/mahnob-hci-raw/Sessions", with session-associated folders. Each session folder must have a .xml file for labels and a .bdf file.<br/>
 - Data Name: MAHNOB <br/>
@@ -246,21 +234,33 @@ You can adapt arguments within the sh file according to your specific intentions
 - Channels: 32 <br/>
 - Number of Classes: 2
 
+**AMIGOS Setup:** <br/>
+- Data Path: Organize your path as "your_path_to/AMIGOS/", which should lead to a Physiological recordings folder, then to a "Matlab Preprocessed Data" folder containing .mat files. <br/>
+- Data Name: AMIGOS <br/>
+- Channels: 14 <br/>
+- Number of Classes: 2 <br/>
+  
 **DREAMER Setup:** <br/>
 - Data Path: Ensure your file path is "your_path_to/DREAMER.mat". <br/>
 - Data Name: DREAMER <br/>
 - Channels: 14 <br/>
 - Number of Classes: 2
 
-**AMIGOS Setup:** <br/>
-- Data Path: Organize your path as "your_path_to/AMIGOS/", which should lead to a Physiological recordings folder, then to a "Matlab Preprocessed Data" folder containing .mat files. <br/>
-- Data Name: AMIGOS <br/>
-- Channels: 14 <br/>
-- Number of Classes: 2 <br/>
+**Seed Setup:**
+- Data Path: Use the structure "your_path_to/Preprocessed_EEG", which should contain .mat files, a channel-order.xlsx file, and a label.mat file.<br/>
+- Data Name: Seed<br/>
+- Channels: 62<br/>
+- Number of Classes: 3
+
+**SeedIV Setup:**
+- Data Path: Ensure your directory structure follows "your_path_to/eeg_raw_data", containing three session folders. Each session folder must include .mat files. The "eeg_raw_data" folder should also contain "Channel Order.xlsx" and "ReadMe.txt" files.<br/>
+- Data Name: SeedIV<br/>
+- Channels: 62<br/>
+- Number of Classes: 4
 
 **[Struture of the framework](https://miro.com/app/board/uXjVMEB2nB0=/?share_link_id=710707650624)**
 
-### **6. Leave-one-subject-out Evaluation Results**
+### **5. Leave-one-subject-out Evaluation Results**
 The following table shows the **pre-processing** done on each dataset:
 
 | Dataset     | Cropping                   | Channels Dropped                                                                                      | Band-pass Filter | Notch Filter | Ground Truth |
