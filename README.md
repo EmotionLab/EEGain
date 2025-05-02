@@ -109,6 +109,19 @@ You can add your custom model as well.
     <th>Description</th>
   </tr>
   <tr>
+    <td><pre>--data_name</pre></td>
+    <td>
+      Chooses a custom name or a name of predefined datasets. The predefined datasets are:<br><br>
+      - <code>DEAP</code><br>
+      - <code>MAHNOB</code><br>
+      - <code>AMIGOS</code><br>
+      - <code>DREAMER</code><br>
+      - <code>Seed</code><br>
+      - <code>SeedIV</code><br><br>
+      You can add your custom dataset as well.
+    </td>
+  </tr>
+  <tr>
     <td><pre>--data_path</pre></td>
     <td>Specifies the directory where the data files are saved. You can check exact path for each dataset below in "Key Arguments to Modify" section.</td>
   </tr>
@@ -260,7 +273,7 @@ Our tests were conducted on Google Colab, utilizing a V100 GPU, with a batch siz
 
 **AMIGOS** Dataset: Around 5 to 6 hours.
 
-estimated time for LOTO_Fixed approach is approximately 20 minutes for each dataset independently 
+estimated time for LOSO_Fixed approach is approximately 20 minutes for each dataset independently 
 
 ### **6. License**:
 This code repository is licensed under the [CC BY 4.0 License](LICENSE).
