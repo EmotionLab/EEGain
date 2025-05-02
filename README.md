@@ -273,7 +273,9 @@ The following table shows the **pre-processing** done on each dataset:
 | SEED IV     | -                           | -                                                                                                     | [0.3Hz, 45Hz]     | 50Hz         | -             |
 
 
-All datasets were resampled using a sampling rate of 128Hz. Segments of the signal are created using a window size of 4 with an overlap of 0. All experiments were run for 200 epochs, with a batch size of 32. The learning rate used was 0.001 with no weight decay. For the Cross-entropy loss function, a label smoothing of 0.01 was used as we found that it slightly increased Accuracies (≈1%) for some models. For training the different methods, the data was split by subject into 80% training and 20% validation sets. In each fold of the LOSO loop, we select the model with the best accuracy on the validation set for evaluation on the test subject. To ensure reproducibility, we ran all our experiments using the random seed value of 2025
+All datasets were resampled using a sampling rate of 128Hz. Segments of the signal are created using a window size of 4 with an overlap of 0. All experiments were run for 200 epochs, with a batch size of 32. The learning rate used was 0.001 with no weight decay. For the Cross-entropy loss function, a label smoothing of 0.01 was used as we found that it slightly increased Accuracies (≈1%) for some models. For training the different methods, the data was split by subject into 80% training and 20% validation sets. In each fold of the LOSO loop, we select the model with the best accuracy on the validation set for evaluation on the test subject. To ensure reproducibility, we ran all our experiments using the random seed value of 2025.
+
+(⭐= Best performance)
 
 #### Mahnob Dataset
 
