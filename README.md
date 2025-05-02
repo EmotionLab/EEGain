@@ -91,22 +91,24 @@ You can see results on tensorboard using the logs stored in `logs/` directory.
 
 You can adapt arguments within the sh file according to your specific intentions:
 
-```--model_name``` - Selects a model. The implemented predefined models are:
-- TSception
-- EEGNet
-- DeepconvNet
-- ShallowConvNet
-- RANDOM_most_occurring (for testing random baseline using most occuring class as the output)
-- RANDOM_class_distribution (for testing random baseline using class distribution based output)
-
-**NOTE:** The RANDOM_most_occurring model always predicts the most occurring class in the training set, so it is not recommended to use it for F1-score calculations. For F1-score calculations, please use the RANDOM_class_distribution model, that predicts a random class based on class distribution.
-
-You can add your custom model as well.
-
 <table>
   <tr>
     <th style="width: 200px;">Argument</th>
     <th>Description</th>
+  </tr>
+  <tr>
+    <td><pre>--model_name</pre></td>
+    <td>
+      Selects a model. The implemented predefined models are:<br><br>
+      - <code>TSception</code><br>
+      - <code>EEGNet</code><br>
+      - <code>DeepconvNet</code><br>
+      - <code>ShallowConvNet</code><br>
+      - <code>RANDOM_most_occurring</code> (for testing random baseline using most occuring class as the output)<br>
+      - <code>RANDOM_class_distribution</code> (for testing random baseline using class distribution based output)<br><br>
+      <b>NOTE</b>: The <code>RANDOM_most_occurring</code> model always predicts the most occurring class in the training set, so it is not recommended to use it for F1-score calculations. For F1-score calculations, please use the <code>RANDOM_class_distribution</code> model, that predicts a random class based on class distribution.<br>
+      You can add your custom model as well.
+    </td>
   </tr>
   <tr>
     <td><pre>--data_name</pre></td>
