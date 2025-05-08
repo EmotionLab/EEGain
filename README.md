@@ -357,8 +357,60 @@ All datasets were resampled using a sampling rate of 128Hz. Segments of the sign
 |             | ShallowConvNet   | 0.37 ± 0.06       | 0.32 ± 0.06       | 0.33 ± 0.07       |
 |             | Trivial Baseline | 0.31 ± 0.00       | 0.24 ± 0.03       | 0.24 ± 0.03       |
 
+### **6. Leave-one-trial-out Validation Results**
+These results showcase the LOTO experiments that were conducted to replicate the [TSception](https://ieeexplore.ieee.org/document/9762054) paper.
 
-### **6. License**:
+To run the LOTO experiments on DEAP with TSception model, please follow the instruction:-
+
+1. In ```helpers.py``` file, uncomment the four extra channels ("Oz", "Pz", "Fz", "Cz") in DEAPConfig that are dropped in the TSception paper.
+2. Comment out the notch filtering as well from DEAPConfig
+3. Use the following ```run_cli.sh``` file:
+   
+```
+#!/bin/bash
+python run_cli.py \
+--model_name=TSception \
+--data_name=DEAP \
+--data_path='/netscratch/agupta/DEAP/data_preprocessed_python' \
+--data_config=DEAPConfig \
+--split_type="LOTO" \
+--num_classes=2 \
+--ground_truth_threshold=5 \
+--sampling_r=128 \
+--window=4 \
+--overlap=0 \
+--label_type="A" \
+--num_epochs=500 \
+--batch_size=64 \
+--lr=0.001 \
+--weight_decay=0 \
+--label_smoothing=0 \
+--dropout_rate=0.5 \
+--channels=28 \
+--train_val_split=0.8 \
+--random_seed=2021 \
+--log_dir="logs/..." \
+--overal_log_file="DEAP_TSception_A_LOTO.txt" \
+--log_predictions=True \
+--log_predictions_dir="Logged_predictions/DEAP_TSception_A_LOTO" \
+```
+
+| **Method**                  | **Arousal ACC** | **Arousal F1** | **Valence ACC** | **Valence F1** |
+| --------------------------- | --------------- | -------------- | --------------- | -------------- |
+| **SVM**                     | 62.00%          | 58.30%         | 57.60%          | 56.30%         |
+| **UL**                      | 62.34%          | 60.44%         | 56.25%          | 61.25%         |
+| **CSP**                     | 58.26%          | --             | 57.59%          | --             |
+| **FBCSP**                   | 59.13%          | --             | 59.19%          | --             |
+| **FgMDM**                   | 60.04%          | --             | 58.87%          | --             |
+| **TSC**                     | 60.04%          | --             | 59.47%          | --             |
+| **FBFgMDM**                 | 60.30%          | --             | 61.01%          | --             |
+| **FBTSC**                   | 60.60%          | --             | 61.09%          | --             |
+| **TSception**               | 63.75%          | 63.35%         | 62.27%          | 65.37%         |
+| **TSception (ours)**        | 60.67%          | 61.40%         | 59.32%          | 62.49%         |
+| **Trivial Baseline (ours)** | 62.73%          | 55.82%         | 50.31%          | 53.81%         |
+
+
+### **7. License**:
 This code repository is licensed under the [CC BY 4.0 License](LICENSE).
 
-### **7. Citation**:
+### **8. Citation**:

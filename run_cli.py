@@ -64,7 +64,7 @@ DEAP_transform = [
                 #"Oz", "Pz", "Fz", "Cz" # remove Oz, Pz, Fz, Cz channels to replicate the TSception paper
             ]
         ),
-        eegain.transforms.NotchFilter(freq=50),
+        eegain.transforms.NotchFilter(freq=50), # comment this line to replicate the TSception paper
         eegain.transforms.Resample(sampling_r=128)
     ]
 
