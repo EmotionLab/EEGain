@@ -358,7 +358,7 @@ All datasets were resampled using a sampling rate of 128Hz. Segments of the sign
 |             | Trivial Baseline | 0.31 ± 0.00       | 0.24 ± 0.03       | 0.24 ± 0.03       |
 
 ### **6. Leave-one-trial-out Validation Results**
-These results showcase the LOTO experiments that were conducted to replicate the [TSception](https://ieeexplore.ieee.org/document/9762054) paper.
+These results showcase the LOTO experiments on DEAP dataset that were conducted to replicate the [TSception](https://ieeexplore.ieee.org/document/9762054) paper.
 
 To run the LOTO experiments on DEAP with TSception model, please follow the instruction:-
 
