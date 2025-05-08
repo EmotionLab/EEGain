@@ -32,6 +32,8 @@ Models that are implemented in EEGain for now :-
 - <a href="https://ieeexplore.ieee.org/document/9762054" target="_blank">TSception</a>
 - <a href="https://www.researchgate.net/publication/318965745_Deep_learning_with_convolutional_neural_networks_for_EEG_decoding_and_visualization_Convolutional_Neural_Networks_in_EEG_Analysis" target="_blank">DeepConvNet</a>
 - <a href="https://www.researchgate.net/publication/318965745_Deep_learning_with_convolutional_neural_networks_for_EEG_decoding_and_visualization_Convolutional_Neural_Networks_in_EEG_Analysis" target="_blank">ShallowConvNet</a>
+- RANDOM_most_occurring (for testing random baseline using most occuring class as the output)
+- RANDOM_class_distribution (for testing random baseline using class distribution based output)
 
 Datasets that are implemented in EEGain for now :-
 
@@ -363,7 +365,7 @@ These results showcase the LOTO experiments on DEAP dataset that were conducted 
 To run the LOTO experiments on DEAP with TSception model, please follow the instruction:-
 
 1. In ```helpers.py``` file, uncomment the four extra channels ("Oz", "Pz", "Fz", "Cz") in DEAPConfig that are dropped in the TSception paper.
-2. Comment out the notch filtering as well from DEAPConfig
+2. Comment out the notch filtering as well from DEAPConfig.
 3. Use the following ```run_cli.sh``` file:
    
 ```
@@ -409,6 +411,7 @@ python run_cli.py \
 | **TSception (ours)**        | 60.67%          | 61.40%         | 59.32%          | 62.49%         |
 | **Trivial Baseline (ours)** | 62.73%          | 55.82%         | 50.31%          | 53.81%         |
 
+**NOTE**: In the trivial baseline results, the ACCURACY values are calculated using ```RANDOM_most_occurring``` model and the F1 values are calculated using ```RANDOM_class_distribution``` model.
 
 ### **7. License**:
 This code repository is licensed under the [CC BY 4.0 License](LICENSE).
