@@ -371,7 +371,7 @@ To run the LOTO experiments on DEAP with TSception model, please follow the inst
 python run_cli.py \
 --model_name=TSception \
 --data_name=DEAP \
---data_path='/netscratch/agupta/DEAP/data_preprocessed_python' \
+--data_path='path_to_DEAP/data_preprocessed_python' \
 --data_config=DEAPConfig \
 --split_type="LOTO" \
 --num_classes=2 \
